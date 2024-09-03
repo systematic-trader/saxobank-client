@@ -3,14 +3,20 @@ import { Client } from '../types/records/client.ts'
 
 export class ClientResource {
   #client: HTTPClient
+  #meURL: URL
 
-  constructor(client: HTTPClient) {
+  constructor({
+    client,
+    prefixURL,
+  }: {
+    readonly client: HTTPClient
+    readonly prefixURL: string
+  }) {
     this.#client = client
+    this.#meURL = new URL('port/v1/clients/me', prefixURL)
   }
 
   async me(): Promise<Client> {
-    return await this.#client.getJSON('https://gateway.saxobank.com/sim/openapi/port/v1/clients/me', {
-      guard: Client,
-    })
+    return await this.#client.getJSON(this.#meURL, { guard: Client })
   }
 }
