@@ -2,9 +2,9 @@ import type { HTTPClient } from '../../http-client.ts'
 import { EntitlementDetails } from '../../types/records/entitlement-details.ts'
 import { UserResponse } from '../../types/records/user-response.ts'
 import { User } from '../../types/records/user.ts'
-import { fetchPaginated } from '../internal/fetch-paginated.ts'
 import type { ActiveUsersFilter } from '../../types/derives/active-users-filter.ts'
 import type { EntitlementFieldSet } from '../../types/derives/entitlement-field-set.ts'
+import { fetchResourceData } from '../fetch-resource-data.ts'
 
 export class UserResource {
   readonly #client: HTTPClient
@@ -69,7 +69,7 @@ export class UserResource {
       url.searchParams.set('IncludeSubUsers', String(includeSubUsers))
     }
 
-    return fetchPaginated({
+    return fetchResourceData({
       client: this.#client,
       url,
       guard: UserResponse,
@@ -98,7 +98,7 @@ export class UserResource {
 
     url.searchParams.set('EntitlementFieldSet', entitlementFieldSet)
 
-    return fetchPaginated({
+    return fetchResourceData({
       client: this.#client,
       url,
       guard: EntitlementDetails,
@@ -130,7 +130,7 @@ export class UserResource {
       url.searchParams.set('EntitlementFieldSet', entitlementFieldSet)
     }
 
-    return fetchPaginated({
+    return fetchResourceData({
       client: this.#client,
       url,
       guard: EntitlementDetails,
