@@ -1,6 +1,7 @@
 import type { HTTPClient } from '../../http-client.ts'
 import { fetchResourceData } from '../fetch-resource-data.ts'
 import { AccountResponse } from '../../types/records/account-response.ts'
+import { urlJoin } from '../utils.ts'
 
 export class AccountResource {
   readonly #client: HTTPClient
@@ -14,7 +15,7 @@ export class AccountResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/accounts/', prefixURL)
+    this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'accounts')
   }
 
   me({ inlineCount, skip, top }: {
@@ -22,7 +23,7 @@ export class AccountResource {
     readonly skip?: undefined | number
     readonly top?: undefined | number
   } = {}): Promise<ReadonlyArray<AccountResponse>> {
-    const url = new URL('me', this.#resourceURL)
+    const url = urlJoin(this.#resourceURL, 'me')
 
     if (inlineCount !== undefined) {
       url.searchParams.set('$inlinecount', inlineCount)

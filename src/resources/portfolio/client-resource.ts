@@ -1,5 +1,6 @@
 import type { HTTPClient } from '../../http-client.ts'
 import { Client } from '../../types/records/client.ts'
+import { urlJoin } from '../utils.ts'
 
 export class ClientResource {
   #client: HTTPClient
@@ -13,11 +14,11 @@ export class ClientResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/clients/', prefixURL)
+    this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'clients')
   }
 
   async me(): Promise<Client> {
-    const url = new URL('me', this.#resourceURL)
+    const url = urlJoin(this.#resourceURL, 'me')
     return await this.#client.getJSON(url, { guard: Client })
   }
 }

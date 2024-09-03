@@ -5,6 +5,7 @@ import { User } from '../../types/records/user.ts'
 import type { ActiveUsersFilter } from '../../types/derives/active-users-filter.ts'
 import type { EntitlementFieldSet } from '../../types/derives/entitlement-field-set.ts'
 import { fetchResourceData } from '../fetch-resource-data.ts'
+import { urlJoin } from '../utils.ts'
 
 export class UserResource {
   readonly #client: HTTPClient
@@ -18,7 +19,7 @@ export class UserResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/users/', prefixURL)
+    this.#resourceURL = urlJoin(prefixURL, 'port/v1/users')
   }
 
   /** Get all users under a particular owner. */
@@ -80,7 +81,7 @@ export class UserResource {
   user({ userKey }: {
     readonly userKey: string
   }): Promise<UserResponse> {
-    const url = new URL(userKey, this.#resourceURL)
+    const url = urlJoin(this.#resourceURL, userKey)
     return this.#client.getJSON(url, {
       guard: UserResponse,
     })
@@ -94,7 +95,7 @@ export class UserResource {
     /** Specifies which values to be returned in the Entitlements array. */
     readonly entitlementFieldSet: EntitlementFieldSet
   }): Promise<ReadonlyArray<EntitlementDetails>> {
-    const url = new URL(`${userKey}/entitlements`, this.#resourceURL)
+    const url = urlJoin(this.#resourceURL, userKey, 'entitlements')
 
     url.searchParams.set('EntitlementFieldSet', entitlementFieldSet)
 
@@ -107,7 +108,7 @@ export class UserResource {
 
   /** Get details about the logged in user. */
   me(): Promise<User> {
-    const url = new URL('me', this.#resourceURL)
+    const url = new URL(this.#resourceURL, 'me')
     return this.#client.getJSON(url, { guard: User })
   }
 
@@ -124,7 +125,7 @@ export class UserResource {
       readonly entitlementFieldSet?: undefined | EntitlementFieldSet
     } = {},
   ): Promise<ReadonlyArray<EntitlementDetails>> {
-    const url = new URL('me/entitlements', this.#resourceURL)
+    const url = urlJoin(this.#resourceURL, 'me', 'entitlements')
 
     if (entitlementFieldSet !== undefined) {
       url.searchParams.set('EntitlementFieldSet', entitlementFieldSet)
