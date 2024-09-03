@@ -1,6 +1,7 @@
 import type { HTTPClient } from '../../http-client.ts'
 import { urlJoin } from '../utils.ts'
 
+/** Read only end points serving orders. */
 export class OrderResource {
   readonly #client: HTTPClient
   readonly #resourceURL: URL
