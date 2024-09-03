@@ -4,7 +4,7 @@ import { Environment } from '../../environment.ts'
 import { HTTPClient } from '../../http-client.ts'
 import { ClientResource } from '../client-resource.ts'
 
-describe('ClientResource', () => {
+describe('ClientsResource', () => {
   const token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN']
   if (token === undefined) {
     throw new Error('No token provided')
@@ -20,7 +20,7 @@ describe('ClientResource', () => {
     prefixURL,
   })
 
-  test.only('me', async () => {
+  test('me', async () => {
     const me = await clientResource.me()
     expect(me).toBeDefined()
   })
