@@ -2,8 +2,8 @@ import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
 import { Environment } from '../../environment.ts'
 import { HTTPClient } from '../../http-client.ts'
-import { AccountGroupsResource } from '../account-group-resource.ts'
-import { ClientResource } from '../client-resource.ts'
+import { AccountGroupsResource } from '../portfolio/account-group-resource.ts'
+import { ClientResource } from '../portfolio/client-resource.ts'
 
 describe('AccountGroupsResource', () => {
   const token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN']

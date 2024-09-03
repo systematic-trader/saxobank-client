@@ -1,6 +1,6 @@
-import type { HTTPClient } from '../http-client.ts'
+import type { HTTPClient } from '../../http-client.ts'
 
-export class OrderResource {
+export class ExposureResource {
   readonly #client: HTTPClient
   readonly #resourceURL: URL
 
@@ -12,6 +12,6 @@ export class OrderResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/orders/', prefixURL)
+    this.#resourceURL = new URL('port/v1/exposure/', prefixURL)
   }
 }

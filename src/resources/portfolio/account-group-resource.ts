@@ -1,6 +1,6 @@
-import type { HTTPClient } from '../http-client.ts'
-import { AccountGroupResponse } from '../types/records/account-group-response.ts'
-import { fetchPaginated } from './internal/fetch-paginated.ts'
+import type { HTTPClient } from '../../http-client.ts'
+import { AccountGroupResponse } from '../../types/records/account-group-response.ts'
+import { fetchPaginated } from '../internal/fetch-paginated.ts'
 
 /** End points serving account groups. The set of account groups is restricted by the supplied query parameters as well as whether or not the identity represented by the authorization token has access to the groups. */
 export class AccountGroupsResource {
