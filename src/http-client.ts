@@ -1,7 +1,4 @@
-import {
-  assertReturn,
-  type Guard,
-} from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
 export class HTTPError extends Error {
   readonly statusCode: number
@@ -77,7 +74,7 @@ export class HTTPClient {
       headers: argumentHeaders,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<Response> {
     const headers = mergeHeaders(this.#headers, argumentHeaders)
 
@@ -92,7 +89,7 @@ export class HTTPClient {
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<T> {
     const response = await this.#get(url, { headers })
 
@@ -111,7 +108,7 @@ export class HTTPClient {
       headers,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<Blob> {
     return await this.#get(url, { headers }).then((response) => response.blob())
   }
@@ -122,7 +119,7 @@ export class HTTPClient {
       headers,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<string> {
     return await this.#get(url, { headers }).then((response) => response.text())
   }
@@ -135,7 +132,7 @@ export class HTTPClient {
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
-    }
+    },
   ): Promise<Response> {
     const headers = mergeHeaders(this.#headers, argumentHeaders)
 
@@ -154,7 +151,7 @@ export class HTTPClient {
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
-    }
+    },
   ): Promise<Response> {
     const headers = mergeHeaders(this.#headers, argumentHeaders)
 
@@ -171,7 +168,7 @@ export class HTTPClient {
       headers: argumentHeaders,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<Response> {
     const headers = mergeHeaders(this.#headers, argumentHeaders)
 
@@ -181,7 +178,7 @@ export class HTTPClient {
 
 function mergeHeaders(
   first: Headers,
-  second: undefined | HTTPClientHeaders
+  second: undefined | HTTPClientHeaders,
 ): Headers {
   const headers = new Headers(first)
 
@@ -214,7 +211,7 @@ async function rateLimitFetch(
     readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
     readonly headers?: undefined | Headers
     readonly body?: RequestInit['body']
-  }
+  },
 ): Promise<Response> {
   while (true) {
     const response = await fetch(url, options)
@@ -226,7 +223,7 @@ async function rateLimitFetch(
         throw new HTTPClientError(
           response.status,
           response.statusText,
-          await response.text()
+          await response.text(),
         )
       }
 
@@ -261,9 +258,9 @@ async function rateLimitFetch(
 
     if (response.ok === false) {
       const body = response.headers
-        .get('Content-Type')
-        ?.toLocaleLowerCase()
-        .includes('application/json')
+          .get('Content-Type')
+          ?.toLocaleLowerCase()
+          .includes('application/json')
         ? await response.json()
         : await response.text()
 
@@ -279,7 +276,7 @@ async function rateLimitFetch(
 }
 
 function getRateLimit(
-  headers: Headers
+  headers: Headers,
 ): undefined | { name: string; sleep: number } {
   for (const [key, value] of headers.entries()) {
     const regex = /x-ratelimit-(.*?)-reset/
