@@ -1,6 +1,6 @@
 import { Environment } from './environment.ts'
 import { HTTPClient } from './http-client.ts'
-import { AccountGroupsResource } from './resources/portfolio/account-group-resource.ts'
+import { AccountGroupResource } from './resources/portfolio/account-group-resource.ts'
 import { AccountResource } from './resources/portfolio/account-resource.ts'
 import { BalanceResource } from './resources/portfolio/balance-resource.ts'
 import { ClientResource } from './resources/portfolio/client-resource.ts'
@@ -14,7 +14,7 @@ export class SaxoBankClient {
   readonly #client: HTTPClient
 
   readonly portfolio: {
-    readonly accountGroups: AccountGroupsResource
+    readonly accountGroups: AccountGroupResource
     readonly account: AccountResource
     readonly balance: BalanceResource
     readonly client: ClientResource
@@ -44,7 +44,7 @@ export class SaxoBankClient {
     this.#client = HTTPClient.withBearerToken(token)
 
     this.portfolio = {
-      accountGroups: new AccountGroupsResource({ client: this.#client, prefixURL }),
+      accountGroups: new AccountGroupResource({ client: this.#client, prefixURL }),
       account: new AccountResource({ client: this.#client, prefixURL }),
       balance: new BalanceResource({ client: this.#client, prefixURL }),
       client: new ClientResource({ client: this.#client, prefixURL }),

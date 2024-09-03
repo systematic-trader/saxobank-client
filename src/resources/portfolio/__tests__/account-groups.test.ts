@@ -1,9 +1,9 @@
 import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { Environment } from '../../environment.ts'
-import { HTTPClient } from '../../http-client.ts'
-import { AccountGroupsResource } from '../portfolio/account-group-resource.ts'
-import { ClientResource } from '../portfolio/client-resource.ts'
+import { Environment } from '../../../environment.ts'
+import { HTTPClient } from '../../../http-client.ts'
+import { AccountGroupResource } from '../../portfolio/account-group-resource.ts'
+import { ClientResource } from '../../portfolio/client-resource.ts'
 
 describe('AccountGroupsResource', () => {
   const token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN']
@@ -19,7 +19,7 @@ describe('AccountGroupsResource', () => {
   const httpClient = HTTPClient.withBearerToken(token)
 
   const clientsResource = new ClientResource({ client: httpClient, prefixURL })
-  const accountGroupsResource = new AccountGroupsResource({ client: httpClient, prefixURL })
+  const accountGroupsResource = new AccountGroupResource({ client: httpClient, prefixURL })
 
   test('accountGroups', async () => {
     const client = await clientsResource.me() // the only way we can get a known client key is to lookup the current client
