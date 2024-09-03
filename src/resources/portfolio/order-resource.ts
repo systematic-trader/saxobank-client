@@ -1,4 +1,5 @@
 import type { HTTPClient } from '../../http-client.ts'
+import { urlJoin } from '../utils.ts'
 
 export class OrderResource {
   readonly #client: HTTPClient
@@ -12,6 +13,6 @@ export class OrderResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/orders/', prefixURL)
+    this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'orders')
   }
 }

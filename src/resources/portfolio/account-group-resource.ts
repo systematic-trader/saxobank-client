@@ -1,6 +1,7 @@
 import type { HTTPClient } from '../../http-client.ts'
 import { AccountGroupResponse } from '../../types/records/account-group-response.ts'
 import { fetchResourceData } from '../fetch-resource-data.ts'
+import { urlJoin } from '../utils.ts'
 
 /** End points serving account groups. The set of account groups is restricted by the supplied query parameters as well as whether or not the identity represented by the authorization token has access to the groups. */
 export class AccountGroupResource {
@@ -15,7 +16,7 @@ export class AccountGroupResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/accountgroups/', prefixURL)
+    this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'accountgroups')
   }
 
   /** Get a list of all account groups used by the specified client */
@@ -77,7 +78,7 @@ export class AccountGroupResource {
     readonly skip?: undefined | number
     readonly top?: undefined | number
   } = {}): Promise<ReadonlyArray<AccountGroupResponse>> {
-    const url = new URL('me', this.#resourceURL)
+    const url = urlJoin(this.#resourceURL, 'me')
 
     if (inlineCount !== undefined) {
       url.searchParams.set('$inlinecount', inlineCount)
