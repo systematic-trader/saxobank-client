@@ -1,6 +1,6 @@
-import type { HTTPClient } from '../http-client.ts'
+import type { HTTPClient } from '../../http-client.ts'
 
-export class NetPositionResource {
+export class PositionResource {
   readonly #client: HTTPClient
   readonly #resourceURL: URL
 
@@ -12,6 +12,6 @@ export class NetPositionResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/netpositions/', prefixURL)
+    this.#resourceURL = new URL('port/v1/positions/', prefixURL)
   }
 }

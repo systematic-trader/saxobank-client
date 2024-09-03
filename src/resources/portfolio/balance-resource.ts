@@ -1,4 +1,4 @@
-import type { HTTPClient } from '../http-client.ts'
+import type { HTTPClient } from '../../http-client.ts'
 
 export class BalanceResource {
   readonly #client: HTTPClient

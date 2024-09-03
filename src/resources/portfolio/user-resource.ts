@@ -1,10 +1,10 @@
-import type { HTTPClient } from '../http-client.ts'
-import { EntitlementDetails } from '../types/records/entitlement-details.ts'
-import { UserResponse } from '../types/records/user-response.ts'
-import { User } from '../types/records/user.ts'
-import { fetchPaginated } from './internal/fetch-paginated.ts'
-import type { ActiveUsersFilter } from '../types/derives/active-users-filter.ts'
-import type { EntitlementFieldSet } from '../types/derives/entitlement-field-set.ts'
+import type { HTTPClient } from '../../http-client.ts'
+import { EntitlementDetails } from '../../types/records/entitlement-details.ts'
+import { UserResponse } from '../../types/records/user-response.ts'
+import { User } from '../../types/records/user.ts'
+import { fetchPaginated } from '../internal/fetch-paginated.ts'
+import type { ActiveUsersFilter } from '../../types/derives/active-users-filter.ts'
+import type { EntitlementFieldSet } from '../../types/derives/entitlement-field-set.ts'
 
 export class UserResource {
   readonly #client: HTTPClient
@@ -43,7 +43,7 @@ export class UserResource {
       readonly includeSubUsers?: undefined | boolean
     } = {},
   ): Promise<ReadonlyArray<UserResponse>> {
-    const url = new URL('https://gateway.saxobank.com/sim/openapi/port/v1/users')
+    const url = new URL(this.#resourceURL)
 
     if (inlineCount !== undefined) {
       url.searchParams.set('$inlinecount', inlineCount)

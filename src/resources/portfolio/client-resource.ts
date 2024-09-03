@@ -1,5 +1,5 @@
-import type { HTTPClient } from '../http-client.ts'
-import { Client } from '../types/records/client.ts'
+import type { HTTPClient } from '../../http-client.ts'
+import { Client } from '../../types/records/client.ts'
 
 export class ClientResource {
   #client: HTTPClient

@@ -1,6 +1,6 @@
-import type { HTTPClient } from '../http-client.ts'
+import type { HTTPClient } from '../../http-client.ts'
 
-export class ClosedPositionResource {
+export class AccountResource {
   readonly #client: HTTPClient
   readonly #resourceURL: URL
 
@@ -12,6 +12,6 @@ export class ClosedPositionResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#resourceURL = new URL('port/v1/closedpositions/', prefixURL)
+    this.#resourceURL = new URL('port/v1/accounts/', prefixURL)
   }
 }
