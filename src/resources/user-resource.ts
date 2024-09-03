@@ -7,8 +7,8 @@ import type { ActiveUsersFilter } from '../types/derives/active-users-filter.ts'
 import type { EntitlementFieldSet } from '../types/derives/entitlement-field-set.ts'
 
 export class UserResource {
-  #client: HTTPClient
-  #meURL: URL
+  readonly #client: HTTPClient
+  readonly #resourceURL: URL
 
   constructor({
     client,
@@ -18,14 +18,14 @@ export class UserResource {
     readonly prefixURL: string
   }) {
     this.#client = client
-    this.#meURL = new URL('port/v1/clients/me', prefixURL)
+    this.#resourceURL = new URL('port/v1/users/', prefixURL)
   }
 
   /** Get all users under a particular owner. */
   users(
-    params?: undefined | {
+    { inlineCount, skip, top, activeUsersFilter, clientKey, includeSubUsers }: undefined | {
       /** Specifies that the response to the request should include a count of the number of entries in the collection */
-      readonly inlineCount?: undefined | boolean
+      readonly inlineCount?: undefined | 'AllPages'
 
       /** The number of entries to skip from the beginning of the collection */
       readonly skip?: undefined | number
@@ -41,32 +41,32 @@ export class UserResource {
 
       /** Set to true if users of all underlying partners should be included in output. */
       readonly includeSubUsers?: undefined | boolean
-    },
+    } = {},
   ): Promise<ReadonlyArray<UserResponse>> {
     const url = new URL('https://gateway.saxobank.com/sim/openapi/port/v1/users')
 
-    if (params?.inlineCount !== undefined) {
-      url.searchParams.set('$inlinecount', String(params.inlineCount))
+    if (inlineCount !== undefined) {
+      url.searchParams.set('$inlinecount', inlineCount)
     }
 
-    if (params?.skip !== undefined) {
-      url.searchParams.set('$skip', String(params.skip))
+    if (skip !== undefined) {
+      url.searchParams.set('$skip', skip.toString())
     }
 
-    if (params?.top !== undefined) {
-      url.searchParams.set('$top', String(params.top))
+    if (top !== undefined) {
+      url.searchParams.set('$top', top.toString())
     }
 
-    if (params?.activeUsersFilter !== undefined) {
-      url.searchParams.set('ActiveUsersFilter', params.activeUsersFilter)
+    if (activeUsersFilter !== undefined) {
+      url.searchParams.set('ActiveUsersFilter', activeUsersFilter)
     }
 
-    if (params?.clientKey !== undefined) {
-      url.searchParams.set('ClientKey', params.clientKey)
+    if (clientKey !== undefined) {
+      url.searchParams.set('ClientKey', clientKey)
     }
 
-    if (params?.includeSubUsers !== undefined) {
-      url.searchParams.set('IncludeSubUsers', String(params.includeSubUsers))
+    if (includeSubUsers !== undefined) {
+      url.searchParams.set('IncludeSubUsers', String(includeSubUsers))
     }
 
     return fetchPaginated({
@@ -80,8 +80,7 @@ export class UserResource {
   user({ userKey }: {
     readonly userKey: string
   }): Promise<UserResponse> {
-    const url = new URL(`https://gateway.saxobank.com/sim/openapi/port/v1/users/${userKey}`)
-
+    const url = new URL(userKey, this.#resourceURL)
     return this.#client.getJSON(url, {
       guard: UserResponse,
     })
@@ -95,7 +94,7 @@ export class UserResource {
     /** Specifies which values to be returned in the Entitlements array. */
     readonly entitlementFieldSet: EntitlementFieldSet
   }): Promise<ReadonlyArray<EntitlementDetails>> {
-    const url = new URL(`https://gateway.saxobank.com/sim/openapi/port/v1/users/${userKey}/entitlements`)
+    const url = new URL(`${userKey}/entitlements`, this.#resourceURL)
 
     url.searchParams.set('EntitlementFieldSet', entitlementFieldSet)
 
@@ -107,8 +106,9 @@ export class UserResource {
   }
 
   /** Get details about the logged in user. */
-  async me(): Promise<User> {
-    return await this.#client.getJSON(this.#meURL, { guard: User })
+  me(): Promise<User> {
+    const url = new URL('me', this.#resourceURL)
+    return this.#client.getJSON(url, { guard: User })
   }
 
   /** Enables the user to update preferred language, culture and timezone. */
@@ -120,14 +120,14 @@ export class UserResource {
 
   /** This operation retrieves a list of all client specific entitlements per exchanges for market data. */
   entitlements(
-    params?: undefined | {
+    { entitlementFieldSet }: undefined | {
       readonly entitlementFieldSet?: undefined | EntitlementFieldSet
-    },
+    } = {},
   ): Promise<ReadonlyArray<EntitlementDetails>> {
-    const url = new URL('https://gateway.saxobank.com/sim/openapi/port/v1/users/me/entitlements')
+    const url = new URL('me/entitlements', this.#resourceURL)
 
-    if (params?.entitlementFieldSet !== undefined) {
-      url.searchParams.set('EntitlementFieldSet', params.entitlementFieldSet)
+    if (entitlementFieldSet !== undefined) {
+      url.searchParams.set('EntitlementFieldSet', entitlementFieldSet)
     }
 
     return fetchPaginated({
