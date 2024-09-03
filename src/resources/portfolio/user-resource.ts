@@ -7,6 +7,7 @@ import type { EntitlementFieldSet } from '../../types/derives/entitlement-field-
 import { fetchResourceData } from '../fetch-resource-data.ts'
 import { urlJoin } from '../utils.ts'
 
+/** End points serving user resources. */
 export class UserResource {
   readonly #client: HTTPClient
   readonly #resourceURL: URL

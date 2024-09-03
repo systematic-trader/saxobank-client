@@ -3,6 +3,7 @@ import { fetchResourceData } from '../fetch-resource-data.ts'
 import { AccountResponse } from '../../types/records/account-response.ts'
 import { urlJoin } from '../utils.ts'
 
+/** End points serving accounts. The set of accounts is restricted by the supplied query parameters as well as whether or not the identity represented by the authorization token has access to the account. */
 export class AccountResource {
   readonly #client: HTTPClient
   readonly #resourceURL: URL
