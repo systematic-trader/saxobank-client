@@ -18,8 +18,8 @@ export class ClientResource {
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'clients')
   }
 
-  async me(): Promise<Client> {
+  me(): Promise<Client> {
     const url = urlJoin(this.#resourceURL, 'me')
-    return await this.#client.getJSON(url, { guard: Client })
+    return this.#client.getJSON(url, { guard: Client })
   }
 }
