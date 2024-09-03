@@ -4,7 +4,7 @@ import { Environment } from '../../../environment.ts'
 import { HTTPClient } from '../../../http-client.ts'
 import { ClientResource } from '../../portfolio/client-resource.ts'
 
-describe('ClientsResource', () => {
+describe('ClientResource', () => {
   const token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN']
   if (token === undefined) {
     throw new Error('No token provided')

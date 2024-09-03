@@ -3,8 +3,8 @@ import { Client } from '../../types/records/client.ts'
 import { urlJoin } from '../utils.ts'
 
 export class ClientResource {
-  #client: HTTPClient
-  #resourceURL: URL
+  readonly #client: HTTPClient
+  readonly #resourceURL: URL
 
   constructor({
     client,
