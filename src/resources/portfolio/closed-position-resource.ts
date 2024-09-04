@@ -1,5 +1,8 @@
 import type { HTTPClient } from '../../http-client.ts'
+import { ClosedPositionResponse } from '../../types/records/closed-position-response.ts'
+import { fetchResourceData } from '../fetch-resource-data.ts'
 import { urlJoin } from '../utils.ts'
+import type { ClosedPositionFieldGroup } from '../../types/derives/closed-position-field-group.ts'
 
 /**
  * Read only end points serving closed positions and the underlying closed positions making up the net closed position. The set of closed positions is restricted by the supplied query parameters as well as whether or not the identity represented by the authorization token has access to the account on which the positions are posted.
@@ -22,5 +25,31 @@ export class ClosedPositionResource {
   }) {
     this.#client = client
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'closedpositions')
+  }
+
+  me({ skip, top, fieldGroups }: {
+    skip?: undefined | number
+    top?: undefined | number
+    fieldGroups: ReadonlyArray<ClosedPositionFieldGroup>
+  }): Promise<ReadonlyArray<ClosedPositionResponse>> {
+    const url = urlJoin(this.#resourceURL, 'me')
+
+    if (skip !== undefined) {
+      url.searchParams.set('$skip', skip.toString())
+    }
+
+    if (top !== undefined) {
+      url.searchParams.set('$top', top.toString())
+    }
+
+    if (fieldGroups.length > 0) {
+      url.searchParams.set('FieldGroups', fieldGroups.join(','))
+    }
+
+    return fetchResourceData({
+      client: this.#client,
+      url,
+      guard: ClosedPositionResponse,
+    })
   }
 }

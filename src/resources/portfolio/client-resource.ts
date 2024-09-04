@@ -20,6 +20,8 @@ export class ClientResource {
 
   me(): Promise<Client> {
     const url = urlJoin(this.#resourceURL, 'me')
-    return this.#client.getJSON(url, { guard: Client })
+    return this.#client.getJSON(url, {
+      guard: Client,
+    })
   }
 }

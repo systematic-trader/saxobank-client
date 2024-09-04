@@ -109,7 +109,7 @@ export class UserResource {
 
   /** Get details about the logged in user. */
   me(): Promise<User> {
-    const url = new URL(this.#resourceURL, 'me')
+    const url = urlJoin(this.#resourceURL, 'me')
     return this.#client.getJSON(url, { guard: User })
   }
 

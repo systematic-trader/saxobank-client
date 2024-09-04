@@ -21,7 +21,6 @@ describe('AccountResource', () => {
 
   test('me', async () => {
     const me = await accountResource.me()
-
     expect(me).toBeDefined()
   })
 })
