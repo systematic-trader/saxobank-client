@@ -126,6 +126,9 @@ export const AccountResponse = props({
 
   /** Enable/disable the use of cash positions for margin trading collateral. */
   UseCashPositionsAsMarginCollateral: boolean(),
+
+  /** Not documented */
+  ExternalReference: optional(string()),
 })
 
 export interface AccountResponse extends GuardType<typeof AccountResponse> {}

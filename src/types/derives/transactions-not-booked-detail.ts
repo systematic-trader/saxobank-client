@@ -1,6 +1,7 @@
 import {
   type GuardType,
   number,
+  optional,
   props,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
@@ -8,56 +9,56 @@ export interface TransactionsNotBookedDetail extends GuardType<typeof Transactio
 
 export const TransactionsNotBookedDetail = props({
   /** Net accrual for the transaction(s) not booked yet */
-  Accrual: number(),
+  Accrual: optional(number()),
 
   /** Net additional transaction cost for the transaction(s) not booked yet */
-  AdditionalTransactionCost: number(),
+  AdditionalTransactionCost: optional(number()),
 
   /** Net bond value for the transaction(s) not booked yet */
-  BondValue: number(),
+  BondValue: optional(number()),
 
   /** Net cash deposit for the transaction(s) not booked yet */
-  CashDeposit: number(),
+  CashDeposit: optional(number()),
 
   /** Net cash reservation for the transaction(s) not booked yet */
-  CashReservation: number(),
+  CashReservation: optional(number()),
 
   /** Net cash withdrawal for the transaction(s) not booked yet */
-  CashWithdrawal: number(),
+  CashWithdrawal: optional(number()),
 
   /** Net value of certificates for the transaction(s) not booked yet */
-  CertificatesValue: number(),
+  CertificatesValue: optional(number()),
 
   /** Net commission for the transaction(s) not booked yet */
   Commission: number(),
 
   /** Net exchange fee for the transaction(s) not booked yet */
-  ExchangeFee: number(),
+  ExchangeFee: optional(number()),
 
   /** Net external charges for the transaction(s) not booked yet */
-  ExternalCharges: number(),
+  ExternalCharges: optional(number()),
 
   /** Net funds reserved by order for the transaction(s) not booked yet */
-  FundsReservedByOrder: number(),
+  FundsReservedByOrder: optional(number()),
 
   /** IPO subscription fee for the transaction(s) not booked yet */
-  IpoSubscriptionFee: number(),
+  IpoSubscriptionFee: optional(number()),
 
   /** Net value of leveraged knock-out products (Turbos) for the transaction(s) not booked yet. */
-  LeveragedKnockOutProductsValue: number(),
+  LeveragedKnockOutProductsValue: optional(number()),
 
   /** Net mutual fund value for the transaction(s) not booked yet */
-  MutualFundValue: number(),
+  MutualFundValue: optional(number()),
 
   /** Net option premium for the transaction(s) not booked yet */
-  OptionPremium: number(),
+  OptionPremium: optional(number()),
 
   /** Net share value for the transaction(s) not booked yet */
-  ShareValue: number(),
+  ShareValue: optional(number()),
 
   /** Net stamp duty for the transaction(s) not booked yet */
-  StampDuty: number(),
+  StampDuty: optional(number()),
 
   /** Net warrant premium for the transaction(s) not booked yet */
-  WarrantPremium: number(),
+  WarrantPremium: optional(number()),
 })

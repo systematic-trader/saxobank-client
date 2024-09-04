@@ -12,6 +12,7 @@ import {
 import { AssetType } from '../derives/asset-type.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { PositionNettingProfile } from '../derives/position-netting-profile.ts'
+import { ClientPositionNettingMode } from '../derives/client-position-netting-mode.ts'
 
 export interface Client extends GuardType<typeof Client> {}
 
@@ -37,7 +38,7 @@ export const Client = props({
   Name: string(),
   PartnerPlatformId: format('positive-integer'),
   PositionNettingMethod: enums(['FIFO']),
-  PositionNettingMode: enums(['EndOfDay']),
+  PositionNettingMode: ClientPositionNettingMode,
   PositionNettingProfile: PositionNettingProfile,
   ReduceExposureOnly: boolean(),
   SupportsAccountValueProtectionLimit: boolean(),
