@@ -143,6 +143,27 @@ export class HTTPClient {
     })
   }
 
+  async postJSON<T = unknown>(
+    url: string | URL,
+    {
+      guard,
+      headers,
+    }: {
+      readonly guard?: undefined | Guard<T>
+      readonly headers?: undefined | HTTPClientHeaders
+    } = {},
+  ): Promise<T> {
+    const response = await this.post(url, { headers })
+
+    const body = await response.json()
+
+    if (guard !== undefined) {
+      return assertReturn(guard, body)
+    }
+
+    return body
+  }
+
   async put(
     url: string | URL,
     {
