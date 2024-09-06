@@ -11,8 +11,7 @@ export class SaxoBankClient {
 
   constructor({
     token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN'],
-    prefixURL = Environment['SAXOBANK_API_PREFIX_URL'] ??
-      'https://gateway.saxobank.com/sim/openapi',
+    prefixURL = Environment['SAXOBANK_API_PREFIX_URL'] ?? 'https://gateway.saxobank.com/sim/openapi',
   }: {
     readonly token?: undefined | string
     readonly prefixURL?: undefined | string
