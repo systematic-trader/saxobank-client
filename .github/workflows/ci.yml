@@ -23,10 +23,10 @@ jobs:
           deno-version: v1.x
 
       - name: Check formatting
-        run: deno fmt --check --quiet
+        run: deno fmt --check
 
       - name: Lint
-        run: deno lint --quiet
+        run: deno lint
 
       - name: Typecheck
-        run: deno check src/**/*.ts --quiet
+        run: deno check src/**/*.ts
