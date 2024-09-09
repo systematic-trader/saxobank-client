@@ -27,10 +27,11 @@ export class ClosedPositionResource {
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'closedpositions')
   }
 
+  // todo refactor return type and guard to be based on which field groups are requested
   me({ skip, top, fieldGroups }: {
-    skip?: undefined | number
-    top?: undefined | number
-    fieldGroups: ReadonlyArray<ClosedPositionFieldGroup>
+    readonly skip?: undefined | number
+    readonly top?: undefined | number
+    readonly fieldGroups: ReadonlyArray<ClosedPositionFieldGroup>
   }): Promise<ReadonlyArray<ClosedPositionResponse>> {
     const url = urlJoin(this.#resourceURL, 'me')
 
