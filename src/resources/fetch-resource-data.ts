@@ -3,12 +3,15 @@ import {
   assertReturn,
   type Guard,
   integer,
+  literal,
   optional,
   props,
   string,
   unknown,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import type { HTTPClient } from '../http-client.ts'
+
+const EmptyResourceDataGuard = literal([])
 
 const ResourceDataGuard = props({
   Data: array(unknown()),
@@ -26,9 +29,13 @@ export async function fetchResourceData<T = unknown>({
   url: string | URL
   readonly guard?: undefined | Guard<T>
 }): Promise<ReadonlyArray<T>> {
-  const { __next, Data } = await client.getJSON(url, {
-    guard: ResourceDataGuard,
-  })
+  const resource = await client.getJSON(url)
+
+  if (EmptyResourceDataGuard.accept(resource)) {
+    return []
+  }
+
+  const { __next, Data } = assertReturn(ResourceDataGuard, resource)
 
   const assertedData = guard === undefined ? (Data as ReadonlyArray<T>) : Data.map((datum) => {
     return assertReturn(guard, datum)
