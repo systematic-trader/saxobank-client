@@ -1,5 +1,8 @@
 import type { HTTPClient } from '../../http-client.ts'
+import { fetchResourceData } from '../fetch-resource-data.ts'
 import { urlJoin } from '../utils.ts'
+import type { NetPositionFieldGroup } from '../../types/derives/net-position-field-group.ts'
+import { NetPositionResponse } from '../../types/records/net-position-response.ts'
 
 /**
  * Read only end points serving net positions and the positions making up the net position. The set of net positions is restricted by the supplied query parameters as well as whether or not the identity represented by the authorization token has access to the account on which the positions are posted.
@@ -22,5 +25,31 @@ export class NetPositionResource {
   }) {
     this.#client = client
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'netpositions')
+  }
+
+  /** Returns a list of net positions fulfilling the criteria specified by the query string parameters. Each net position may include all related sub positions if fieldGroups includes SubPositions. */
+  // todo refactor return type and guard, such that the given field groups are used to determine the return type
+  me({ skip, top, fieldGroups }: {
+    readonly skip?: undefined | number
+    readonly top?: undefined | number
+    readonly fieldGroups: readonly NetPositionFieldGroup[]
+  }): Promise<ReadonlyArray<NetPositionResponse>> {
+    const url = urlJoin(this.#resourceURL, 'me')
+
+    if (skip !== undefined) {
+      url.searchParams.set('$skip', skip.toString())
+    }
+
+    if (top !== undefined) {
+      url.searchParams.set('$top', top.toString())
+    }
+
+    url.searchParams.set('FieldGroups', fieldGroups.join(','))
+
+    return fetchResourceData({
+      client: this.#client,
+      url,
+      guard: NetPositionResponse,
+    })
   }
 }
