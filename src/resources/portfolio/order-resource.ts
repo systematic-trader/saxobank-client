@@ -21,6 +21,7 @@ export class OrderResource {
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'orders')
   }
 
+  // todo refactor return type and guard to be based on which field groups are requested
   me({ skip, top, fieldGroups, multiLegOrderId, status }: {
     readonly skip?: undefined | number
     readonly top?: undefined | number
@@ -38,7 +39,9 @@ export class OrderResource {
       url.searchParams.set('$top', top.toString())
     }
 
-    url.searchParams.set('FieldGroups', fieldGroups.join(','))
+    if (fieldGroups.length > 0) {
+      url.searchParams.set('FieldGroups', fieldGroups.join(','))
+    }
 
     if (multiLegOrderId !== undefined) {
       url.searchParams.set('MultiLegOrderId', multiLegOrderId)

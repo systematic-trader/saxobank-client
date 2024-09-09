@@ -43,7 +43,9 @@ export class PositionResource {
       url.searchParams.set('$top', top.toString())
     }
 
-    url.searchParams.set('FieldGroups', fieldGroups.join(','))
+    if (fieldGroups.length > 0) {
+      url.searchParams.set('FieldGroups', fieldGroups.join(','))
+    }
 
     return fetchResourceData({
       client: this.#client,

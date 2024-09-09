@@ -28,7 +28,7 @@ export class NetPositionResource {
   }
 
   /** Returns a list of net positions fulfilling the criteria specified by the query string parameters. Each net position may include all related sub positions if fieldGroups includes SubPositions. */
-  // todo refactor return type and guard, such that the given field groups are used to determine the return type
+  // todo refactor return type and guard to be based on which field groups are requested
   me({ skip, top, fieldGroups }: {
     readonly skip?: undefined | number
     readonly top?: undefined | number
@@ -44,7 +44,9 @@ export class NetPositionResource {
       url.searchParams.set('$top', top.toString())
     }
 
-    url.searchParams.set('FieldGroups', fieldGroups.join(','))
+    if (fieldGroups.length > 0) {
+      url.searchParams.set('FieldGroups', fieldGroups.join(','))
+    }
 
     return fetchResourceData({
       client: this.#client,
