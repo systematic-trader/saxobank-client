@@ -1,5 +1,8 @@
 import type { HTTPClient } from '../../http-client.ts'
+import { fetchResourceData } from '../fetch-resource-data.ts'
 import { urlJoin } from '../utils.ts'
+import type { PositionFieldGroup } from '../../types/derives/position-field-group.ts'
+import { PositionResponse } from '../../types/records/position-response.ts'
 
 /**
  * Read only end points serving individual positions. The set of positions is restricted by the supplied query parameters as well as whether or not the identity represented by the authorization token has access to the account on which the positions are posted.
@@ -22,5 +25,30 @@ export class PositionResource {
   }) {
     this.#client = client
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'positions')
+  }
+
+  // todo refactor return type and guard to be based on which field groups are requested
+  me({ skip, top, fieldGroups }: {
+    readonly skip?: undefined | number
+    readonly top?: undefined | number
+    readonly fieldGroups: readonly PositionFieldGroup[]
+  }): Promise<ReadonlyArray<PositionResponse>> {
+    const url = urlJoin(this.#resourceURL, 'me')
+
+    if (skip !== undefined) {
+      url.searchParams.set('$skip', skip.toString())
+    }
+
+    if (top !== undefined) {
+      url.searchParams.set('$top', top.toString())
+    }
+
+    url.searchParams.set('FieldGroups', fieldGroups.join(','))
+
+    return fetchResourceData({
+      client: this.#client,
+      url,
+      guard: PositionResponse,
+    })
   }
 }
