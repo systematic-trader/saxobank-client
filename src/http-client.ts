@@ -240,6 +240,9 @@ async function rateLimitFetch(
     if (response.status === 429) {
       const rateLimit = getRateLimit(response.headers)
 
+      console.log('response.status:', response.status)
+      console.log('response.headers:', response.headers)
+
       if (rateLimit === undefined) {
         throw new HTTPClientError(
           response.status,
