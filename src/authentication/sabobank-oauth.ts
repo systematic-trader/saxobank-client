@@ -46,7 +46,10 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
     readonly appSecret?: undefined | string
     readonly oauthURL?: undefined | string | URL
     readonly callbackPort?: undefined | string | number
-    readonly keepAlive?: undefined | boolean
+    readonly keepAlive?: undefined | boolean | {
+      readonly refreshDelayMs?: undefined | number
+      readonly retryDelayMs?: undefined | number
+    }
   } = {}): Promise<SaboBankOAuth> {
     if (appKey === undefined) {
       throw new Error('No app key provided')
@@ -81,10 +84,11 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
         // todo handle the possibility of the refresh token being expired, before we manage to refresh it
         if (accessTokenExpired === true && refreshTokenExpired === false) {
           await authentication.refresh()
+          await authentication.#sessionTokens.saveToDisk({ appKey })
         }
 
-        if (keepAlive === true) {
-          authentication.keepAlive()
+        if (keepAlive === true || typeof keepAlive === 'object') {
+          authentication.keepAlive(keepAlive === true ? {} : keepAlive)
         }
 
         return authentication
@@ -112,8 +116,8 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
       sessionTokens: freshSessionTokens,
     })
 
-    if (keepAlive === true) {
-      authentication.keepAlive()
+    if (keepAlive === true || typeof keepAlive === 'object') {
+      authentication.keepAlive(keepAlive === true ? {} : keepAlive)
     }
 
     return authentication
@@ -125,7 +129,7 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
    *
    * In most cases it should be possible to avoid re-authorization by using the keepAlive method.
    */
-  public async reauthorize(): Promise<void> {
+  public async reauthenticate(): Promise<void> {
     const code = await AuthorizationCode.fromBrowser({
       appKey: this.#appKey,
       oauthURL: this.#oauthURL,
@@ -144,7 +148,7 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
     const { accessTokenExpired, refreshTokenExpired } = this.#sessionTokens.expired
 
     if (refreshTokenExpired === true) {
-      throw new RefreshTokenExpiredError('You need to re-authorize')
+      throw new RefreshTokenExpiredError('You need to re-authenticate')
     }
 
     if (accessTokenExpired) {
@@ -162,7 +166,7 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
    */
   public async refresh(): Promise<void> {
     if (new Date() >= this.#sessionTokens.refreshTokenExpiresAt) {
-      throw new RefreshTokenExpiredError('You need to re-authorize')
+      throw new RefreshTokenExpiredError('You need to re-authenticate')
     }
 
     this.#sessionTokens = await SessionTokens.fromRefreshToken({
@@ -186,7 +190,7 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
    * Since existing tokens are still valid, even after refreshing, we can perform the refreshing more frequently.
    * If we refresh the tokens every 1 minutes, we effectively make the system robust enough to handle periods of up to ~59 minutes of downtime.
    *
-   * Remember that, if we fail to refresh using the refresh token, we need to re-authorize, which requires user interaction.
+   * Remember that, if we fail to refresh using the refresh token, we need to re-authenticate, which requires user interaction.
    *
    * @returns A function that can be called to stop the process of refreshing the access token
    */
@@ -202,7 +206,7 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
     const { accessTokenExpired, refreshTokenExpired } = this.#sessionTokens.expired
 
     if (refreshTokenExpired === true) {
-      throw new RefreshTokenExpiredError('You need to re-authorize')
+      throw new RefreshTokenExpiredError('You need to re-authenticate')
     }
 
     const stop = () => {
@@ -243,6 +247,7 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
     await this.#sessionTokens.saveToDisk({ appKey: this.#appKey })
 
     this.#keepAliveTimeout = setTimeout(async () => {
+      this.#keepAliveTimeout = undefined
       await this.keepAlive({
         refreshImmediately: true,
         refreshDelayMs,

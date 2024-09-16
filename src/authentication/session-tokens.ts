@@ -23,16 +23,16 @@ async function readSessionsFile(): Promise<SessionFileContent> {
   return assertReturn(SessionFileContent, JSON.parse(fileContentString))
 }
 
+function expirationFromJWT(jwt: string): number {
+  const [, payload] = decode<{ readonly exp: string }>(jwt)
+  return parseInt(payload.exp, 10)
+}
+
 export class SessionTokens {
   readonly accessToken: string
   readonly accessTokenExpiresAt: Date
   readonly refreshToken: string
   readonly refreshTokenExpiresAt: Date
-
-  static #expirationUnix(jwt: string): number {
-    const [, payload] = decode<{ readonly exp: string }>(jwt)
-    return 1000 * parseInt(payload.exp, 10) - 19 * 60 * 1000 // Unix timestamp (seconds)
-  }
 
   private constructor({ accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt }: {
     readonly accessToken: string
@@ -54,8 +54,8 @@ export class SessionTokens {
     const accessToken = tokensResponse.access_token
     const refreshToken = tokensResponse.refresh_token
 
-    const accessTokenExpirationUnix = SessionTokens.#expirationUnix(accessToken)
-    const refreshTokenExpirationDelta = tokensResponse.refresh_token_expires_in - tokensResponse.expires_in
+    const accessTokenExpirationUnix = expirationFromJWT(accessToken) * 1000
+    const refreshTokenExpirationDelta = (tokensResponse.refresh_token_expires_in - tokensResponse.expires_in) * 1000
     const refreshTokenExporationUnix = accessTokenExpirationUnix + refreshTokenExpirationDelta
 
     return new SessionTokens({
