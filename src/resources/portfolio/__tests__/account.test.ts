@@ -4,13 +4,13 @@ import { SaxoBankClient } from '../../../../mod.ts'
 import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 
 describe('AccountResource', () => {
-  const httpClient = new SaxoBankClient({
+  const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),
   })
 
   test('me', async () => {
-    const me = await httpClient.portfolio.account.me()
+    const me = await saxoBankClient.portfolio.account.me()
     expect(me).toBeDefined()
   })
 })

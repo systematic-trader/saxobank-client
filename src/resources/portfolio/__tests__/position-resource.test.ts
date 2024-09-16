@@ -4,13 +4,13 @@ import { SaxoBankClient } from '../../../../mod.ts'
 import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 
 describe('PositionResource', () => {
-  const httpClient = new SaxoBankClient({
+  const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),
   })
 
   test('me with no field group', async () => {
-    const me = await httpClient.portfolio.position.me({
+    const me = await saxoBankClient.portfolio.position.me({
       fieldGroups: [],
     })
 
@@ -18,7 +18,7 @@ describe('PositionResource', () => {
   })
 
   test('me with every field group', async () => {
-    const me = await httpClient.portfolio.position.me({
+    const me = await saxoBankClient.portfolio.position.me({
       fieldGroups: [
         'Costs',
         'DisplayAndFormat',

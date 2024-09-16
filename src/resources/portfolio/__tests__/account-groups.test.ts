@@ -4,14 +4,14 @@ import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-to
 import { SaxoBankClient } from '../../../saxobank-client.ts'
 
 describe('AccountGroupResource', () => {
-  const httpClient = new SaxoBankClient({
+  const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),
   })
 
   test('accountGroups', async () => {
-    const client = await httpClient.portfolio.client.me() // the only way we can get a known client key is to lookup the current client
-    const accountGroups = await httpClient.portfolio.accountGroups.accountGroups({ clientKey: client.ClientKey })
+    const client = await saxoBankClient.portfolio.client.me() // the only way we can get a known client key is to lookup the current client
+    const accountGroups = await saxoBankClient.portfolio.accountGroups.accountGroups({ clientKey: client.ClientKey })
 
     expect(accountGroups).toBeDefined()
   })
@@ -21,7 +21,7 @@ describe('AccountGroupResource', () => {
   })
 
   test('me', async () => {
-    const me = await httpClient.portfolio.accountGroups.me()
+    const me = await saxoBankClient.portfolio.accountGroups.me()
 
     expect(me).toBeDefined()
   })

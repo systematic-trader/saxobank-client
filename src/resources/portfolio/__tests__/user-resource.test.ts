@@ -4,40 +4,40 @@ import { SaxoBankClient } from '../../../../mod.ts'
 import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 
 describe('UserResource', () => {
-  const httpClient = new SaxoBankClient({
+  const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),
   })
 
   test('me', async () => {
-    const me = await httpClient.portfolio.user.me()
+    const me = await saxoBankClient.portfolio.user.me()
 
     expect(me).toBeDefined()
   })
 
   test('getAllEntitlements', async () => {
-    const entitlements = await httpClient.portfolio.user.entitlements()
+    const entitlements = await saxoBankClient.portfolio.user.entitlements()
 
     expect(entitlements).toBeDefined()
   })
 
   test('users', async () => {
-    const users = await httpClient.portfolio.user.users()
+    const users = await saxoBankClient.portfolio.user.users()
 
     expect(users).toBeDefined()
   })
 
   test('user', async () => {
-    const me = await httpClient.portfolio.user.me() // the only way we can get a known user key is to lookup the current user
-    const user = await httpClient.portfolio.user.user({ userKey: me.UserKey })
+    const me = await saxoBankClient.portfolio.user.me() // the only way we can get a known user key is to lookup the current user
+    const user = await saxoBankClient.portfolio.user.user({ userKey: me.UserKey })
 
     expect(user).toBeDefined()
     expect(user).toStrictEqual(me)
   })
 
   test('userEntitlements', async () => {
-    const me = await httpClient.portfolio.user.me() // the only way we can get a known user key is to lookup the current user
-    const entitlements = await httpClient.portfolio.user.userEntitlements({
+    const me = await saxoBankClient.portfolio.user.me() // the only way we can get a known user key is to lookup the current user
+    const entitlements = await saxoBankClient.portfolio.user.userEntitlements({
       userKey: me.UserKey,
       entitlementFieldSet: 'Default',
     })
