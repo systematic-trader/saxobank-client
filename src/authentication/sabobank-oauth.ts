@@ -40,11 +40,13 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
     appSecret = Environment['SAXOBANK_APP_SECRET'],
     oauthURL = Environment['SAXOBANK_OAUTH_URL'],
     callbackPort = Environment['SAXOBANK_OAUTH_CALLBACK_PORT'],
+    keepAlive = true,
   }: {
     readonly appKey?: undefined | string
     readonly appSecret?: undefined | string
     readonly oauthURL?: undefined | string | URL
     readonly callbackPort?: undefined | string | number
+    readonly keepAlive?: undefined | boolean
   } = {}): Promise<SaboBankOAuth> {
     if (appKey === undefined) {
       throw new Error('No app key provided')
@@ -81,6 +83,10 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
           await authentication.refresh()
         }
 
+        if (keepAlive === true) {
+          authentication.keepAlive()
+        }
+
         return authentication
       }
     }
@@ -98,13 +104,19 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
       oauthURL,
     })
 
-    return new SaboBankOAuth({
+    const authentication = new SaboBankOAuth({
       appKey,
       appSecret,
       oauthURL,
       callbackPort: port,
       sessionTokens: freshSessionTokens,
     })
+
+    if (keepAlive === true) {
+      authentication.keepAlive()
+    }
+
+    return authentication
   }
 
   /**
@@ -202,6 +214,10 @@ export class SaboBankOAuth implements SaxoBankAuthorization {
       this.#keepAliveTimeout = undefined
       Deno.refTimer(timer)
       clearTimeout(timer)
+    }
+
+    if (this.#keepAliveTimeout !== undefined) {
+      stop()
     }
 
     if (accessTokenExpired === true || refreshImmediately === true) {
