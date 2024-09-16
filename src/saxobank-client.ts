@@ -1,6 +1,7 @@
 import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
 import { Environment } from './environment.ts'
 import { HTTPClient } from './http-client.ts'
+import { ChartResource } from './resources/chart/chart-resource.ts'
 import { AccountGroupResource } from './resources/portfolio/account-group-resource.ts'
 import { AccountResource } from './resources/portfolio/account-resource.ts'
 import { BalanceResource } from './resources/portfolio/balance-resource.ts'
@@ -14,6 +15,8 @@ import { UserResource } from './resources/portfolio/user-resource.ts'
 
 export class SaxoBankClient {
   readonly #client: HTTPClient
+
+  readonly chart: ChartResource
 
   readonly portfolio: {
     readonly accountGroups: AccountGroupResource
@@ -40,6 +43,8 @@ export class SaxoBankClient {
     }
 
     this.#client = HTTPClient.withAuthorization(authorization)
+
+    this.chart = new ChartResource({ client: this.#client, prefixURL })
 
     this.portfolio = {
       accountGroups: new AccountGroupResource({ client: this.#client, prefixURL }),
