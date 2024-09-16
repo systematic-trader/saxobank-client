@@ -1,7 +1,6 @@
 import type { HTTPClient } from '../../http-client.ts'
 import { EntitlementDetails } from '../../types/records/entitlement-details.ts'
 import { UserResponse } from '../../types/records/user-response.ts'
-import { User } from '../../types/records/user.ts'
 import type { ActiveUsersFilter } from '../../types/derives/active-users-filter.ts'
 import type { EntitlementFieldSet } from '../../types/derives/entitlement-field-set.ts'
 import { fetchResourceData } from '../fetch-resource-data.ts'
@@ -108,9 +107,9 @@ export class UserResource {
   }
 
   /** Get details about the logged in user. */
-  me(): Promise<User> {
+  me(): Promise<UserResponse> {
     const url = urlJoin(this.#resourceURL, 'me')
-    return this.#client.getJSON(url, { guard: User })
+    return this.#client.getJSON(url, { guard: UserResponse })
   }
 
   /** Enables the user to update preferred language, culture and timezone. */
