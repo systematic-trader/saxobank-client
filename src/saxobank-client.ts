@@ -1,3 +1,4 @@
+import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
 import { Environment } from './environment.ts'
 import { HTTPClient } from './http-client.ts'
 import { AccountGroupResource } from './resources/portfolio/account-group-resource.ts'
@@ -8,6 +9,7 @@ import { ClosedPositionResource } from './resources/portfolio/closed-position-re
 import { ExposureResource } from './resources/portfolio/exposure-resource.ts'
 import { NetPositionResource } from './resources/portfolio/net-position-resource.ts'
 import { OrderResource } from './resources/portfolio/order-resource.ts'
+import { PositionResource } from './resources/portfolio/position-resource.ts'
 import { UserResource } from './resources/portfolio/user-resource.ts'
 
 export class SaxoBankClient {
@@ -22,26 +24,22 @@ export class SaxoBankClient {
     readonly exposure: ExposureResource
     readonly netPosition: NetPositionResource
     readonly order: OrderResource
-    readonly position: ClosedPositionResource
+    readonly position: PositionResource
     readonly user: UserResource
   }
 
   constructor({
-    token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN'],
+    authorization,
     prefixURL = Environment['SAXOBANK_API_PREFIX_URL'] ?? 'https://gateway.saxobank.com/sim/openapi',
   }: {
-    readonly token?: undefined | string
+    readonly authorization: SaxoBankAuthorization
     readonly prefixURL?: undefined | string
-  } = {}) {
-    if (token === undefined) {
-      throw new Error('No token provided')
-    }
-
+  }) {
     if (prefixURL === undefined) {
       throw new Error('No prefix URL provided')
     }
 
-    this.#client = HTTPClient.withBearerToken(token)
+    this.#client = HTTPClient.withAuthorization(authorization)
 
     this.portfolio = {
       accountGroups: new AccountGroupResource({ client: this.#client, prefixURL }),
@@ -52,7 +50,7 @@ export class SaxoBankClient {
       exposure: new ExposureResource({ client: this.#client, prefixURL }),
       netPosition: new NetPositionResource({ client: this.#client, prefixURL }),
       order: new OrderResource({ client: this.#client, prefixURL }),
-      position: new ClosedPositionResource({ client: this.#client, prefixURL }),
+      position: new PositionResource({ client: this.#client, prefixURL }),
       user: new UserResource({ client: this.#client, prefixURL }),
     }
   }
