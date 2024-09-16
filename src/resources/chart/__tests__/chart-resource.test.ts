@@ -1,24 +1,14 @@
 import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { Environment } from '../../../environment.ts'
-import { HTTPClient } from '../../../http-client.ts'
-import { ChartResource, type ChartsParameters } from '../chart-resource.ts'
+import type { ChartsParameters } from '../chart-resource.ts'
 import { extractEntries } from '../../utils.ts'
+import { SaxoBankClient } from '../../../../mod.ts'
+import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 
 describe('ChartResource', () => {
-  const token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN']
-  if (token === undefined) {
-    throw new Error('No token provided')
-  }
-
-  const prefixURL = Environment['SAXOBANK_API_PREFIX_URL']
-  if (prefixURL === undefined) {
-    throw new Error('No prefix URL provided')
-  }
-
-  const chartResource = new ChartResource({
-    client: HTTPClient.withBearerToken(token),
-    prefixURL,
+  const saxoBankClient = new SaxoBankClient({
+    prefixURL: 'https://gateway.saxobank.com/sim/openapi',
+    authorization: new SaxoBank24HourToken(),
   })
 
   test('Getting chart data for asset type', async ({ step }) => {
@@ -126,7 +116,7 @@ describe('ChartResource', () => {
       await step(assetType, async ({ step: substep }) => {
         for (const [label, { uic }] of extractEntries(subcases)) {
           await substep(label, async () => {
-            const chart = await chartResource.charts({
+            const chart = await saxoBankClient.chart.charts({
               assetType,
               uic,
               horizon: 60,
@@ -141,7 +131,7 @@ describe('ChartResource', () => {
   })
 
   test('Getting bid/ask ohlc chart data for fx spot', async () => {
-    const chart = await chartResource.charts({
+    const chart = await saxoBankClient.chart.charts({
       assetType: 'FxSpot',
       uic: 8176, // Gold/US Dollar
       horizon: 60,
@@ -160,7 +150,7 @@ describe('ChartResource', () => {
   })
 
   test('Getting ohlc chart data for stock', async () => {
-    const chart = await chartResource.charts({
+    const chart = await saxoBankClient.chart.charts({
       assetType: 'Stock',
       uic: 211, // Apple Inc.
       horizon: 60,
