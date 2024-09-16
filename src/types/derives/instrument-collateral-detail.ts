@@ -1,7 +1,9 @@
 import {
+  array,
   type GuardType,
   integer,
   number,
+  optional,
   props,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
@@ -36,4 +38,7 @@ export const InstrumentCollateralDetail = props({
 
   /**	Uic of the instrument */
   'Uic': integer(),
+
+  /** Not documented */
+  ContributingAssetTypes: optional(array(AssetType)),
 })
