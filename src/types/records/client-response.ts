@@ -100,7 +100,7 @@ export const ClientResponse = props({
   MarginMonitoringMode: optional(MarginMonitoringMode),
 
   /** Indicates the currency used when placing MutualFunds orders with OrderAmountType.CashAmount. */
-  MutualFundsCashAmountOrderCurrency: MutualFundsCashAmountOrderCurrency,
+  MutualFundsCashAmountOrderCurrency: optional(MutualFundsCashAmountOrderCurrency),
 
   /** The name of the client. */
   Name: string(),
@@ -118,7 +118,7 @@ export const ClientResponse = props({
   ReduceExposureOnly: boolean(),
 
   /** Indicates if the client is enabled for security lending. */
-  SecurityLendingEnabled: SecurityLendingEnabled,
+  SecurityLendingEnabled: optional(SecurityLendingEnabled),
 
   /**
    * If true, an AccountValueProtectionLimit may be set on the client level.

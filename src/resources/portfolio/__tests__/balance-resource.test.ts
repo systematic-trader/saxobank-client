@@ -9,8 +9,7 @@ describe('BalanceResource', () => {
     authorization: new SaxoBank24HourToken(),
   })
 
-  // todo fix this test
-  test.skip('me', async () => {
+  test('me', async () => {
     const me = await saxoBankClient.portfolio.balance.me()
     expect(me).toBeDefined()
   })
