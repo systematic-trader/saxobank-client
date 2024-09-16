@@ -3,8 +3,9 @@ import { SessionTokens } from './session-tokens.ts'
 import { RefreshTokenExpiredError } from './refresh-token-expired-error.ts'
 import { AuthorizationCode } from './authorization-code.ts'
 import { AccessTokenExpiredError } from './access-token-expired-error.ts'
+import type { SaxoBankAuthorization } from './saxobank-authentication.ts'
 
-export class SabobankOAuth {
+export class SaboBankOAuth implements SaxoBankAuthorization {
   readonly #appKey: string
   readonly #appSecret: string
   readonly #oauthURL: string | URL
@@ -44,7 +45,7 @@ export class SabobankOAuth {
     readonly appSecret?: undefined | string
     readonly oauthURL?: undefined | string | URL
     readonly callbackPort?: undefined | string | number
-  } = {}): Promise<SabobankOAuth> {
+  } = {}): Promise<SaboBankOAuth> {
     if (appKey === undefined) {
       throw new Error('No app key provided')
     }
@@ -67,7 +68,7 @@ export class SabobankOAuth {
       const { accessTokenExpired, refreshTokenExpired } = restoredSessionTokens.expired
 
       if (accessTokenExpired === false || refreshTokenExpired === false) {
-        const authentication = new SabobankOAuth({
+        const authentication = new SaboBankOAuth({
           appKey,
           appSecret,
           oauthURL,
@@ -97,7 +98,7 @@ export class SabobankOAuth {
       oauthURL,
     })
 
-    return new SabobankOAuth({
+    return new SaboBankOAuth({
       appKey,
       appSecret,
       oauthURL,

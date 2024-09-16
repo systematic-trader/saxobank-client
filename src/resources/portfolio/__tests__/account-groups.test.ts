@@ -1,30 +1,17 @@
 import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { Environment } from '../../../environment.ts'
-import { HTTPClient } from '../../../http-client.ts'
-import { AccountGroupResource } from '../../portfolio/account-group-resource.ts'
-import { ClientResource } from '../../portfolio/client-resource.ts'
+import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
+import { SaxoBankClient } from '../../../saxobank-client.ts'
 
 describe('AccountGroupResource', () => {
-  const token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN']
-  if (token === undefined) {
-    throw new Error('No token provided')
-  }
-
-  const prefixURL = Environment['SAXOBANK_API_PREFIX_URL']
-  if (prefixURL === undefined) {
-    throw new Error('No prefix URL provided')
-  }
-
-  const httpClient = HTTPClient.withBearerToken(token)
-
-  const clientsResource = new ClientResource({ client: httpClient, prefixURL })
-  const accountGroupsResource = new AccountGroupResource({ client: httpClient, prefixURL })
+  const httpClient = new SaxoBankClient({
+    prefixURL: 'https://gateway.saxobank.com/sim/openapi',
+    authorization: new SaxoBank24HourToken(),
+  })
 
   test('accountGroups', async () => {
-    const client = await clientsResource.me() // the only way we can get a known client key is to lookup the current client
-
-    const accountGroups = await accountGroupsResource.accountGroups({ clientKey: client.ClientKey })
+    const client = await httpClient.portfolio.client.me() // the only way we can get a known client key is to lookup the current client
+    const accountGroups = await httpClient.portfolio.accountGroups.accountGroups({ clientKey: client.ClientKey })
 
     expect(accountGroups).toBeDefined()
   })
@@ -34,7 +21,7 @@ describe('AccountGroupResource', () => {
   })
 
   test('me', async () => {
-    const me = await accountGroupsResource.me()
+    const me = await httpClient.portfolio.accountGroups.me()
 
     expect(me).toBeDefined()
   })
