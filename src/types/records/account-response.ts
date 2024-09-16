@@ -38,7 +38,7 @@ export const AccountResponse = props({
   AccountType: AccountType,
 
   /** If set, this value shields the account value from going below the given limit by automatically triggering closing of positions should the limit be exceeded. A limit of zero means there is no limit. */
-  AccountValueProtectionLimit: number(),
+  AccountValueProtectionLimit: optional(number()),
 
   /** Indicates whether the account is active or not. */
   Active: boolean(),
@@ -53,7 +53,7 @@ export const AccountResponse = props({
   CanUseCashPositionsAsMarginCollateral: boolean(),
 
   /** Indicates if the account is configured for CFD borrowing costs. */
-  CfdBorrowingCostsActive: boolean(),
+  CfdBorrowingCostsActive: optional(boolean()),
 
   /** Unique ID of the client owning the account */
   ClientId: string(),
@@ -122,7 +122,7 @@ export const AccountResponse = props({
   Sharing: array(string()),
 
   /** If true, an AccountValueProtectionLimit may be set on this account. If it is false, the AccountValueProtectionLimit can be set on client or account group. */
-  SupportsAccountValueProtectionLimit: boolean(),
+  SupportsAccountValueProtectionLimit: optional(boolean()),
 
   /** Enable/disable the use of cash positions for margin trading collateral. */
   UseCashPositionsAsMarginCollateral: boolean(),
