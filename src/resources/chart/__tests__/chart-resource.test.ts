@@ -31,6 +31,10 @@ describe('ChartResource', () => {
         'Gold - Aug 2025': { uic: 40758986 },
         'Light Sweet Crude Oil (WTI) - Dec 2027': { uic: 37393385 },
       },
+      CfdOnFutures: {
+        'UK 100 Index September 2024': { uic: 42694469 },
+        'US Crude October 2024': { uic: 42754533 },
+      },
 
       Etc: {
         'Global X Physical Gold ETC': { uic: 19357 },

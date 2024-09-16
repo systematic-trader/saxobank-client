@@ -29,8 +29,6 @@ const ChartResponseOHLCBidAsk = ChartResponse.merge({
   Data: array(ChartSampleBidAskOHLC),
 })
 
-// todo missing CfdOnFutures
-// todo we might be missing more (why would chartSampleFieldSet specify that it's only relevant for Warrants, MiniFutures and Certificates, if we can't get some of these?)
 const AssetTypeMap = {
   Bond: ChartResponseOHLCBond,
 
@@ -38,6 +36,7 @@ const AssetTypeMap = {
   CfdOnCompanyWarrant: ChartResponseOHLC,
 
   ContractFutures: ChartResponseOHLC,
+  CfdOnFutures: ChartResponseOHLCBidAsk,
 
   Etc: ChartResponseOHLC,
   CfdOnEtc: ChartResponseOHLC,
