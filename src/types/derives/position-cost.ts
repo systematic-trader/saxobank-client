@@ -19,8 +19,8 @@ export const PositionCost = props({
   CurrencyCutPct: optional(number()),
 
   /** Costs associated with the opening trade. */
-  OpenCost: CostData,
+  OpenCost: optional(CostData),
 
   /** Costs associated with the opening trade in requested account or client currency. */
-  OpenCostInBaseCurrency: CostData,
+  OpenCostInBaseCurrency: optional(CostData),
 })

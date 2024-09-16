@@ -107,7 +107,7 @@ export const PositionStatic = props({
   RelatedPositionId: optional(string()),
 
   /** Unique id of the source order */
-  SourceOrderId: string(),
+  SourceOrderId: optional(string()),
 
   /** The date on which settlement is to occur for an Fx spot transaction. */
   SpotDate: optional(string()), // todo e.g. 2021-05-21T00:00:00
