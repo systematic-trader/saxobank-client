@@ -9,18 +9,8 @@ describe('NetPositionResource', () => {
     authorization: new SaxoBank24HourToken(),
   })
 
-  test('me with no field group', async () => {
-    const me = await saxoBankClient.portfolio.netPosition.me({
-      fieldGroups: [],
-    })
-
-    expect(me).toBeDefined()
-  })
-
-  test('me with every field group', async () => {
-    const me = await saxoBankClient.portfolio.netPosition.me({
-      fieldGroups: ['DisplayAndFormat', 'ExchangeInfo', 'Greeks', 'NetPositionBase', 'NetPositionView'],
-    })
+  test('me', async () => {
+    const me = await saxoBankClient.portfolio.netPosition.me()
 
     expect(me).toBeDefined()
   })

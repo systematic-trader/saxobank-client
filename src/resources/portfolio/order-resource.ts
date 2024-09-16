@@ -21,14 +21,12 @@ export class OrderResource {
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'orders')
   }
 
-  // todo refactor return type and guard to be based on which field groups are requested
-  me({ skip, top, fieldGroups, multiLegOrderId, status }: {
+  me({ skip, top, multiLegOrderId, status }: {
     readonly skip?: undefined | number
     readonly top?: undefined | number
-    readonly fieldGroups: readonly OrderFieldGroup[]
     readonly multiLegOrderId?: undefined | string
     readonly status?: undefined | OrderStatusFilter
-  }): Promise<ReadonlyArray<OrderResponse>> {
+  } = {}): Promise<ReadonlyArray<OrderResponse>> {
     const url = urlJoin(this.#resourceURL, 'me')
 
     if (skip !== undefined) {
@@ -39,9 +37,12 @@ export class OrderResource {
       url.searchParams.set('$top', top.toString())
     }
 
-    if (fieldGroups.length > 0) {
-      url.searchParams.set('FieldGroups', fieldGroups.join(','))
-    }
+    const fieldGroups: OrderFieldGroup[] = [
+      'DisplayAndFormat',
+      'ExchangeInfo',
+      'Greeks',
+    ]
+    url.searchParams.set('FieldGroups', fieldGroups.join(','))
 
     if (multiLegOrderId !== undefined) {
       url.searchParams.set('MultiLegOrderId', multiLegOrderId)

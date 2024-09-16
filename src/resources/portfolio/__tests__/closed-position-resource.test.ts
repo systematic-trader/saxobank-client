@@ -13,9 +13,7 @@ describe('ClosedPositionResource', () => {
 
   // todo this requires more testing - different positions will probably have different fields - currently only tested with a forex trade
   test('me', async () => {
-    const me = await saxoBankClient.portfolio.closedPosition.me({
-      fieldGroups: ['ClosedPosition'],
-    })
+    const me = await saxoBankClient.portfolio.closedPosition.me()
 
     expect(me).toBeDefined()
   })

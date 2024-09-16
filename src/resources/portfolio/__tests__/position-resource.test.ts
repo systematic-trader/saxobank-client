@@ -9,26 +9,8 @@ describe('PositionResource', () => {
     authorization: new SaxoBank24HourToken(),
   })
 
-  test('me with no field group', async () => {
-    const me = await saxoBankClient.portfolio.position.me({
-      fieldGroups: [],
-    })
-
-    expect(me).toBeDefined()
-  })
-
-  test('me with every field group', async () => {
-    const me = await saxoBankClient.portfolio.position.me({
-      fieldGroups: [
-        'Costs',
-        'DisplayAndFormat',
-        'ExchangeInfo',
-        'Greeks',
-        'PositionBase',
-        'PositionIdOnly',
-        'PositionView',
-      ],
-    })
+  test('me', async () => {
+    const me = await saxoBankClient.portfolio.position.me()
 
     expect(me).toBeDefined()
   })
