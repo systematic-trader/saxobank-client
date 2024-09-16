@@ -9,18 +9,8 @@ describe('OrderResource', () => {
     authorization: new SaxoBank24HourToken(),
   })
 
-  test('me with no field group', async () => {
-    const me = await saxoBankClient.portfolio.order.me({
-      fieldGroups: [],
-    })
-
-    expect(me).toBeDefined()
-  })
-
-  test('me with every field group', async () => {
-    const me = await saxoBankClient.portfolio.order.me({
-      fieldGroups: ['DisplayAndFormat', 'ExchangeInfo', 'Greeks'],
-    })
+  test('me', async () => {
+    const me = await saxoBankClient.portfolio.order.me()
 
     expect(me).toBeDefined()
   })

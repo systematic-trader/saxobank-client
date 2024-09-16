@@ -9,8 +9,8 @@ import type { ClosedPositionFieldGroup } from '../../types/derives/closed-positi
  * - A user of a client will have access to accounts under that client
  * - A user of an IB or WLC will have access to accounts on that client or clients there under
  * - An employee has access to all accounts
- *  -A request containing a TradingFloor "Federated Access" token will have access to the account specified in that token.
-If access is granted on the basis of the TradingFloor "Federated Access" token, then the number of fields will be a subset of the full set of fields shown in the specification for the response.
+ * - A request containing a TradingFloor "Federated Access" token will have access to the account specified in that token.
+ * If access is granted on the basis of the TradingFloor "Federated Access" token, then the number of fields will be a subset of the full set of fields shown in the specification for the response.
  */
 export class ClosedPositionResource {
   readonly #client: HTTPClient
@@ -28,11 +28,10 @@ export class ClosedPositionResource {
   }
 
   // todo refactor return type and guard to be based on which field groups are requested
-  me({ skip, top, fieldGroups }: {
+  me({ skip, top }: {
     readonly skip?: undefined | number
     readonly top?: undefined | number
-    readonly fieldGroups: ReadonlyArray<ClosedPositionFieldGroup>
-  }): Promise<ReadonlyArray<ClosedPositionResponse>> {
+  } = {}): Promise<ReadonlyArray<ClosedPositionResponse>> {
     const url = urlJoin(this.#resourceURL, 'me')
 
     if (skip !== undefined) {
@@ -43,9 +42,13 @@ export class ClosedPositionResource {
       url.searchParams.set('$top', top.toString())
     }
 
-    if (fieldGroups.length > 0) {
-      url.searchParams.set('FieldGroups', fieldGroups.join(','))
-    }
+    const fieldGroups: ClosedPositionFieldGroup[] = [
+      'ClosedPosition',
+      'ClosedPositionDetails',
+      'DisplayAndFormat',
+      'ExchangeInfo',
+    ]
+    url.searchParams.set('FieldGroups', fieldGroups.join(','))
 
     return fetchResourceData({
       client: this.#client,
