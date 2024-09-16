@@ -1,6 +1,7 @@
 import {
   type GuardType,
   number,
+  optional,
   props,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
@@ -11,5 +12,5 @@ export const SpendingPower = props({
   Current: number(),
 
   /** Spending power for shares / ETF (based on max collateral factor defined for shares) */
-  Maximum: number(),
+  Maximum: optional(number()),
 })
