@@ -199,4 +199,29 @@ export const BalanceResponse = props({
 
   /** Maximmum amount that may be withdrawn from unrealized derivatives positions (VariationMargin). */
   VariationMarginThreshold: optional(number()),
+
+  /** Not documented */
+  ExtendedTradingHoursData: optional(props({
+    CostToClosePositions: number(),
+    InitialMarginUncertainty: number(),
+    MaintenanceMarginUncertainty: number(),
+    MarginAvailableForTrading: number(),
+    MarginUsedByCurrentPositions: number(),
+    NonMarginPositionsValue: number(),
+    TotalValue: number(),
+    UncertaintyValue: number(),
+    UnrealizedMarginClosedProfitLoss: number(),
+    UnrealizedMarginOpenProfitLoss: number(),
+    UnrealizedMarginProfitLoss: number(),
+    UnrealizedPositionsValue: number(),
+  })),
+
+  /** Not documented */
+  ExtendedTradingHoursUncertaintyValue: optional(number()),
+
+  /** Not documented */
+  SpendingPower: optional(number()),
+
+  /** Not documented */
+  SrdSpendingPower: optional(number()),
 })

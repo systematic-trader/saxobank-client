@@ -27,12 +27,10 @@ export class PositionResource {
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'positions')
   }
 
-  // todo refactor return type and guard to be based on which field groups are requested
-  me({ skip, top, fieldGroups }: {
+  me({ skip, top }: {
     readonly skip?: undefined | number
     readonly top?: undefined | number
-    readonly fieldGroups: readonly PositionFieldGroup[]
-  }): Promise<ReadonlyArray<PositionResponse>> {
+  } = {}): Promise<ReadonlyArray<PositionResponse>> {
     const url = urlJoin(this.#resourceURL, 'me')
 
     if (skip !== undefined) {
@@ -43,9 +41,16 @@ export class PositionResource {
       url.searchParams.set('$top', top.toString())
     }
 
-    if (fieldGroups.length > 0) {
-      url.searchParams.set('FieldGroups', fieldGroups.join(','))
-    }
+    const fieldGroups: PositionFieldGroup[] = [
+      'Costs',
+      'DisplayAndFormat',
+      'ExchangeInfo',
+      'Greeks',
+      'PositionBase',
+      'PositionIdOnly',
+      'PositionView',
+    ]
+    url.searchParams.set('FieldGroups', fieldGroups.join(','))
 
     return fetchResourceData({
       client: this.#client,

@@ -30,7 +30,7 @@ export const TransactionsNotBookedDetail = props({
   CertificatesValue: optional(number()),
 
   /** Net commission for the transaction(s) not booked yet */
-  Commission: number(),
+  Commission: optional(number()),
 
   /** Net exchange fee for the transaction(s) not booked yet */
   ExchangeFee: optional(number()),

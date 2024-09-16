@@ -1,54 +1,43 @@
 import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { Environment } from '../../../environment.ts'
-import { HTTPClient } from '../../../http-client.ts'
-import { UserResource } from '../../portfolio/user-resource.ts'
+import { SaxoBankClient } from '../../../../mod.ts'
+import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 
 describe('UserResource', () => {
-  const token = Environment['SAXOBANK_API_AUTHORIZATION_BEARER_TOKEN']
-  if (token === undefined) {
-    throw new Error('No token provided')
-  }
-
-  const prefixURL = Environment['SAXOBANK_API_PREFIX_URL']
-  if (prefixURL === undefined) {
-    throw new Error('No prefix URL provided')
-  }
-
-  const userResource = new UserResource({
-    client: HTTPClient.withBearerToken(token),
-    prefixURL,
+  const saxoBankClient = new SaxoBankClient({
+    prefixURL: 'https://gateway.saxobank.com/sim/openapi',
+    authorization: new SaxoBank24HourToken(),
   })
 
   test('me', async () => {
-    const me = await userResource.me()
+    const me = await saxoBankClient.portfolio.user.me()
 
     expect(me).toBeDefined()
   })
 
   test('getAllEntitlements', async () => {
-    const entitlements = await userResource.entitlements()
+    const entitlements = await saxoBankClient.portfolio.user.entitlements()
 
     expect(entitlements).toBeDefined()
   })
 
   test('users', async () => {
-    const users = await userResource.users()
+    const users = await saxoBankClient.portfolio.user.users()
 
     expect(users).toBeDefined()
   })
 
   test('user', async () => {
-    const me = await userResource.me() // the only way we can get a known user key is to lookup the current user
-    const user = await userResource.user({ userKey: me.UserKey })
+    const me = await saxoBankClient.portfolio.user.me() // the only way we can get a known user key is to lookup the current user
+    const user = await saxoBankClient.portfolio.user.user({ userKey: me.UserKey })
 
     expect(user).toBeDefined()
     expect(user).toStrictEqual(me)
   })
 
   test('userEntitlements', async () => {
-    const me = await userResource.me() // the only way we can get a known user key is to lookup the current user
-    const entitlements = await userResource.userEntitlements({
+    const me = await saxoBankClient.portfolio.user.me() // the only way we can get a known user key is to lookup the current user
+    const entitlements = await saxoBankClient.portfolio.user.userEntitlements({
       userKey: me.UserKey,
       entitlementFieldSet: 'Default',
     })

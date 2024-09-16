@@ -1,4 +1,5 @@
 import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
 
 export class HTTPError extends Error {
   readonly statusCode: number
@@ -52,23 +53,37 @@ export class HTTPServiceError extends HTTPError {
 export type HTTPClientHeaders = Headers | Record<string, undefined | string>
 
 export class HTTPClient {
-  static withBearerToken(token: string): HTTPClient {
+  static withAuthorization(authentication: SaxoBankAuthorization): HTTPClient {
     return new HTTPClient({
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      authentication,
     })
   }
 
-  #headers: Headers
+  #constructorHeaders: Headers
+  #authentication: undefined | SaxoBankAuthorization
 
   constructor({
+    authentication,
     headers,
-  }: { readonly headers?: undefined | HTTPClientHeaders } = {}) {
-    this.#headers = mergeHeaders(new Headers(), headers)
+  }: {
+    readonly authentication?: undefined | SaxoBankAuthorization
+    readonly headers?: undefined | HTTPClientHeaders
+  } = {}) {
+    this.#authentication = authentication
+    this.#constructorHeaders = mergeHeaders(new Headers(), headers)
   }
 
-  async #get(
+  get #authenticationHeaders(): Headers {
+    if (this.#authentication === undefined) {
+      return new Headers()
+    }
+
+    return new Headers({
+      'Authorization': `Bearer ${this.#authentication.accessToken}`,
+    })
+  }
+
+  async get(
     url: string | URL,
     {
       headers: argumentHeaders,
@@ -76,7 +91,7 @@ export class HTTPClient {
       readonly headers?: undefined | HTTPClientHeaders
     } = {},
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#headers, argumentHeaders)
+    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
 
     return await rateLimitFetch(this, url, { method: 'GET', headers })
   }
@@ -91,7 +106,7 @@ export class HTTPClient {
       readonly headers?: undefined | HTTPClientHeaders
     } = {},
   ): Promise<T> {
-    const response = await this.#get(url, { headers })
+    const response = await this.get(url, { headers })
 
     const body = await response.json()
 
@@ -110,7 +125,7 @@ export class HTTPClient {
       readonly headers?: undefined | HTTPClientHeaders
     } = {},
   ): Promise<Blob> {
-    return await this.#get(url, { headers }).then((response) => response.blob())
+    return await this.get(url, { headers }).then((response) => response.blob())
   }
 
   async getText(
@@ -121,7 +136,7 @@ export class HTTPClient {
       readonly headers?: undefined | HTTPClientHeaders
     } = {},
   ): Promise<string> {
-    return await this.#get(url, { headers }).then((response) => response.text())
+    return await this.get(url, { headers }).then((response) => response.text())
   }
 
   async post(
@@ -134,7 +149,7 @@ export class HTTPClient {
       readonly body?: RequestInit['body']
     },
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#headers, argumentHeaders)
+    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
 
     return await rateLimitFetch(this, url, {
       method: 'POST',
@@ -174,7 +189,7 @@ export class HTTPClient {
       readonly body?: RequestInit['body']
     },
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#headers, argumentHeaders)
+    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
 
     return await rateLimitFetch(this, url, {
       method: 'PUT',
@@ -191,7 +206,7 @@ export class HTTPClient {
       readonly headers?: undefined | HTTPClientHeaders
     } = {},
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#headers, argumentHeaders)
+    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
 
     return await rateLimitFetch(this, url, { method: 'DELETE', headers })
   }
@@ -199,19 +214,21 @@ export class HTTPClient {
 
 function mergeHeaders(
   first: Headers,
-  second: undefined | HTTPClientHeaders,
+  ...rest: Array<Headers | HTTPClientHeaders | undefined>
 ): Headers {
   const headers = new Headers(first)
 
-  if (second !== undefined) {
-    if (second instanceof Headers) {
-      for (const [key, value] of second.entries()) {
-        headers.set(key, value)
-      }
-    } else {
-      for (const [key, value] of Object.entries(second)) {
-        if (typeof value === 'string') {
+  for (const header of rest) {
+    if (header !== undefined) {
+      if (header instanceof Headers) {
+        for (const [key, value] of header.entries()) {
           headers.set(key, value)
+        }
+      } else {
+        for (const [key, value] of Object.entries(header)) {
+          if (typeof value === 'string') {
+            headers.set(key, value)
+          }
         }
       }
     }

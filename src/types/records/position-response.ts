@@ -15,13 +15,13 @@ export interface PositionResponse extends GuardType<typeof PositionResponse> {}
 
 export const PositionResponse = props({
   /** Trading costs associated with opening/closing a position. */
-  Costs: optional(PositionCost),
+  Costs: PositionCost,
 
   /** Information about the position instrument and how to display it. */
-  DisplayAndFormat: optional(InstrumentDisplayAndFormat),
+  DisplayAndFormat: InstrumentDisplayAndFormat,
 
   /** Information about the instrument's exchange and trading status. */
-  Exchange: optional(InstrumentExchangeDetails),
+  Exchange: InstrumentExchangeDetails,
 
   /** Greeks, only available for options, i.e. FX Options, Contract Options, and Contract Options CFDs. */
   Greeks: optional(Greeks),
@@ -30,13 +30,13 @@ export const PositionResponse = props({
   NetPositionId: string(),
 
   /** Static part of position information. */
-  PositionBase: optional(PositionStatic),
+  PositionBase: PositionStatic,
 
   /** Unique id of this position. */
   PositionId: string(),
 
   /** Dynamic part of position information. */
-  PositionView: optional(PositionDynamic),
+  PositionView: PositionDynamic,
 
   /** Information about the underlying instrument of the net position and how to display it. */
   UnderlyingDisplayAndFormat: optional(InstrumentDisplayAndFormat),

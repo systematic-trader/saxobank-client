@@ -27,13 +27,14 @@ export class NetPositionResource {
     this.#resourceURL = urlJoin(prefixURL, 'port', 'v1', 'netpositions')
   }
 
-  /** Returns a list of net positions fulfilling the criteria specified by the query string parameters. Each net position may include all related sub positions if fieldGroups includes SubPositions. */
-  // todo refactor return type and guard to be based on which field groups are requested
-  me({ skip, top, fieldGroups }: {
+  /**
+   * Returns a list of net positions fulfilling the criteria specified by the query string parameters.
+   * Each net position may include all related sub positions if fieldGroups includes SubPositions.
+   */
+  me({ skip, top }: {
     readonly skip?: undefined | number
     readonly top?: undefined | number
-    readonly fieldGroups: readonly NetPositionFieldGroup[]
-  }): Promise<ReadonlyArray<NetPositionResponse>> {
+  } = {}): Promise<ReadonlyArray<NetPositionResponse>> {
     const url = urlJoin(this.#resourceURL, 'me')
 
     if (skip !== undefined) {
@@ -44,9 +45,14 @@ export class NetPositionResource {
       url.searchParams.set('$top', top.toString())
     }
 
-    if (fieldGroups.length > 0) {
-      url.searchParams.set('FieldGroups', fieldGroups.join(','))
-    }
+    const fieldGroups: NetPositionFieldGroup[] = [
+      'DisplayAndFormat',
+      'ExchangeInfo',
+      'Greeks',
+      'NetPositionBase',
+      'NetPositionView',
+    ]
+    url.searchParams.set('FieldGroups', fieldGroups.join(','))
 
     return fetchResourceData({
       client: this.#client,

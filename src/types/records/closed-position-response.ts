@@ -1,6 +1,5 @@
 import {
   type GuardType,
-  optional,
   props,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
@@ -12,16 +11,16 @@ export interface ClosedPositionResponse extends GuardType<typeof ClosedPositionR
 
 export const ClosedPositionResponse = props({
   /** ClosedPosition info */
-  ClosedPosition: optional(ClosedPosition),
+  ClosedPosition: ClosedPosition,
 
   /** Unique id of the closed position based on OpeningPositionId and ClosingPositionId - Required for subscription to provide a key. */
   ClosedPositionUniqueId: string(),
 
   /** [Community] Information about the instrument of the closed position and how to display it. */
-  DisplayAndFormat: optional(InstrumentDisplayAndFormat),
+  DisplayAndFormat: InstrumentDisplayAndFormat,
 
   /** Information about the instrument's exchange and trading status. */
-  Exchange: optional(InstrumentExchangeDetails),
+  Exchange: InstrumentExchangeDetails,
 
   /** NetPosition ID */
   NetPositionId: string(),
