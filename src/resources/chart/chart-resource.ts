@@ -26,7 +26,7 @@ const ChartResponseOHLCBond = ChartResponse.merge({
   Data: array(ChartSampleOHLC),
 })
 
-const ChartResponseOHLCBidAsk = ChartResponse.merge({
+const ChartResponseBidAskOHLC = ChartResponse.merge({
   Data: array(ChartSampleBidAskOHLC),
 })
 
@@ -37,7 +37,7 @@ const AssetTypeMap = {
   CfdOnCompanyWarrant: ChartResponseOHLC,
 
   ContractFutures: ChartResponseOHLC,
-  CfdOnFutures: ChartResponseOHLCBidAsk,
+  CfdOnFutures: ChartResponseBidAskOHLC,
 
   Etc: ChartResponseOHLC,
   CfdOnEtc: ChartResponseOHLC,
@@ -51,7 +51,7 @@ const AssetTypeMap = {
   Fund: ChartResponseOHLC,
   CfdOnFund: ChartResponseOHLC,
 
-  FxSpot: ChartResponseOHLCBidAsk,
+  FxSpot: ChartResponseBidAskOHLC,
 
   Rights: ChartResponseOHLC,
   CfdOnRights: ChartResponseOHLC,
@@ -60,7 +60,7 @@ const AssetTypeMap = {
   CfdOnStock: ChartResponseOHLC,
 
   StockIndex: ChartResponseOHLC,
-  CfdOnIndex: ChartResponseOHLCBidAsk,
+  CfdOnIndex: ChartResponseBidAskOHLC,
 } as const
 
 type ChartResponseByAssetType<T extends keyof typeof AssetTypeMap> = GuardType<typeof AssetTypeMap[T]>
