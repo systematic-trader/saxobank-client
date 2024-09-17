@@ -81,7 +81,10 @@ export const ChartsParametersGuard = props({
   horizon: Horizon,
   uic: integer(),
   accountKey: optional(string()),
-  count: optional(integer({ minimum: 1, maximum: 1200 })),
+  count: optional(integer({
+    minimum: 1,
+    maximum: 1200,
+  })),
 })
 
 export type ChartsParameters =
@@ -130,8 +133,9 @@ export class ChartResource {
         | ({
           /**
            * Mode specifies if the endpoint should returns samples "UpTo" or "From" the specified time.
-           * When mode=From, the results will be inclusive of the specified time.
-           * When mode=To, the results will be exclusive of the specified time.
+           * The results will include the sample at the specified time.
+           *
+           * Please note that when mode=UpTo and count=1, sometimes the returned data will be empty.
            */
           readonly mode: NonNullable<ChartsParameters['mode']>
 
