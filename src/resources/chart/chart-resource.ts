@@ -1,12 +1,13 @@
 import {
   array,
-  assert,
+  assertReturn,
   enums,
   type GuardType,
   integer,
   optional,
   props,
   string,
+  union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import type { HTTPClient } from '../../http-client.ts'
 import { ChartRequestMode } from '../../types/derives/chart-request-mode.ts'
@@ -64,18 +65,28 @@ const AssetTypeMap = {
 
 type ChartResponseByAssetType<T extends keyof typeof AssetTypeMap> = GuardType<typeof AssetTypeMap[T]>
 
+const ChartsParametersModeAndTimeGuard = union([
+  props({
+    mode: optional(ChartRequestMode),
+    time: optional(string({ format: 'date-iso8601' })),
+  }),
+
+  props({
+    mode: ChartRequestMode,
+    time: string({ format: 'date-iso8601' }),
+  }),
+])
 export const ChartsParametersGuard = props({
-  accountKey: optional(string()),
   assetType: enums(extractKeys(AssetTypeMap)),
-  // chartSampleFieldSet: optional(ChartSampleFieldSet), // todo consider if we should support this
-  count: optional(integer({ minimum: 1, maximum: 1200 })),
   horizon: Horizon,
-  mode: optional(ChartRequestMode),
-  time: optional(string({ format: 'date-iso8601' })),
   uic: integer(),
+  accountKey: optional(string()),
+  count: optional(integer({ minimum: 1, maximum: 1200 })),
 })
 
-export interface ChartsParameters extends GuardType<typeof ChartsParametersGuard> {}
+export type ChartsParameters =
+  & GuardType<typeof ChartsParametersGuard>
+  & GuardType<typeof ChartsParametersModeAndTimeGuard>
 
 /** Allows you to set up subscriptions for streamed charts data. */
 export class ChartResource {
@@ -93,17 +104,61 @@ export class ChartResource {
     this.#resourceURL = urlJoin(prefixURL, 'chart', 'v3', 'charts')
   }
 
-  charts<AssetType extends keyof typeof AssetTypeMap>(parameters: {
-    readonly accountKey?: ChartsParameters['accountKey']
-    readonly assetType: AssetType
-    readonly count?: ChartsParameters['count']
-    readonly horizon: ChartsParameters['horizon']
-    readonly mode?: ChartsParameters['mode']
-    readonly time?: ChartsParameters['time']
-    readonly uic: ChartsParameters['uic']
-  }): Promise<ChartResponseByAssetType<AssetType>> {
-    assert(ChartsParametersGuard, parameters)
-    const { accountKey, assetType, count, horizon, mode, time, uic } = parameters
+  /**
+   * Returns timestamped OHLC samples for a single instrument identified by UIC and AssetType.
+   * The covered time period and intervals between samples are controlled by the combination of parameters horizon, time, mode and count.
+   */
+  charts<ChartAssetType extends keyof typeof AssetTypeMap>(
+    parameters:
+      & {
+        /** Asset type of the instrument. */
+        readonly assetType: ChartAssetType
+
+        /** The time period that each sample covers, in minutes. */
+        readonly horizon: ChartsParameters['horizon']
+
+        /** UIC (Universal Instrument Code) of the instrument. */
+        readonly uic: ChartsParameters['uic']
+
+        /** Optional */
+        readonly accountKey?: ChartsParameters['accountKey']
+
+        /** Specifies maximum number of samples to return, max 1200, default 1200. */
+        readonly count?: ChartsParameters['count']
+      }
+      & (
+        | ({
+          /**
+           * Mode specifies if the endpoint should returns samples "UpTo" or "From" the specified time.
+           * When mode=From, the results will be inclusive of the specified time.
+           * When mode=To, the results will be exclusive of the specified time.
+           */
+          readonly mode: NonNullable<ChartsParameters['mode']>
+
+          /**
+           * Specifies the time of a sample, which must either be the first (If mode="From") or the last (if mode="UpTo") in the returned data.
+           * The time must be in ISO8601 format.
+           * Minutes and seconds are ignored.
+           */
+          readonly time: NonNullable<ChartsParameters['time']>
+        })
+        | ({
+          readonly mode?: undefined
+          readonly time?: undefined
+        })
+      ),
+  ): Promise<ChartResponseByAssetType<ChartAssetType>> {
+    const { accountKey, assetType, count, horizon, uic } = assertReturn(ChartsParametersGuard, {
+      assetType: parameters.assetType,
+      horizon: parameters.horizon,
+      uic: parameters.uic,
+      accountKey: parameters.accountKey,
+      count: parameters.count,
+    })
+    const { mode, time } = assertReturn(ChartsParametersModeAndTimeGuard, {
+      mode: parameters.mode,
+      time: parameters.time,
+    })
 
     const url = urlJoin(this.#resourceURL)
 
