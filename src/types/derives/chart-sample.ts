@@ -56,7 +56,7 @@ export const ChartSampleOHLC = ChartSampleBase.merge(props({
   Open: number(),
 
   /** Volume */
-  Volume: number(), // todo this is not available when trading forex
+  Volume: number(),
 }))
 
 export interface ChartSampleOHLC extends GuardType<typeof ChartSampleOHLC> {}
