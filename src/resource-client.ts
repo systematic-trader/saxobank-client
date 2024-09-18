@@ -34,7 +34,10 @@ export class ResourceClient {
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?:
       | undefined
-      | Record<string, undefined | number | string>
+      | Record<
+          string,
+          undefined | boolean | number | string | readonly string[]
+        >
     readonly guard?: undefined | Guard<T>
   }): Promise<T> {
     const url = urlJoin(this.#prefixURL, options.path)
@@ -48,12 +51,21 @@ export class ResourceClient {
   async getMany<T>(options: {
     readonly path: string
     readonly headers?: undefined | Record<string, string>
-    readonly searchParams?: undefined | Record<string, number | string>
+    readonly searchParams?:
+      | undefined
+      | Record<
+          string,
+          undefined | boolean | number | string | readonly string[]
+        >
     readonly guard?: undefined | Guard<T>
   }): Promise<ReadonlyArray<T>> {
     const url = urlJoin(this.#prefixURL, options.path)
     const headers = { ...this.#headers, ...options.headers }
-    const searchParams = { $top: '1000', $skip: '0', ...options.searchParams }
+    const searchParams = {
+      $top: '1000',
+      $skip: '0',
+      ...options.searchParams,
+    }
 
     setSearchParams(url, searchParams)
 
@@ -81,7 +93,9 @@ function urlJoin(base: string | URL, ...paths: readonly string[]): URL {
 
 function setSearchParams(
   url: URL,
-  searchParams: undefined | Record<string, undefined | number | string>
+  searchParams:
+    | undefined
+    | Record<string, undefined | boolean | number | string | readonly string[]>
 ): void {
   if (searchParams === undefined) {
     return
