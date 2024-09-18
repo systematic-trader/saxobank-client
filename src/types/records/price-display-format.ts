@@ -1,4 +1,8 @@
-import { integer, optional, props } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import {
+  integer,
+  optional,
+  props,
+} from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { PriceDisplayFormatType } from '../derives/price-display-format-type.ts'
 
@@ -14,7 +18,7 @@ export const PriceDisplayFormat = props({
   /** Some fractional prices have decimals in the numerator, e.g. 2.5/32. This is relevant for futures and cfds on futures. */
   NumeratorDecimals: optional(integer()),
   /** The number of decimals trigger price for orders should be formatted with. */
-  OrderDecimals: integer(),
+  OrderDecimals: optional(integer()),
   /** Price currency of the instrument. */
   PriceCurrency: optional(Currency3),
   /** The decimals value to use when formatting strike price. Only relevant for options. */

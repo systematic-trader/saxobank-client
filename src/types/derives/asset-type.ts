@@ -1,8 +1,11 @@
-import { enums, type GuardType } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import {
+  enums,
+  type GuardType,
+} from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
 export type AssetType = GuardType<typeof AssetType>
 
-export const AssetType = enums([
+export const AssetTypeValues = [
   /* Not tradeable */
   'Cash',
   /**
@@ -435,4 +438,6 @@ export const AssetType = enums([
    * Warrant with built-in spread.
    */
   'WarrantSpread',
-])
+] as const
+
+export const AssetType = enums(AssetTypeValues)
