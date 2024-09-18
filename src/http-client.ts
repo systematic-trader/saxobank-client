@@ -1,4 +1,7 @@
-import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import {
+  assertReturn,
+  type Guard,
+} from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
 
 export class HTTPError extends Error {
@@ -9,6 +12,8 @@ export class HTTPError extends Error {
     super(message)
     this.statusCode = statusCode
     this.statusText = statusText
+
+    this.name = 'HTTPError'
   }
 }
 
@@ -28,6 +33,8 @@ export class HTTPClientError extends HTTPError {
 
     super(message, statusCode, statusText)
     this.body = body
+
+    this.name = 'HTTPClientError'
   }
 }
 
@@ -47,6 +54,8 @@ export class HTTPServiceError extends HTTPError {
 
     super(message, statusCode, statusText)
     this.body = body
+
+    this.name = 'HTTPServiceError'
   }
 }
 
@@ -79,7 +88,7 @@ export class HTTPClient {
     }
 
     return new Headers({
-      'Authorization': `Bearer ${this.#authentication.accessToken}`,
+      Authorization: `Bearer ${this.#authentication.accessToken}`,
     })
   }
 
@@ -89,9 +98,13 @@ export class HTTPClient {
       headers: argumentHeaders,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {},
+    } = {}
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
+    const headers = mergeHeaders(
+      this.#constructorHeaders,
+      this.#authenticationHeaders,
+      argumentHeaders
+    )
 
     return await rateLimitFetch(this, url, { method: 'GET', headers })
   }
@@ -104,9 +117,11 @@ export class HTTPClient {
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
-    } = {},
+    } = {}
   ): Promise<T> {
     const response = await this.get(url, { headers })
+
+    // console.log(response.headers)
 
     const body = await response.json()
 
@@ -123,7 +138,7 @@ export class HTTPClient {
       headers,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {},
+    } = {}
   ): Promise<Blob> {
     return await this.get(url, { headers }).then((response) => response.blob())
   }
@@ -134,7 +149,7 @@ export class HTTPClient {
       headers,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {},
+    } = {}
   ): Promise<string> {
     return await this.get(url, { headers }).then((response) => response.text())
   }
@@ -147,9 +162,13 @@ export class HTTPClient {
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
-    },
+    }
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
+    const headers = mergeHeaders(
+      this.#constructorHeaders,
+      this.#authenticationHeaders,
+      argumentHeaders
+    )
 
     return await rateLimitFetch(this, url, {
       method: 'POST',
@@ -166,7 +185,7 @@ export class HTTPClient {
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
-    } = {},
+    } = {}
   ): Promise<T> {
     const response = await this.post(url, { headers })
 
@@ -187,9 +206,13 @@ export class HTTPClient {
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
-    },
+    }
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
+    const headers = mergeHeaders(
+      this.#constructorHeaders,
+      this.#authenticationHeaders,
+      argumentHeaders
+    )
 
     return await rateLimitFetch(this, url, {
       method: 'PUT',
@@ -204,9 +227,13 @@ export class HTTPClient {
       headers: argumentHeaders,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {},
+    } = {}
   ): Promise<Response> {
-    const headers = mergeHeaders(this.#constructorHeaders, this.#authenticationHeaders, argumentHeaders)
+    const headers = mergeHeaders(
+      this.#constructorHeaders,
+      this.#authenticationHeaders,
+      argumentHeaders
+    )
 
     return await rateLimitFetch(this, url, { method: 'DELETE', headers })
   }
@@ -243,33 +270,38 @@ const RateLimitRefs = new WeakMap<
 >()
 
 async function rateLimitFetch(
-  ref: HTTPClient,
+  reference: HTTPClient,
   url: string | URL,
   options: {
     readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
     readonly headers?: undefined | Headers
     readonly body?: RequestInit['body']
-  },
+  }
 ): Promise<Response> {
   while (true) {
     const response = await fetch(url, options)
 
     if (response.status === 429) {
-      const rateLimit = getRateLimit(response.headers)
+      // console.log('response.status:', response.status)
+      // console.log('response.headers:', response.headers)
+
+      const rateLimit = getRateLimitExceeded(response.headers)
 
       if (rateLimit === undefined) {
         throw new HTTPClientError(
           response.status,
           response.statusText,
-          await response.text(),
+          await response.text()
         )
       }
 
-      let penaltyMap = RateLimitRefs.get(ref)
+      // console.log('rateLimit:', `${rateLimit.name} - ${rateLimit.sleep}`)
+
+      let penaltyMap = RateLimitRefs.get(reference)
 
       if (penaltyMap === undefined) {
         penaltyMap = new Map()
-        RateLimitRefs.set(ref, penaltyMap)
+        RateLimitRefs.set(reference, penaltyMap)
       }
 
       let penaltyPromise = penaltyMap.get(rateLimit.name)
@@ -295,10 +327,14 @@ async function rateLimitFetch(
     }
 
     if (response.ok === false) {
+      // console.log('response.ok:', response.ok)
+      // console.log('response.status:', response.status)
+      // console.log(response.headers)
+
       const body = response.headers
-          .get('Content-Type')
-          ?.toLocaleLowerCase()
-          .includes('application/json')
+        .get('Content-Type')
+        ?.toLocaleLowerCase()
+        .includes('application/json')
         ? await response.json()
         : await response.text()
 
@@ -313,18 +349,80 @@ async function rateLimitFetch(
   }
 }
 
-function getRateLimit(
-  headers: Headers,
-): undefined | { name: string; sleep: number } {
-  for (const [key, value] of headers.entries()) {
-    const regex = /x-ratelimit-(.*?)-reset/
-    const match = key.match(regex)
+function getRateLimitExceeded(
+  headers: Headers
+): undefined | { readonly name: string; readonly sleep: number } {
+  const rateLimits: Array<{
+    name: string
+    sleep: undefined | number
+    remaining: undefined | number
+  }> = []
 
-    if (match !== null) {
-      const name = match[1]!
+  for (const [key, value] of headers) {
+    const regexRemaining = /x-ratelimit-(.*?)-remaining/i
+    const matchRemaining = key.match(regexRemaining)
+
+    if (matchRemaining !== null) {
+      const name = matchRemaining[1]!.toLowerCase()
+      const remaining = parseInt(value, 10)
+
+      if (name === 'appday') {
+        if (remaining === 0) {
+          throw new Error('Rate limit exceeded for appday')
+        } else {
+          continue
+        }
+      }
+
+      const entry = rateLimits.find((entry) => entry.name === name)
+
+      if (entry === undefined) {
+        rateLimits.push({ name, sleep: undefined, remaining })
+      } else {
+        entry.remaining = remaining
+      }
+
+      continue
+    }
+
+    const regexReset = /x-ratelimit-(.*?)-reset/i
+    const matchReset = key.match(regexReset)
+
+    if (matchReset !== null) {
+      const name = matchReset[1]!.toLowerCase()
+
+      if (name === 'appday') {
+        continue
+      }
+
       const sleep = parseInt(value, 10) * 1000
 
-      return { name, sleep }
+      const entry = rateLimits.find((entry) => entry.name === name)
+
+      if (entry === undefined) {
+        rateLimits.push({ name, sleep, remaining: undefined })
+      } else {
+        entry.sleep = sleep
+      }
+    }
+  }
+
+  if (rateLimits.length === 0) {
+    return undefined
+  }
+
+  if (rateLimits.length > 1) {
+    const names = rateLimits.map((entry) => entry.name).join(', ')
+
+    throw new Error(`Multiple rate limits not supported: ${names}`)
+  }
+
+  const entry = rateLimits[0]!
+
+  if (entry.remaining === 0) {
+    return {
+      name: entry.name,
+      sleep: entry.sleep === undefined || entry.sleep === 0 ? 50 : entry.sleep,
     }
   }
 
