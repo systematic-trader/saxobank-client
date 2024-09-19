@@ -39,7 +39,7 @@ export class ResourceClient {
   }
 
   async get<T = unknown>(options: {
-    readonly path: string
+    readonly path?: undefined | string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?:
       | undefined
@@ -58,7 +58,7 @@ export class ResourceClient {
   }
 
   async getPaginated<T = unknown>(options: {
-    readonly path: string
+    readonly path?: undefined | string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?:
       | undefined
@@ -87,10 +87,14 @@ export class ResourceClient {
   }
 }
 
-function urlJoin(base: string | URL, ...paths: readonly string[]): URL {
+function urlJoin(base: string | URL, ...paths: ReadonlyArray<undefined | string>): URL {
   let url = new URL(base)
 
   for (const path of paths) {
+    if (path === undefined) {
+      continue
+    }
+
     const nextBase = url.href.endsWith('/') ? url.href : `${url.href}/`
     const nextPath = path.startsWith('/') ? path.slice(1) : path
 
