@@ -29,6 +29,14 @@ export class ResourceClient {
     this.#prefixURL = prefixURL
   }
 
+  appendPath(path: string): ResourceClient {
+    return new ResourceClient({
+      client: this.#client,
+      headers: this.#headers,
+      prefixURL: urlJoin(this.#prefixURL, path).href,
+    })
+  }
+
   async get<T = unknown>(options: {
     readonly path: string
     readonly headers?: undefined | Record<string, string>
