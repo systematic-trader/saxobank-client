@@ -1,4 +1,8 @@
-import { props, string } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import {
+  type GuardType,
+  props,
+  string,
+} from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
 export const TimeZoneDetails = props({
   /** Full name/description of the time zone. */
@@ -12,3 +16,5 @@ export const TimeZoneDetails = props({
   /** The IANA/tz database time zone identifier. */
   ZoneName: string(),
 })
+
+export interface TimeZoneDetails extends GuardType<typeof TimeZoneDetails> {}

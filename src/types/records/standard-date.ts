@@ -10,7 +10,7 @@ export interface StandardDate extends GuardType<typeof StandardDate> {}
 
 export const StandardDate = props({
   /** The standard date */
-  Date: format('date-iso8601'),
+  Date: format('gregorian-date'),
   Unit: TenorUnit,
   Value: integer(),
 })
