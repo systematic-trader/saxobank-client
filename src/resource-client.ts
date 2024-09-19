@@ -8,6 +8,7 @@ import {
   string,
   unknown,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import { Environment } from './environment.ts'
 import type { HTTPClient } from './http-client.ts'
 
 export class ResourceClient {
@@ -18,10 +19,10 @@ export class ResourceClient {
   constructor({
     client,
     headers = {},
-    prefixURL,
+    prefixURL = Environment['SAXOBANK_API_PREFIX_URL'] ?? 'https://gateway.saxobank.com/sim/openapi',
   }: {
     readonly client: HTTPClient
-    readonly prefixURL: string
+    readonly prefixURL?: undefined | string
     readonly headers?: undefined | Record<string, string>
   }) {
     this.#client = client

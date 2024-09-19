@@ -3,6 +3,7 @@ import {
   boolean,
   enums,
   format,
+  type GuardType,
   integer,
   literal,
   number,
@@ -15,13 +16,16 @@ import { BondType } from '../derives/bond-type.ts'
 import { BondsCouponType } from '../derives/bonds-coupon-type.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { DefaultSlippageType } from '../derives/default-slippage-type.ts'
+import { DisplayHintType } from '../derives/display-hint-type.ts'
 import { LotSizeType } from '../derives/lot-size-type.ts'
 import { NonTradableReason } from '../derives/non-tradable-reason.ts'
 import { OrderTriggerPriceType } from '../derives/order-trigger-price-type.ts'
 import { PlaceableOrderType } from '../derives/placeable-order-type.ts'
+import { StrategyType } from '../derives/strategy-type.ts'
 import { SupportedStrategyType } from '../derives/supported-strategy-type.ts'
 import { TradingSignal } from '../derives/trading-signal.ts'
 import { TradingStatus } from '../derives/trading-status.ts'
+import { TradingUnitsPluralType, TradingUnitsSingularType } from '../derives/trading-units-type.ts'
 import { UnderlyingTypeCategory } from '../derives/underlying-type-category.ts'
 import { ExchangeSummary } from './exchange-summary.ts'
 import { InstrumentKey } from './instrument-key.ts'
@@ -31,16 +35,11 @@ import { OrderDistances } from './order-distances.ts'
 import { OrderSetting } from './order-setting.ts'
 import { PriceDisplayFormat } from './price-display-format.ts'
 import { RelatedOptionRoot } from './related-option-root.ts'
+import { StrategyLeg } from './strategy-leg.ts'
 import { SupportedOrderTypeSetting } from './supported-order-type-setting.ts'
 import { TickSizeScheme } from './tick-size-scheme.ts'
-import { DisplayHintType } from '../derives/display-hint-type.ts'
-import {
-  TradingUnitsPluralType,
-  TradingUnitsSingularType,
-} from '../derives/trading-units-type.ts'
-import { StrategyLeg } from './strategy-leg.ts'
-import { StrategyType } from '../derives/strategy-type.ts'
 
+export interface InstrumentDetailsStock extends GuardType<typeof InstrumentDetailsStock> {}
 export const InstrumentDetailsStock = props({
   AssetType: literal('Stock'),
   AffiliateInfoRequired: boolean(),
@@ -98,6 +97,7 @@ export const InstrumentDetailsStock = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsBond extends GuardType<typeof InstrumentDetailsBond> {}
 export const InstrumentDetailsBond = props({
   AssetType: literal('Bond'),
   AffiliateInfoRequired: boolean(),
@@ -158,6 +158,7 @@ export const InstrumentDetailsBond = props({
   UnderlyingUic: optional(integer()),
 })
 
+export interface InstrumentDetailsFund extends GuardType<typeof InstrumentDetailsFund> {}
 export const InstrumentDetailsFund = props({
   AssetType: literal('Fund'),
   AffiliateInfoRequired: boolean(),
@@ -212,6 +213,7 @@ export const InstrumentDetailsFund = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCfdOnCompanyWarrant extends GuardType<typeof InstrumentDetailsCfdOnCompanyWarrant> {}
 export const InstrumentDetailsCfdOnCompanyWarrant = props({
   AssetType: literal('CfdOnCompanyWarrant'),
   AffiliateInfoRequired: boolean(),
@@ -263,6 +265,7 @@ export const InstrumentDetailsCfdOnCompanyWarrant = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCfdOnEtc extends GuardType<typeof InstrumentDetailsCfdOnEtc> {}
 export const InstrumentDetailsCfdOnEtc = props({
   AssetType: literal('CfdOnEtc'),
   AffiliateInfoRequired: boolean(),
@@ -314,6 +317,7 @@ export const InstrumentDetailsCfdOnEtc = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCfdOnEtf extends GuardType<typeof InstrumentDetailsCfdOnEtf> {}
 export const InstrumentDetailsCfdOnEtf = props({
   AssetType: literal('CfdOnEtf'),
   AffiliateInfoRequired: boolean(),
@@ -368,6 +372,7 @@ export const InstrumentDetailsCfdOnEtf = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCfdOnEtn extends GuardType<typeof InstrumentDetailsCfdOnEtn> {}
 export const InstrumentDetailsCfdOnEtn = props({
   AssetType: literal('CfdOnEtn'),
   AffiliateInfoRequired: boolean(),
@@ -419,6 +424,7 @@ export const InstrumentDetailsCfdOnEtn = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCfdOnFund extends GuardType<typeof InstrumentDetailsCfdOnFund> {}
 export const InstrumentDetailsCfdOnFund = props({
   AssetType: literal('CfdOnFund'),
   AffiliateInfoRequired: boolean(),
@@ -469,6 +475,7 @@ export const InstrumentDetailsCfdOnFund = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCfdOnFutures extends GuardType<typeof InstrumentDetailsCfdOnFutures> {}
 export const InstrumentDetailsCfdOnFutures = props({
   AssetType: literal('CfdOnFutures'),
   AffiliateInfoRequired: boolean(),
@@ -524,6 +531,7 @@ export const InstrumentDetailsCfdOnFutures = props({
   UnderlyingUic: integer(),
 })
 
+export interface InstrumentDetailsCfdOnIndex extends GuardType<typeof InstrumentDetailsCfdOnIndex> {}
 export const InstrumentDetailsCfdOnIndex = props({
   AssetType: literal('CfdOnIndex'),
   AffiliateInfoRequired: boolean(),
@@ -570,6 +578,7 @@ export const InstrumentDetailsCfdOnIndex = props({
   UnderlyingUic: integer(),
 })
 
+export interface InstrumentDetailsCfdOnRights extends GuardType<typeof InstrumentDetailsCfdOnRights> {}
 export const InstrumentDetailsCfdOnRights = props({
   AssetType: literal('CfdOnRights'),
   AffiliateInfoRequired: boolean(),
@@ -615,6 +624,7 @@ export const InstrumentDetailsCfdOnRights = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCfdOnStock extends GuardType<typeof InstrumentDetailsCfdOnStock> {}
 export const InstrumentDetailsCfdOnStock = props({
   AssetType: literal('CfdOnStock'),
   AffiliateInfoRequired: boolean(),
@@ -670,6 +680,7 @@ export const InstrumentDetailsCfdOnStock = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsCompanyWarrant extends GuardType<typeof InstrumentDetailsCompanyWarrant> {}
 export const InstrumentDetailsCompanyWarrant = props({
   AssetType: literal('CompanyWarrant'),
   AffiliateInfoRequired: boolean(),
@@ -722,6 +733,7 @@ export const InstrumentDetailsCompanyWarrant = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsContractFutures extends GuardType<typeof InstrumentDetailsContractFutures> {}
 export const InstrumentDetailsContractFutures = props({
   AssetType: literal('ContractFutures'),
   AffiliateInfoRequired: boolean(),
@@ -777,6 +789,7 @@ export const InstrumentDetailsContractFutures = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsEtc extends GuardType<typeof InstrumentDetailsEtc> {}
 export const InstrumentDetailsEtc = props({
   AssetType: literal('Etc'),
   AffiliateInfoRequired: boolean(),
@@ -829,6 +842,7 @@ export const InstrumentDetailsEtc = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsEtf extends GuardType<typeof InstrumentDetailsEtf> {}
 export const InstrumentDetailsEtf = props({
   AssetType: literal('Etf'),
   AffiliateInfoRequired: boolean(),
@@ -884,6 +898,7 @@ export const InstrumentDetailsEtf = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsEtn extends GuardType<typeof InstrumentDetailsEtn> {}
 export const InstrumentDetailsEtn = props({
   AssetType: literal('Etn'),
   AffiliateInfoRequired: boolean(),
@@ -938,6 +953,7 @@ export const InstrumentDetailsEtn = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsFuturesOption extends GuardType<typeof InstrumentDetailsFuturesOption> {}
 export const InstrumentDetailsFuturesOption = props({
   AssetType: literal('FuturesOption'),
   AffiliateInfoRequired: boolean(),
@@ -990,6 +1006,7 @@ export const InstrumentDetailsFuturesOption = props({
   // UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsFuturesStrategy extends GuardType<typeof InstrumentDetailsFuturesStrategy> {}
 export const InstrumentDetailsFuturesStrategy = props({
   AssetType: literal('FuturesStrategy'),
   AffiliateInfoRequired: boolean(),
@@ -1044,6 +1061,7 @@ export const InstrumentDetailsFuturesStrategy = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsFxSpot extends GuardType<typeof InstrumentDetailsFxSpot> {}
 export const InstrumentDetailsFxSpot = props({
   AssetType: literal('FxSpot'),
   AffiliateInfoRequired: boolean(),
@@ -1091,6 +1109,7 @@ export const InstrumentDetailsFxSpot = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsFxVanillaOption extends GuardType<typeof InstrumentDetailsFxVanillaOption> {}
 export const InstrumentDetailsFxVanillaOption = props({
   AssetType: literal('FxVanillaOption'),
   AffiliateInfoRequired: boolean(),
@@ -1136,6 +1155,7 @@ export const InstrumentDetailsFxVanillaOption = props({
   UnderlyingUic: optional(integer()),
 })
 
+export interface InstrumentDetailsMutualFund extends GuardType<typeof InstrumentDetailsMutualFund> {}
 export const InstrumentDetailsMutualFund = props({
   AssetType: literal('MutualFund'),
   // AffiliateInfoRequired: boolean(),
@@ -1190,6 +1210,7 @@ export const InstrumentDetailsMutualFund = props({
   // UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsRights extends GuardType<typeof InstrumentDetailsRights> {}
 export const InstrumentDetailsRights = props({
   AssetType: literal('Rights'),
   AffiliateInfoRequired: boolean(),
@@ -1241,6 +1262,7 @@ export const InstrumentDetailsRights = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsStockIndexOption extends GuardType<typeof InstrumentDetailsStockIndexOption> {}
 export const InstrumentDetailsStockIndexOption = props({
   AssetType: literal('StockIndexOption'),
   // AffiliateInfoRequired: boolean(),
@@ -1286,6 +1308,7 @@ export const InstrumentDetailsStockIndexOption = props({
   // UnderlyingUic: integer(),
 })
 
+export interface InstrumentDetailsStockIndex extends GuardType<typeof InstrumentDetailsStockIndex> {}
 export const InstrumentDetailsStockIndex = props({
   AssetType: literal('StockIndex'),
   AffiliateInfoRequired: boolean(),
@@ -1326,6 +1349,7 @@ export const InstrumentDetailsStockIndex = props({
   UnderlyingTypeCategory: UnderlyingTypeCategory,
 })
 
+export interface InstrumentDetailsStockOption extends GuardType<typeof InstrumentDetailsStockOption> {}
 export const InstrumentDetailsStockOption = props({
   AssetType: literal('StockOption'),
   AffiliateInfoRequired: boolean(),

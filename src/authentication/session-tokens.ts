@@ -1,9 +1,9 @@
 import { decode } from 'https://deno.land/x/djwt@v3.0.2/mod.ts'
-import { TokensResponse } from './types/tokens-response.ts'
-import { SessionFileContent } from './types/session-file-content.ts'
 import { assertReturn } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { urlJoin } from '../resources/utils.ts'
 import { HTTPClient } from '../http-client.ts'
+import { urlJoin } from '../service-groups/utils.ts'
+import { SessionFileContent } from './types/session-file-content.ts'
+import { TokensResponse } from './types/tokens-response.ts'
 
 // todo in the future, we should consider moving this file out from this repository - maybe into the user's home directory
 const PERSISTED_SESSION_FILE_NAME = 'saxobank-session.json'

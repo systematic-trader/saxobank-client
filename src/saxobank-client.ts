@@ -1,20 +1,22 @@
 import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
 import { Environment } from './environment.ts'
 import { HTTPClient } from './http-client.ts'
-import { ChartResource } from './resources/chart/chart-resource.ts'
-import { AccountGroupResource } from './resources/portfolio/account-group-resource.ts'
-import { AccountResource } from './resources/portfolio/account-resource.ts'
-import { BalanceResource } from './resources/portfolio/balance-resource.ts'
-import { ClientResource } from './resources/portfolio/client-resource.ts'
-import { ClosedPositionResource } from './resources/portfolio/closed-position-resource.ts'
-import { ExposureResource } from './resources/portfolio/exposure-resource.ts'
-import { NetPositionResource } from './resources/portfolio/net-position-resource.ts'
-import { OrderResource } from './resources/portfolio/order-resource.ts'
-import { PositionResource } from './resources/portfolio/position-resource.ts'
-import { UserResource } from './resources/portfolio/user-resource.ts'
+import { ResourceClient } from './resource-client.ts'
+import { ChartResource } from './service-groups/chart/chart-resource.ts'
+import { AccountGroupResource } from './service-groups/portfolio/account-group-resource.ts'
+import { AccountResource } from './service-groups/portfolio/account-resource.ts'
+import { BalanceResource } from './service-groups/portfolio/balance-resource.ts'
+import { ClientResource } from './service-groups/portfolio/client-resource.ts'
+import { ClosedPositionResource } from './service-groups/portfolio/closed-position-resource.ts'
+import { ExposureResource } from './service-groups/portfolio/exposure-resource.ts'
+import { NetPositionResource } from './service-groups/portfolio/net-position-resource.ts'
+import { OrderResource } from './service-groups/portfolio/order-resource.ts'
+import { PositionResource } from './service-groups/portfolio/position-resource.ts'
+import { UserResource } from './service-groups/portfolio/user-resource.ts'
+import { ReferenceData } from './service-groups/reference-data.ts'
 
 export class SaxoBankClient {
-  readonly #client: HTTPClient
+  readonly #httpClient: HTTPClient
 
   readonly chart: ChartResource
 
@@ -31,6 +33,8 @@ export class SaxoBankClient {
     readonly user: UserResource
   }
 
+  readonly referenceData: ReferenceData
+
   constructor({
     authorization,
     prefixURL = Environment['SAXOBANK_API_PREFIX_URL'] ?? 'https://gateway.saxobank.com/sim/openapi',
@@ -42,21 +46,28 @@ export class SaxoBankClient {
       throw new Error('No prefix URL provided')
     }
 
-    this.#client = HTTPClient.withAuthorization(authorization)
+    this.#httpClient = HTTPClient.withAuthorization(authorization)
 
-    this.chart = new ChartResource({ client: this.#client, prefixURL })
+    const resourceClient = new ResourceClient({
+      client: this.#httpClient,
+      prefixURL,
+    })
+
+    this.chart = new ChartResource({ client: this.#httpClient, prefixURL })
 
     this.portfolio = {
-      accountGroups: new AccountGroupResource({ client: this.#client, prefixURL }),
-      account: new AccountResource({ client: this.#client, prefixURL }),
-      balance: new BalanceResource({ client: this.#client, prefixURL }),
-      client: new ClientResource({ client: this.#client, prefixURL }),
-      closedPosition: new ClosedPositionResource({ client: this.#client, prefixURL }),
-      exposure: new ExposureResource({ client: this.#client, prefixURL }),
-      netPosition: new NetPositionResource({ client: this.#client, prefixURL }),
-      order: new OrderResource({ client: this.#client, prefixURL }),
-      position: new PositionResource({ client: this.#client, prefixURL }),
-      user: new UserResource({ client: this.#client, prefixURL }),
+      accountGroups: new AccountGroupResource({ client: this.#httpClient, prefixURL }),
+      account: new AccountResource({ client: this.#httpClient, prefixURL }),
+      balance: new BalanceResource({ client: this.#httpClient, prefixURL }),
+      client: new ClientResource({ client: this.#httpClient, prefixURL }),
+      closedPosition: new ClosedPositionResource({ client: this.#httpClient, prefixURL }),
+      exposure: new ExposureResource({ client: this.#httpClient, prefixURL }),
+      netPosition: new NetPositionResource({ client: this.#httpClient, prefixURL }),
+      order: new OrderResource({ client: this.#httpClient, prefixURL }),
+      position: new PositionResource({ client: this.#httpClient, prefixURL }),
+      user: new UserResource({ client: this.#httpClient, prefixURL }),
     }
+
+    this.referenceData = new ReferenceData({ client: resourceClient })
   }
 }

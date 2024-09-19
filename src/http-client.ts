@@ -1,7 +1,5 @@
-import {
-  assertReturn,
-  type Guard,
-} from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import { SaxoBank24HourToken } from './authentication/saxobank-24-hour-token.ts'
 import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
 
 export class HTTPError extends Error {
@@ -20,8 +18,8 @@ export class HTTPError extends Error {
 export class HTTPClientError extends HTTPError {
   readonly body: unknown
 
-  constructor(statusCode: number, statusText: string, body: unknown) {
-    let message = `${statusCode} ${statusText}`
+  constructor(statusCode: number, statusText: string, href: string, body: unknown) {
+    let message = `${statusCode} ${statusText} - ${href}`
 
     if (typeof body === 'string') {
       message = `${message}\n${body}`
@@ -62,6 +60,10 @@ export class HTTPServiceError extends HTTPError {
 export type HTTPClientHeaders = Headers | Record<string, undefined | string>
 
 export class HTTPClient {
+  static fromEnvironment(): HTTPClient {
+    return this.withAuthorization(new SaxoBank24HourToken())
+  }
+
   static withAuthorization(authentication: SaxoBankAuthorization): HTTPClient {
     return new HTTPClient({
       authentication,
@@ -98,12 +100,12 @@ export class HTTPClient {
       headers: argumentHeaders,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<Response> {
     const headers = mergeHeaders(
       this.#constructorHeaders,
       this.#authenticationHeaders,
-      argumentHeaders
+      argumentHeaders,
     )
 
     return await rateLimitFetch(this, url, { method: 'GET', headers })
@@ -117,7 +119,7 @@ export class HTTPClient {
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<T> {
     const response = await this.get(url, { headers })
 
@@ -138,7 +140,7 @@ export class HTTPClient {
       headers,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<Blob> {
     return await this.get(url, { headers }).then((response) => response.blob())
   }
@@ -149,7 +151,7 @@ export class HTTPClient {
       headers,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<string> {
     return await this.get(url, { headers }).then((response) => response.text())
   }
@@ -162,12 +164,12 @@ export class HTTPClient {
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
-    }
+    },
   ): Promise<Response> {
     const headers = mergeHeaders(
       this.#constructorHeaders,
       this.#authenticationHeaders,
-      argumentHeaders
+      argumentHeaders,
     )
 
     return await rateLimitFetch(this, url, {
@@ -185,7 +187,7 @@ export class HTTPClient {
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<T> {
     const response = await this.post(url, { headers })
 
@@ -206,12 +208,12 @@ export class HTTPClient {
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
-    }
+    },
   ): Promise<Response> {
     const headers = mergeHeaders(
       this.#constructorHeaders,
       this.#authenticationHeaders,
-      argumentHeaders
+      argumentHeaders,
     )
 
     return await rateLimitFetch(this, url, {
@@ -227,12 +229,12 @@ export class HTTPClient {
       headers: argumentHeaders,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
-    } = {}
+    } = {},
   ): Promise<Response> {
     const headers = mergeHeaders(
       this.#constructorHeaders,
       this.#authenticationHeaders,
-      argumentHeaders
+      argumentHeaders,
     )
 
     return await rateLimitFetch(this, url, { method: 'DELETE', headers })
@@ -276,7 +278,7 @@ async function rateLimitFetch(
     readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
     readonly headers?: undefined | Headers
     readonly body?: RequestInit['body']
-  }
+  },
 ): Promise<Response> {
   while (true) {
     const response = await fetch(url, options)
@@ -291,7 +293,8 @@ async function rateLimitFetch(
         throw new HTTPClientError(
           response.status,
           response.statusText,
-          await response.text()
+          response.url,
+          await response.text(),
         )
       }
 
@@ -332,9 +335,9 @@ async function rateLimitFetch(
       // console.log(response.headers)
 
       const body = response.headers
-        .get('Content-Type')
-        ?.toLocaleLowerCase()
-        .includes('application/json')
+          .get('Content-Type')
+          ?.toLocaleLowerCase()
+          .includes('application/json')
         ? await response.json()
         : await response.text()
 
@@ -342,7 +345,7 @@ async function rateLimitFetch(
         throw new HTTPServiceError(response.status, response.statusText, body)
       }
 
-      throw new HTTPClientError(response.status, response.statusText, body)
+      throw new HTTPClientError(response.status, response.statusText, response.url, body)
     }
 
     return response
@@ -350,7 +353,7 @@ async function rateLimitFetch(
 }
 
 function getRateLimitExceeded(
-  headers: Headers
+  headers: Headers,
 ): undefined | { readonly name: string; readonly sleep: number } {
   const rateLimits: Array<{
     name: string
