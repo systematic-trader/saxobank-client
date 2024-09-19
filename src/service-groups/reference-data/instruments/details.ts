@@ -66,10 +66,9 @@ type ExtractInstrumentDetails<T extends AssetType> = Extract<
 
 export class InstrumentsDetails {
   readonly #client: ResourceClient
-  readonly #path = 'details'
 
   constructor({ client }: { readonly client: ResourceClient }) {
-    this.#client = client
+    this.#client = client.appendPath('details')
   }
 
   async get<T extends AssetType = AssetType>({
@@ -97,12 +96,7 @@ export class InstrumentsDetails {
     }
 
     // deno-lint-ignore no-explicit-any
-    const instrumentsUnverified = await this.#client.getPaginated<any>(
-      {
-        path: this.#path,
-        searchParams,
-      },
-    )
+    const instrumentsUnverified = await this.#client.getPaginated<any>({ searchParams })
 
     const instruments = instrumentsUnverified.map((instrument: { AssetType: AssetType }) => {
       try {
