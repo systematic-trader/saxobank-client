@@ -1,12 +1,12 @@
 import {
   array,
   assertReturn,
+  type Guard,
   integer,
   optional,
   props,
   string,
   unknown,
-  type Guard,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import type { HTTPClient } from './http-client.ts'
 
@@ -29,15 +29,15 @@ export class ResourceClient {
     this.#prefixURL = prefixURL
   }
 
-  async getOne<T = unknown>(options: {
+  async get<T = unknown>(options: {
     readonly path: string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?:
       | undefined
       | Record<
-          string,
-          undefined | boolean | number | string | readonly string[]
-        >
+        string,
+        undefined | boolean | number | string | readonly string[]
+      >
     readonly guard?: undefined | Guard<T>
   }): Promise<T> {
     const url = urlJoin(this.#prefixURL, options.path)
@@ -48,15 +48,15 @@ export class ResourceClient {
     return await this.#client.getJSON(url, { headers, guard: options.guard })
   }
 
-  async getMany<T>(options: {
+  async getPaginated<T = unknown>(options: {
     readonly path: string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?:
       | undefined
       | Record<
-          string,
-          undefined | boolean | number | string | readonly string[]
-        >
+        string,
+        undefined | boolean | number | string | readonly string[]
+      >
     readonly guard?: undefined | Guard<T>
   }): Promise<ReadonlyArray<T>> {
     const url = urlJoin(this.#prefixURL, options.path)
@@ -95,7 +95,7 @@ function setSearchParams(
   url: URL,
   searchParams:
     | undefined
-    | Record<string, undefined | boolean | number | string | readonly string[]>
+    | Record<string, undefined | boolean | number | string | readonly string[]>,
 ): void {
   if (searchParams === undefined) {
     return
@@ -144,12 +144,9 @@ async function fetchResourceData<T = unknown>({
 
   const { __next, Data } = assertReturn(ResourceDataGuard, resource)
 
-  const assertedData =
-    guard === undefined
-      ? (Data as ReadonlyArray<T>)
-      : Data.map((datum) => {
-          return assertReturn(guard, datum)
-        })
+  const assertedData = guard === undefined ? (Data as ReadonlyArray<T>) : Data.map((datum) => {
+    return assertReturn(guard, datum)
+  })
 
   if (__next === undefined) {
     return assertedData
