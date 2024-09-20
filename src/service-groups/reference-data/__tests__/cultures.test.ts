@@ -5,11 +5,11 @@ import { ResourceClient } from '../../../resource-client.ts'
 import { Cultures } from '../cultures.ts'
 
 test('reference-data/cultures', async () => {
-  const cultures = new Cultures({
+  const resource = new Cultures({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref'),
   })
 
-  const result = await cultures.get()
+  const cultures = await resource.get()
 
-  expect(result).toBeDefined()
+  expect(cultures).toBeDefined()
 })

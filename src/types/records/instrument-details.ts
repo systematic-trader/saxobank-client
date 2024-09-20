@@ -39,6 +39,34 @@ import { StrategyLeg } from './strategy-leg.ts'
 import { SupportedOrderTypeSetting } from './supported-order-type-setting.ts'
 import { TickSizeScheme } from './tick-size-scheme.ts'
 
+export type InstrumentDetailsType =
+  | InstrumentDetailsBond
+  | InstrumentDetailsCfdOnCompanyWarrant
+  | InstrumentDetailsCfdOnEtc
+  | InstrumentDetailsCfdOnEtf
+  | InstrumentDetailsCfdOnEtn
+  | InstrumentDetailsCfdOnFund
+  | InstrumentDetailsCfdOnFutures
+  | InstrumentDetailsCfdOnIndex
+  | InstrumentDetailsCfdOnRights
+  | InstrumentDetailsCfdOnStock
+  | InstrumentDetailsCompanyWarrant
+  | InstrumentDetailsContractFutures
+  | InstrumentDetailsEtc
+  | InstrumentDetailsEtf
+  | InstrumentDetailsEtn
+  | InstrumentDetailsFund
+  | InstrumentDetailsFuturesOption
+  | InstrumentDetailsFuturesStrategy
+  | InstrumentDetailsFxSpot
+  | InstrumentDetailsFxVanillaOption
+  | InstrumentDetailsMutualFund
+  | InstrumentDetailsRights
+  | InstrumentDetailsStock
+  | InstrumentDetailsStockIndex
+  | InstrumentDetailsStockIndexOption
+  | InstrumentDetailsStockOption
+
 export interface InstrumentDetailsStock extends GuardType<typeof InstrumentDetailsStock> {}
 export const InstrumentDetailsStock = props({
   AssetType: literal('Stock'),

@@ -5,11 +5,17 @@ import { ResourceClient } from '../../../resource-client.ts'
 import { AlgoStrategies } from '../algostrategies.ts'
 
 test('reference-data/algostrategies', async () => {
-  const algostrategies = new AlgoStrategies({
+  const resource = new AlgoStrategies({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref'),
   })
 
-  const result = await algostrategies.get()
+  const strategies = await resource.get()
+
+  expect(strategies).toBeDefined()
+
+  const strategy = strategies[0]!
+
+  const result = await resource.get({ name: strategy.Name })
 
   expect(result).toBeDefined()
 })

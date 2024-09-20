@@ -29,35 +29,8 @@ import {
   InstrumentDetailsStockIndex,
   InstrumentDetailsStockIndexOption,
   InstrumentDetailsStockOption,
+  type InstrumentDetailsType,
 } from '../../../types/records/instrument-details.ts'
-
-type InstrumentDetailsType =
-  | InstrumentDetailsBond
-  | InstrumentDetailsCfdOnCompanyWarrant
-  | InstrumentDetailsCfdOnEtc
-  | InstrumentDetailsCfdOnEtf
-  | InstrumentDetailsCfdOnEtn
-  | InstrumentDetailsCfdOnFund
-  | InstrumentDetailsCfdOnFutures
-  | InstrumentDetailsCfdOnIndex
-  | InstrumentDetailsCfdOnRights
-  | InstrumentDetailsCfdOnStock
-  | InstrumentDetailsCompanyWarrant
-  | InstrumentDetailsContractFutures
-  | InstrumentDetailsEtc
-  | InstrumentDetailsEtf
-  | InstrumentDetailsEtn
-  | InstrumentDetailsFund
-  | InstrumentDetailsFuturesOption
-  | InstrumentDetailsFuturesStrategy
-  | InstrumentDetailsFxSpot
-  | InstrumentDetailsFxVanillaOption
-  | InstrumentDetailsMutualFund
-  | InstrumentDetailsRights
-  | InstrumentDetailsStock
-  | InstrumentDetailsStockIndex
-  | InstrumentDetailsStockIndexOption
-  | InstrumentDetailsStockOption
 
 type ExtractInstrumentDetails<T extends AssetType> = Extract<
   InstrumentDetailsType,

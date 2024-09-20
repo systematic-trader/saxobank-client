@@ -5,11 +5,17 @@ import { ResourceClient } from '../../../resource-client.ts'
 import { Exchanges } from '../exchanges.ts'
 
 test('reference-data/exchanges', async () => {
-  const exchanges = new Exchanges({
+  const resource = new Exchanges({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref'),
   })
 
-  const result = await exchanges.get()
+  const exchanges = await resource.get()
+
+  expect(exchanges).toBeDefined()
+
+  const exchange = exchanges[0]!
+
+  const result = await resource.get({ exchangeId: exchange.ExchangeId })
 
   expect(result).toBeDefined()
 })

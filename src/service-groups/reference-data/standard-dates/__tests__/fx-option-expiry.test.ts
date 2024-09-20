@@ -5,11 +5,11 @@ import { ResourceClient } from '../../../../resource-client.ts'
 import { FxOptionExpiry } from '../fx-option-expiry.ts'
 
 test('reference-data/standard-dates/fxoptionexpiry', async () => {
-  const fxOptionExpiry = new FxOptionExpiry({
+  const resource = new FxOptionExpiry({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref/v1/standarddates'),
   })
 
-  const result = await fxOptionExpiry.get({ Uic: 22041762 /*1249*/ })
+  const fxOptionExpiry = await resource.get({ Uic: 22041762 /*1249*/ })
 
-  expect(result).toBeDefined()
+  expect(fxOptionExpiry).toBeDefined()
 })

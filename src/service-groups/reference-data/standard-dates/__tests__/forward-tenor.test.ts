@@ -5,11 +5,11 @@ import { ResourceClient } from '../../../../resource-client.ts'
 import { ForwardTenor } from '../forward-tenor.ts'
 
 test('reference-data/standard-dates/forwardtenor', async () => {
-  const forwardTenor = new ForwardTenor({
+  const resource = new ForwardTenor({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref/v1/standarddates'),
   })
 
-  const result = await forwardTenor.get({ Uic: 22041762, AccountKey: 'Bla' })
+  const forwardTenor = await resource.get({ Uic: 22041762, AccountKey: 'Bla' })
 
-  expect(result).toBeDefined()
+  expect(forwardTenor).toBeDefined()
 })

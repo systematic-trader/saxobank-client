@@ -5,15 +5,15 @@ import { ResourceClient } from '../../../../resource-client.ts'
 import { InstrumentsDetails } from '../details.ts'
 
 test('reference-data/instruments/details', async () => {
-  const details = new InstrumentsDetails({
+  const resource = new InstrumentsDetails({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref/v1/instruments'),
   })
 
-  const etns = await details.get({ AssetTypes: ['Etn'] })
+  const etns = await resource.get({ AssetTypes: ['Etn'] })
 
   expect(etns).toBeDefined()
 
-  const nvidia = await details.get({ Uics: [1249] })
+  const nvidia = await resource.get({ Uics: [1249] })
 
   expect(nvidia).toBeDefined()
 })

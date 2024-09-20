@@ -5,11 +5,11 @@ import { ResourceClient } from '../../../resource-client.ts'
 import { TimeZones } from '../time-zones.ts'
 
 test('reference-data/timezones', async () => {
-  const timezones = new TimeZones({
+  const resource = new TimeZones({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref'),
   })
 
-  const result = await timezones.get()
+  const timezones = await resource.get()
 
-  expect(result).toBeDefined()
+  expect(timezones).toBeDefined()
 })

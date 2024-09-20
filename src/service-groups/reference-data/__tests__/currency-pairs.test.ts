@@ -5,11 +5,11 @@ import { ResourceClient } from '../../../resource-client.ts'
 import { CurrencyPairs } from '../currency-pairs.ts'
 
 test('reference-data/currency-pairs', async () => {
-  const currencyPairs = new CurrencyPairs({
+  const resource = new CurrencyPairs({
     client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref'),
   })
 
-  const result = await currencyPairs.get()
+  const currencyPairs = await resource.get()
 
-  expect(result).toBeDefined()
+  expect(currencyPairs).toBeDefined()
 })
