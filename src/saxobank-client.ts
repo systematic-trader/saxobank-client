@@ -3,6 +3,7 @@ import { Environment } from './environment.ts'
 import { HTTPClient } from './http-client.ts'
 import { ResourceClient } from './resource-client.ts'
 import { Chart } from './service-groups/chart.ts'
+import { ClientServices } from './service-groups/client-services.ts'
 import { Portfolio } from './service-groups/portfolio.ts'
 import { ReferenceData } from './service-groups/reference-data.ts'
 
@@ -12,6 +13,7 @@ export class SaxoBankClient {
   readonly portfolio: Portfolio
   readonly chart: Chart
   readonly referenceData: ReferenceData
+  readonly clientServices: ClientServices
 
   constructor({
     authorization,
@@ -34,5 +36,6 @@ export class SaxoBankClient {
     this.portfolio = new Portfolio({ client: resourceClient })
     this.chart = new Chart({ client: resourceClient })
     this.referenceData = new ReferenceData({ client: resourceClient })
+    this.clientServices = new ClientServices({ client: resourceClient })
   }
 }
