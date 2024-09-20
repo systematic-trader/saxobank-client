@@ -9,7 +9,7 @@ export class ForwardTenor {
   }
 
   async get(
-    { Uic, AccountKey }: { readonly Uic: number | string; readonly AccountKey: number | string },
+    { Uic, AccountKey }: { readonly Uic: number | string; readonly AccountKey: string },
   ): Promise<ReadonlyArray<StandardDate>> {
     return await this.#client.getPaginated({
       path: String(Uic),
