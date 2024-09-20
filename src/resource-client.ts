@@ -48,7 +48,7 @@ export class ResourceClient {
         undefined | boolean | number | string | readonly string[]
       >
     readonly guard?: undefined | Guard<T>
-  }): Promise<T> {
+  } = {}): Promise<T> {
     const url = urlJoin(this.#prefixURL, options.path)
     const headers = { ...this.#headers, ...options.headers }
 
@@ -58,6 +58,7 @@ export class ResourceClient {
   }
 
   async getPaginated<T = unknown>(options: {
+    readonly limit?: undefined | number
     readonly path?: undefined | string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?:
@@ -67,7 +68,17 @@ export class ResourceClient {
         undefined | boolean | number | string | readonly string[]
       >
     readonly guard?: undefined | Guard<T>
-  }): Promise<ReadonlyArray<T>> {
+  } = {}): Promise<ReadonlyArray<T>> {
+    if (typeof options.limit === 'number') {
+      if (options.limit === 0) {
+        return []
+      }
+
+      if (Number.isSafeInteger(options.limit) === false || options.limit < 0) {
+        throw new Error('Limit must be a non-negative integer')
+      }
+    }
+
     const url = urlJoin(this.#prefixURL, options.path)
     const headers = { ...this.#headers, ...options.headers }
     const searchParams = {
@@ -83,6 +94,7 @@ export class ResourceClient {
       headers,
       url,
       guard: options.guard,
+      limit: options.limit,
     })
   }
 }
@@ -143,12 +155,18 @@ async function fetchResourceData<T = unknown>({
   headers,
   url,
   guard,
+  limit,
 }: {
   readonly client: HTTPClient
   readonly headers: Record<string, string>
   readonly url: string | URL
   readonly guard?: undefined | Guard<T>
+  readonly limit?: undefined | number
 }): Promise<ReadonlyArray<T>> {
+  if (limit !== undefined && limit <= 0) {
+    return []
+  }
+
   const resource = await client.getJSON(url, { headers })
 
   if (EmptyResourceDataGuard.accept(resource)) {
@@ -162,7 +180,21 @@ async function fetchResourceData<T = unknown>({
   })
 
   if (__next === undefined) {
+    if (limit !== undefined && assertedData.length > limit) {
+      return assertedData.slice(0, limit)
+    }
+
     return assertedData
+  }
+
+  if (limit !== undefined) {
+    if (assertedData.length === limit) {
+      return assertedData
+    } else if (assertedData.length > limit) {
+      return assertedData.slice(0, limit)
+    }
+
+    limit -= assertedData.length
   }
 
   const nextData = await fetchResourceData<T>({
@@ -170,6 +202,7 @@ async function fetchResourceData<T = unknown>({
     headers,
     url: __next,
     guard,
+    limit,
   })
 
   return assertedData.concat(nextData)
