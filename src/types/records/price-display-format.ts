@@ -1,8 +1,4 @@
-import {
-  integer,
-  optional,
-  props,
-} from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import { integer, optional, props } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { PriceDisplayFormatType } from '../derives/price-display-format-type.ts'
 
