@@ -45,7 +45,7 @@ export class ResourceClient {
       | undefined
       | Record<
         string,
-        undefined | boolean | number | string | readonly string[]
+        undefined | boolean | number | string | ReadonlyArray<number | string>
       >
     readonly guard?: undefined | Guard<T>
   } = {}): Promise<T> {
@@ -65,7 +65,7 @@ export class ResourceClient {
       | undefined
       | Record<
         string,
-        undefined | boolean | number | string | readonly string[]
+        undefined | boolean | number | string | ReadonlyArray<number | string>
       >
     readonly guard?: undefined | Guard<T>
   } = {}): Promise<ReadonlyArray<T>> {
@@ -149,7 +149,7 @@ function setSearchParams(
   url: URL,
   searchParams:
     | undefined
-    | Record<string, undefined | boolean | number | string | readonly string[]>,
+    | Record<string, undefined | boolean | number | string | ReadonlyArray<number | string>>,
 ): void {
   if (searchParams === undefined) {
     return
