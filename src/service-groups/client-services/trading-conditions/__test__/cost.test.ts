@@ -5,7 +5,7 @@ import { SaxoBankClient } from '../../../../saxobank-client.ts'
 import { extractEntries } from '../../../../utils.ts'
 import type { CostParameters } from '../cost.ts'
 
-describe.skip('client-services/trading-conditions/cost', () => {
+describe('client-services/trading-conditions/cost', () => {
   const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),
