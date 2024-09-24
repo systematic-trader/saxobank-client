@@ -327,6 +327,9 @@ async function rateLimitFetch(
         )
       }
 
+      // Prevent memory leak
+      await response.body?.cancel()
+
       // console.log('rateLimit:', `${rateLimit.name} - ${rateLimit.sleep}`)
 
       let penaltyMap = RateLimitRefs.get(reference)
