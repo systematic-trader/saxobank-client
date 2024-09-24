@@ -8,13 +8,44 @@ import {
   optional,
   props,
   string,
-  union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { CountryCodeA2 } from '../derives/country.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { SummaryType } from '../derives/summary-type.ts'
 
-export const BondInstrumentSummaryInfo = props({
+export type InstrumentSummaryInfoType =
+  | InstrumentSummaryInfoBond
+  | InstrumentSummaryInfoCfdOnCompanyWarrant
+  | InstrumentSummaryInfoCfdOnEtc
+  | InstrumentSummaryInfoCfdOnEtf
+  | InstrumentSummaryInfoCfdOnEtn
+  | InstrumentSummaryInfoCfdOnFund
+  | InstrumentSummaryInfoCfdOnFutures
+  | InstrumentSummaryInfoCfdOnIndex
+  | InstrumentSummaryInfoCfdOnRights
+  | InstrumentSummaryInfoCfdOnStock
+  | InstrumentSummaryInfoCompanyWarrant
+  | InstrumentSummaryInfoContractFutures
+  | InstrumentSummaryInfoEtc
+  | InstrumentSummaryInfoEtf
+  | InstrumentSummaryInfoEtn
+  | InstrumentSummaryInfoFund
+  | InstrumentSummaryInfoFuturesOption
+  | InstrumentSummaryInfoFuturesStrategy
+  | InstrumentSummaryInfoFxSpot
+  | InstrumentSummaryInfoFxSwap
+  | InstrumentSummaryInfoFxVanillaOption
+  | InstrumentSummaryInfoMutualFund
+  | InstrumentSummaryInfoRights
+  | InstrumentSummaryInfoStock
+  | InstrumentSummaryInfoStockIndex
+  | InstrumentSummaryInfoStockIndexOption
+  | InstrumentSummaryInfoStockOption
+  | InstrumentSummaryInfoFxForwards
+  | InstrumentSummaryInfoFxNoTouchOption
+  | InstrumentSummaryInfoFxOneTouchOption
+
+export const InstrumentSummaryInfoBond = props({
   AssetType: literal('Bond'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -22,17 +53,16 @@ export const BondInstrumentSummaryInfo = props({
   GroupId: integer(),
   Identifier: integer(),
   IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['Bond']))),
+  TradableAs: array(enums(['Bond'])),
   UnderlyingAssetType: optional(enums(['Stock'])),
   UnderlyingUic: optional(integer()),
 })
 
-export interface BondInstrumentSummaryInfo extends GuardType<typeof BondInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoBond extends GuardType<typeof InstrumentSummaryInfoBond> {}
 
-export const CfdOnCompanyWarrantInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnCompanyWarrant = props({
   AssetType: literal('CfdOnCompanyWarrant'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -43,13 +73,13 @@ export const CfdOnCompanyWarrantInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnCompanyWarrant']))),
+  TradableAs: array(enums(['CfdOnCompanyWarrant'])),
 })
 
-export interface CfdOnCompanyWarrantInstrumentSummaryInfo
-  extends GuardType<typeof CfdOnCompanyWarrantInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnCompanyWarrant
+  extends GuardType<typeof InstrumentSummaryInfoCfdOnCompanyWarrant> {}
 
-export const CfdOnEtcInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnEtc = props({
   AssetType: literal('CfdOnEtc'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -60,12 +90,12 @@ export const CfdOnEtcInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnEtc']))),
+  TradableAs: array(enums(['CfdOnEtc'])),
 })
 
-export interface CfdOnEtcInstrumentSummaryInfo extends GuardType<typeof CfdOnEtcInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnEtc extends GuardType<typeof InstrumentSummaryInfoCfdOnEtc> {}
 
-export const CfdOnEtfInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnEtf = props({
   AssetType: literal('CfdOnEtf'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -76,12 +106,12 @@ export const CfdOnEtfInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnEtf']))),
+  TradableAs: array(enums(['CfdOnEtf'])),
 })
 
-export interface CfdOnEtfInstrumentSummaryInfo extends GuardType<typeof CfdOnEtfInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnEtf extends GuardType<typeof InstrumentSummaryInfoCfdOnEtf> {}
 
-export const CfdOnEtnInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnEtn = props({
   AssetType: literal('CfdOnEtn'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -89,15 +119,14 @@ export const CfdOnEtnInstrumentSummaryInfo = props({
   GroupId: integer(),
   Identifier: integer(),
   IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnEtn']))),
+  TradableAs: array(enums(['CfdOnEtn'])),
 })
 
-export interface CfdOnEtnInstrumentSummaryInfo extends GuardType<typeof CfdOnEtnInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnEtn extends GuardType<typeof InstrumentSummaryInfoCfdOnEtn> {}
 
-export const CfdOnFundInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnFund = props({
   AssetType: literal('CfdOnFund'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -111,42 +140,40 @@ export const CfdOnFundInstrumentSummaryInfo = props({
   TradableAs: optional(array(enums(['CfdOnFund']))),
 })
 
-export interface CfdOnFundInstrumentSummaryInfo extends GuardType<typeof CfdOnFundInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnFund extends GuardType<typeof InstrumentSummaryInfoCfdOnFund> {}
 
-export const CfdOnFuturesInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnFutures = props({
   AssetType: literal('CfdOnFutures'),
   CurrencyCode: Currency3,
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
+  PrimaryListing: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnFutures']))),
+  TradableAs: array(enums(['CfdOnFutures'])),
+  UnderlyingUic: integer(),
 })
 
-export interface CfdOnFuturesInstrumentSummaryInfo extends GuardType<typeof CfdOnFuturesInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnFutures extends GuardType<typeof InstrumentSummaryInfoCfdOnFutures> {}
 
-export const CfdOnIndexInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnIndex = props({
   AssetType: literal('CfdOnIndex'),
   CurrencyCode: Currency3,
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  // IssuerCountry: optional(CountryCodeA2),
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnIndex']))),
+  TradableAs: array(enums(['CfdOnIndex'])),
   UnderlyingUic: integer(),
 })
 
-export interface CfdOnIndexInstrumentSummaryInfo extends GuardType<typeof CfdOnIndexInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnIndex extends GuardType<typeof InstrumentSummaryInfoCfdOnIndex> {}
 
-export const CfdOnRightsInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnRights = props({
   AssetType: literal('CfdOnRights'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -154,15 +181,14 @@ export const CfdOnRightsInstrumentSummaryInfo = props({
   GroupId: integer(),
   Identifier: integer(),
   IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnRights']))),
+  TradableAs: array(enums(['CfdOnRights'])),
 })
 
-export interface CfdOnRightsInstrumentSummaryInfo extends GuardType<typeof CfdOnRightsInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnRights extends GuardType<typeof InstrumentSummaryInfoCfdOnRights> {}
 
-export const CfdOnStockInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCfdOnStock = props({
   AssetType: literal('CfdOnStock'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -173,12 +199,12 @@ export const CfdOnStockInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CfdOnStock']))),
+  TradableAs: array(enums(['CfdOnStock'])),
 })
 
-export interface CfdOnStockInstrumentSummaryInfo extends GuardType<typeof CfdOnStockInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCfdOnStock extends GuardType<typeof InstrumentSummaryInfoCfdOnStock> {}
 
-export const CompanyWarrantInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoCompanyWarrant = props({
   AssetType: literal('CompanyWarrant'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -189,28 +215,27 @@ export const CompanyWarrantInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['CompanyWarrant']))),
+  TradableAs: array(enums(['CompanyWarrant'])),
 })
 
-export interface CompanyWarrantInstrumentSummaryInfo extends GuardType<typeof CompanyWarrantInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoCompanyWarrant extends GuardType<typeof InstrumentSummaryInfoCompanyWarrant> {}
 
-export const ContractFuturesInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoContractFutures = props({
   AssetType: literal('ContractFutures'),
   CurrencyCode: Currency3,
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
+  PrimaryListing: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['ContractFutures']))),
+  TradableAs: array(enums(['ContractFutures'])),
 })
 
-export interface ContractFuturesInstrumentSummaryInfo extends GuardType<typeof ContractFuturesInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoContractFutures extends GuardType<typeof InstrumentSummaryInfoContractFutures> {}
 
-export const EtcInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoEtc = props({
   AssetType: literal('Etc'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -221,12 +246,12 @@ export const EtcInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['Etc']))),
+  TradableAs: array(enums(['Etc'])),
 })
 
-export interface EtcInstrumentSummaryInfo extends GuardType<typeof EtcInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoEtc extends GuardType<typeof InstrumentSummaryInfoEtc> {}
 
-export const EtfInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoEtf = props({
   AssetType: literal('Etf'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -237,12 +262,12 @@ export const EtfInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['Etf']))),
+  TradableAs: array(enums(['Etf'])),
 })
 
-export interface EtfInstrumentSummaryInfo extends GuardType<typeof EtfInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoEtf extends GuardType<typeof InstrumentSummaryInfoEtf> {}
 
-export const EtnInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoEtn = props({
   AssetType: literal('Etn'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -253,12 +278,12 @@ export const EtnInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['Etn']))),
+  TradableAs: array(enums(['Etn'])),
 })
 
-export interface EtnInstrumentSummaryInfo extends GuardType<typeof EtnInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoEtn extends GuardType<typeof InstrumentSummaryInfoEtn> {}
 
-export const FundInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoFund = props({
   AssetType: literal('Fund'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -269,78 +294,74 @@ export const FundInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['Fund']))),
+  TradableAs: array(enums(['Fund'])),
 })
 
-export interface FundInstrumentSummaryInfo extends GuardType<typeof FundInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoFund extends GuardType<typeof InstrumentSummaryInfoFund> {}
 
-export const FuturesOptionInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoFuturesOption = props({
   AssetType: literal('FuturesOption'),
-  // CurrencyCode: optional(Currency3),
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  // IssuerCountry: optional(CountryCodeA2),
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['FuturesOption']))),
   CanParticipateInMultiLegOrder: boolean(),
   GroupOptionRootId: integer(),
 })
 
-export interface FuturesOptionInstrumentSummaryInfo extends GuardType<typeof FuturesOptionInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoFuturesOption extends GuardType<typeof InstrumentSummaryInfoFuturesOption> {}
 
-export const FuturesStrategyInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoFuturesStrategy = props({
   AssetType: literal('FuturesStrategy'),
   CurrencyCode: Currency3,
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
+  PrimaryListing: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['FuturesStrategy']))),
+  TradableAs: array(enums(['FuturesStrategy'])),
 })
 
-export interface FuturesStrategyInstrumentSummaryInfo extends GuardType<typeof FuturesStrategyInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoFuturesStrategy extends GuardType<typeof InstrumentSummaryInfoFuturesStrategy> {}
 
-export const FxSpotInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoFxSpot = props({
   AssetType: literal('FxSpot'),
   CurrencyCode: Currency3,
   Description: string(),
+  DisplayHint: optional(string()),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['FxSpot']))),
+  TradableAs: array(enums(['FxSpot', 'FxForwards', 'FxSwap'])),
 })
 
-export interface FxSpotInstrumentSummaryInfo extends GuardType<typeof FxSpotInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoFxSpot extends GuardType<typeof InstrumentSummaryInfoFxSpot> {}
 
-export const FxVanillaOptionInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoFxVanillaOption = props({
   AssetType: literal('FxVanillaOption'),
   CurrencyCode: Currency3,
   Description: string(),
+  DisplayHint: optional(string()),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['FxVanillaOption']))),
+  TradableAs: array(enums(['FxSpot', 'FxForwards', 'FxSwap'])),
+  CanParticipateInMultiLegOrder: boolean(),
+  UnderlyingAssetType: enums(['FxSpot']),
+  UnderlyingUic: integer(),
 })
 
-export interface FxVanillaOptionInstrumentSummaryInfo extends GuardType<typeof FxVanillaOptionInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoFxVanillaOption extends GuardType<typeof InstrumentSummaryInfoFxVanillaOption> {}
 
-export const MutualFundInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoMutualFund = props({
   AssetType: literal('MutualFund'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -348,15 +369,14 @@ export const MutualFundInstrumentSummaryInfo = props({
   GroupId: integer(),
   Identifier: integer(),
   IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['MutualFund']))),
+  TradableAs: array(enums(['MutualFund'])),
 })
 
-export interface MutualFundInstrumentSummaryInfo extends GuardType<typeof MutualFundInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoMutualFund extends GuardType<typeof InstrumentSummaryInfoMutualFund> {}
 
-export const RightsInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoRights = props({
   AssetType: literal('Rights'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -364,15 +384,15 @@ export const RightsInstrumentSummaryInfo = props({
   GroupId: integer(),
   Identifier: integer(),
   IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
+  PrimaryListing: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['Rights']))),
+  TradableAs: array(enums(['Rights'])),
 })
 
-export interface RightsInstrumentSummaryInfo extends GuardType<typeof RightsInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoRights extends GuardType<typeof InstrumentSummaryInfoRights> {}
 
-export const StockInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoStock = props({
   AssetType: literal('Stock'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -383,12 +403,12 @@ export const StockInstrumentSummaryInfo = props({
   PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['Stock']))),
+  TradableAs: array(enums(['Stock'])),
 })
 
-export interface StockInstrumentSummaryInfo extends GuardType<typeof StockInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoStock extends GuardType<typeof InstrumentSummaryInfoStock> {}
 
-export const StockIndexInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoStockIndex = props({
   AssetType: literal('StockIndex'),
   CurrencyCode: Currency3,
   Description: string(),
@@ -396,104 +416,105 @@ export const StockIndexInstrumentSummaryInfo = props({
   GroupId: integer(),
   Identifier: integer(),
   IssuerCountry: CountryCodeA2,
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['StockIndex']))),
+  TradableAs: array(enums(['StockIndex'])),
 })
 
-export interface StockIndexInstrumentSummaryInfo extends GuardType<typeof StockIndexInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoStockIndex extends GuardType<typeof InstrumentSummaryInfoStockIndex> {}
 
-export const StockIndexOptionInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoStockIndexOption = props({
   AssetType: literal('StockIndexOption'),
-  // CurrencyCode: optional(Currency3),
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  // IssuerCountry: optional(CountryCodeA2),
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['StockIndexOption']))),
   CanParticipateInMultiLegOrder: boolean(),
   GroupOptionRootId: integer(),
 })
 
-export interface StockIndexOptionInstrumentSummaryInfo
-  extends GuardType<typeof StockIndexOptionInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoStockIndexOption
+  extends GuardType<typeof InstrumentSummaryInfoStockIndexOption> {}
 
-export const StockOptionInstrumentSummaryInfo = props({
+export const InstrumentSummaryInfoStockOption = props({
   AssetType: literal('StockOption'),
-  // CurrencyCode: optional(Currency3),
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
   Identifier: integer(),
-  // IssuerCountry: optional(CountryCodeA2),
-  PrimaryListing: optional(integer()),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: optional(array(enums(['StockOption']))),
   CanParticipateInMultiLegOrder: boolean(),
   GroupOptionRootId: integer(),
 })
 
-export interface StockOptionInstrumentSummaryInfo extends GuardType<typeof StockOptionInstrumentSummaryInfo> {}
+export interface InstrumentSummaryInfoStockOption extends GuardType<typeof InstrumentSummaryInfoStockOption> {}
 
-export const InstrumentSummaryInfo = union([
-  BondInstrumentSummaryInfo,
-  CfdOnCompanyWarrantInstrumentSummaryInfo,
-  CfdOnEtcInstrumentSummaryInfo,
-  CfdOnEtfInstrumentSummaryInfo,
-  CfdOnEtnInstrumentSummaryInfo,
-  CfdOnFundInstrumentSummaryInfo,
-  CfdOnFuturesInstrumentSummaryInfo,
-  CfdOnIndexInstrumentSummaryInfo,
-  CfdOnRightsInstrumentSummaryInfo,
-  CfdOnStockInstrumentSummaryInfo,
-  CompanyWarrantInstrumentSummaryInfo,
-  ContractFuturesInstrumentSummaryInfo,
-  EtcInstrumentSummaryInfo,
-  EtfInstrumentSummaryInfo,
-  EtnInstrumentSummaryInfo,
-  FundInstrumentSummaryInfo,
-  FuturesOptionInstrumentSummaryInfo,
-  FuturesStrategyInstrumentSummaryInfo,
-  FxSpotInstrumentSummaryInfo,
-  FxVanillaOptionInstrumentSummaryInfo,
-  MutualFundInstrumentSummaryInfo,
-  RightsInstrumentSummaryInfo,
-  StockIndexOptionInstrumentSummaryInfo,
-  StockIndexInstrumentSummaryInfo,
-  StockOptionInstrumentSummaryInfo,
-  StockInstrumentSummaryInfo,
-])
+export const InstrumentSummaryInfoFxNoTouchOption = props({
+  AssetType: literal('FxNoTouchOption'),
+  CurrencyCode: Currency3,
+  Description: string(),
+  ExchangeId: string(),
+  GroupId: integer(),
+  Identifier: integer(),
+  SummaryType: SummaryType,
+  Symbol: string(),
+  TradableAs: array(enums(['FxSpot', 'FxForwards', 'FxSwap'])),
+  UnderlyingAssetType: enums(['FxSpot']),
+  UnderlyingUic: integer(),
+})
 
-export type InstrumentSummaryInfo =
-  | BondInstrumentSummaryInfo
-  | CfdOnCompanyWarrantInstrumentSummaryInfo
-  | CfdOnEtcInstrumentSummaryInfo
-  | CfdOnEtfInstrumentSummaryInfo
-  | CfdOnEtnInstrumentSummaryInfo
-  | CfdOnFundInstrumentSummaryInfo
-  | CfdOnFuturesInstrumentSummaryInfo
-  | CfdOnIndexInstrumentSummaryInfo
-  | CfdOnRightsInstrumentSummaryInfo
-  | CfdOnStockInstrumentSummaryInfo
-  | CompanyWarrantInstrumentSummaryInfo
-  | ContractFuturesInstrumentSummaryInfo
-  | EtcInstrumentSummaryInfo
-  | EtfInstrumentSummaryInfo
-  | EtnInstrumentSummaryInfo
-  | FundInstrumentSummaryInfo
-  | FuturesOptionInstrumentSummaryInfo
-  | FuturesStrategyInstrumentSummaryInfo
-  | FxSpotInstrumentSummaryInfo
-  | FxVanillaOptionInstrumentSummaryInfo
-  | MutualFundInstrumentSummaryInfo
-  | RightsInstrumentSummaryInfo
-  | StockIndexOptionInstrumentSummaryInfo
-  | StockIndexInstrumentSummaryInfo
-  | StockOptionInstrumentSummaryInfo
-  | StockInstrumentSummaryInfo
+export interface InstrumentSummaryInfoFxNoTouchOption extends GuardType<typeof InstrumentSummaryInfoFxNoTouchOption> {}
+
+export const InstrumentSummaryInfoFxOneTouchOption = props({
+  AssetType: literal('FxOneTouchOption'),
+  CurrencyCode: Currency3,
+  Description: string(),
+  ExchangeId: string(),
+  GroupId: integer(),
+  Identifier: integer(),
+  SummaryType: SummaryType,
+  Symbol: string(),
+  TradableAs: array(enums(['FxSpot', 'FxForwards', 'FxSwap'])),
+  UnderlyingAssetType: enums(['FxSpot']),
+  UnderlyingUic: integer(),
+})
+
+export interface InstrumentSummaryInfoFxOneTouchOption
+  extends GuardType<typeof InstrumentSummaryInfoFxOneTouchOption> {}
+
+export const InstrumentSummaryInfoFxForwards = props({
+  AssetType: literal('FxForwards'),
+  CurrencyCode: Currency3,
+  Description: string(),
+  DisplayHint: optional(string()),
+  ExchangeId: string(),
+  GroupId: integer(),
+  Identifier: integer(),
+  SummaryType: SummaryType,
+  Symbol: string(),
+  TradableAs: array(enums(['FxSpot', 'FxForwards', 'FxSwap'])),
+  UnderlyingAssetType: enums(['FxSpot']),
+  UnderlyingUic: integer(),
+})
+
+export interface InstrumentSummaryInfoFxForwards extends GuardType<typeof InstrumentSummaryInfoFxForwards> {}
+
+export const InstrumentSummaryInfoFxSwap = props({
+  AssetType: literal('FxSwap'),
+  CurrencyCode: Currency3,
+  Description: string(),
+  DisplayHint: optional(string()),
+  ExchangeId: string(),
+  GroupId: integer(),
+  Identifier: integer(),
+  SummaryType: SummaryType,
+  Symbol: string(),
+  TradableAs: array(enums(['FxSpot', 'FxForwards', 'FxSwap'])),
+  UnderlyingAssetType: enums(['FxSpot']),
+  UnderlyingUic: integer(),
+})
+
+export interface InstrumentSummaryInfoFxSwap extends GuardType<typeof InstrumentSummaryInfoFxSwap> {}
