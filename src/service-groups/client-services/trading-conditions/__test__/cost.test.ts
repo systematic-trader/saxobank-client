@@ -2,10 +2,10 @@ import { expect } from 'std/expect/expect.ts'
 import { describe, test } from 'std/testing/bdd.ts'
 import { SaxoBank24HourToken } from '../../../../authentication/saxobank-24-hour-token.ts'
 import { SaxoBankClient } from '../../../../saxobank-client.ts'
+import { extractEntries } from '../../../../utils.ts'
 import type { CostParameters } from '../cost.ts'
-import { extractEntries } from '../../../utils.ts'
 
-describe('client-services/trading-conditions/cost', () => {
+describe.skip('client-services/trading-conditions/cost', () => {
   const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),

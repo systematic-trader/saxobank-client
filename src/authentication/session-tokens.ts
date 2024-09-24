@@ -1,7 +1,7 @@
 import { decode } from 'https://deno.land/x/djwt@v3.0.2/mod.ts'
 import { assertReturn } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { HTTPClient } from '../http-client.ts'
-import { urlJoin } from '../service-groups/utils.ts'
+import { urlJoin } from '../utils.ts'
 import { SessionFileContent } from './types/session-file-content.ts'
 import { TokensResponse } from './types/tokens-response.ts'
 

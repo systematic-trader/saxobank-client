@@ -1,6 +1,6 @@
 import { open } from 'https://deno.land/x/open@v0.0.6/index.ts'
 import { assertReturn, props, string } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { urlJoin } from '../service-groups/utils.ts'
+import { urlJoin } from '../utils.ts'
 import { CodeResponse } from './types/code-response.ts'
 
 const StateGuard = props({

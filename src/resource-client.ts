@@ -10,6 +10,7 @@ import {
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { Environment } from './environment.ts'
 import type { HTTPClient } from './http-client.ts'
+import { urlJoin } from './utils.ts'
 
 export class ResourceClient {
   readonly #client: HTTPClient
@@ -126,23 +127,6 @@ export class ResourceClient {
       guard: options.guard,
     })
   }
-}
-
-function urlJoin(base: string | URL, ...paths: ReadonlyArray<undefined | string>): URL {
-  let url = new URL(base)
-
-  for (const path of paths) {
-    if (path === undefined) {
-      continue
-    }
-
-    const nextBase = url.href.endsWith('/') ? url.href : `${url.href}/`
-    const nextPath = path.startsWith('/') ? path.slice(1) : path
-
-    url = new URL(nextPath, nextBase)
-  }
-
-  return url
 }
 
 function setSearchParams(

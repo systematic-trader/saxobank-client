@@ -11,13 +11,13 @@ import {
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
-import type { TradingConditionFieldGroup } from '../../../types/derives/trading-condition-field-group.ts'
 import type { ResourceClient } from '../../../resource-client.ts'
-import { extractKeys } from '../../utils.ts'
-import { CostResponse } from '../../../types/records/cost-response.ts'
-import { LongShortCost } from '../../../types/derives/long-short-cost.ts'
 import { BuySell } from '../../../types/derives/buy-sell.ts'
 import { Currency3 } from '../../../types/derives/currency.ts'
+import { LongShortCost } from '../../../types/derives/long-short-cost.ts'
+import type { TradingConditionFieldGroup } from '../../../types/derives/trading-condition-field-group.ts'
+import { CostResponse } from '../../../types/records/cost-response.ts'
+import { extractKeys } from '../../../utils.ts'
 
 const CostResponseLongOnly = CostResponse.merge({
   Cost: props({

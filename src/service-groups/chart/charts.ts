@@ -11,13 +11,13 @@ import {
   union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import type { ResourceClient } from '../../resource-client.ts'
-import { ChartResponse } from '../../types/records/chart-response.ts'
+import type { ChartFieldGroupSpec } from '../../types/derives/chart-field-group-spec.ts'
+import { ChartRequestMode } from '../../types/derives/chart-request-mode.ts'
 import { ChartSampleBidAskOHLC, ChartSampleOHLC } from '../../types/derives/chart-sample.ts'
 import { DisplayAndFormat } from '../../types/derives/display-and-format.ts'
-import { ChartRequestMode } from '../../types/derives/chart-request-mode.ts'
-import { extractKeys } from '../utils.ts'
 import { Horizon } from '../../types/derives/horizon.ts'
-import type { ChartFieldGroupSpec } from '../../types/derives/chart-field-group-spec.ts'
+import { ChartResponse } from '../../types/records/chart-response.ts'
+import { extractKeys } from '../../utils.ts'
 
 const ChartResponseOHLC = ChartResponse.merge({
   Data: array(ChartSampleOHLC),

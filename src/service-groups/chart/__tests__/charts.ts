@@ -1,8 +1,8 @@
 import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { extractEntries } from '../../utils.ts'
 import { SaxoBankClient } from '../../../../mod.ts'
 import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
+import { extractEntries } from '../../../utils.ts'
 import type { ChartsParameters } from '../charts.ts'
 
 describe('charts/chart', () => {
