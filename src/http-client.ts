@@ -223,6 +223,35 @@ export class HTTPClient {
     })
   }
 
+  async putJSON<T = unknown>(
+    url: string | URL,
+    {
+      guard,
+      headers,
+      body,
+    }: {
+      readonly guard?: undefined | Guard<T>
+      readonly headers?: undefined | HTTPClientHeaders
+      readonly body?: RequestInit['body']
+    } = {},
+  ): Promise<T> {
+    const response = await this.put(url, {
+      headers: {
+        'content-type': 'application/json',
+        ...headers,
+      },
+      body,
+    })
+
+    const responseBody = response.status === 204 ? undefined : await response.json()
+
+    if (guard !== undefined) {
+      return assertReturn(guard, responseBody)
+    }
+
+    return responseBody
+  }
+
   async delete(
     url: string | URL,
     {
