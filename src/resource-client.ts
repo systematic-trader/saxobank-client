@@ -97,6 +97,35 @@ export class ResourceClient {
       limit: options.limit,
     })
   }
+
+  async put<T = unknown>(options: {
+    readonly path?: undefined | string
+    readonly headers?: undefined | Record<string, string>
+    readonly searchParams?:
+      | undefined
+      | Record<
+        string,
+        undefined | boolean | number | string | readonly string[]
+      >
+    readonly body?:
+      | undefined
+      | Record<
+        string,
+        undefined | boolean | number | string | readonly string[]
+      >
+    readonly guard?: undefined | Guard<T>
+  } = {}): Promise<void> {
+    const url = urlJoin(this.#prefixURL, options.path)
+    const headers = { ...this.#headers, ...options.headers }
+
+    setSearchParams(url, options.searchParams)
+
+    await this.#client.putJSON(url, {
+      headers,
+      body: JSON.stringify(options.body),
+      guard: options.guard,
+    })
+  }
 }
 
 function urlJoin(base: string | URL, ...paths: ReadonlyArray<undefined | string>): URL {
