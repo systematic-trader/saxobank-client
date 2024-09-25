@@ -83,7 +83,7 @@ export class ResourceClient {
     const url = urlJoin(this.#prefixURL, options.path)
     const headers = { ...this.#headers, ...options.headers }
     const searchParams = {
-      $top: '1000',
+      $top: options.limit === undefined ? '1000' : options.limit < 1000 ? String(options.limit) : '1000',
       $skip: '0',
       ...options.searchParams,
     }
