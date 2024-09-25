@@ -39,18 +39,21 @@ import {
 } from '../../types/records/instrument-summary-info.ts'
 import { ContractFuturesSpaces } from './instruments/contract-futures-spaces.ts'
 import { InstrumentsDetails } from './instruments/details.ts'
+import { TradingSchedule } from './instruments/trading-schedule.ts'
 
 export class Instruments {
   readonly #client: ResourceClient
 
   readonly details: InstrumentsDetails
   readonly futuresspaces: ContractFuturesSpaces
+  readonly tradingschedule: TradingSchedule
 
   constructor({ client }: { readonly client: ResourceClient }) {
     this.#client = client.appendPath('v1/instruments')
 
     this.details = new InstrumentsDetails({ client: this.#client })
     this.futuresspaces = new ContractFuturesSpaces({ client: this.#client })
+    this.tradingschedule = new TradingSchedule({ client: this.#client })
   }
 
   async get<T extends AssetType>(
