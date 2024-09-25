@@ -1,13 +1,10 @@
 import { expect } from 'std/expect/mod.ts'
 import { test } from 'std/testing/bdd.ts'
-import { HTTPClient } from '../../../http-client.ts'
-import { ResourceClient } from '../../../resource-client.ts'
-import { CurrencyPairs } from '../currency-pairs.ts'
+import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
+import { SaxoBankClient } from '../../../saxobank-client.ts'
 
 test('reference-data/currency-pairs', async () => {
-  const resource = new CurrencyPairs({
-    client: new ResourceClient({ client: HTTPClient.fromEnvironment() }).appendPath('ref'),
-  })
+  const resource = new SaxoBankClient({ authorization: new SaxoBank24HourToken() }).referenceData.currencyPairs
 
   const currencyPairs = await resource.get()
 

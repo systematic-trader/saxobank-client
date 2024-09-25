@@ -15,7 +15,7 @@ export class ReferenceData {
   readonly countries: Countries
   readonly cultures: Cultures
   readonly currencies: Currencies
-  readonly currencypairs: CurrencyPairs
+  readonly currencyPairs: CurrencyPairs
   readonly exchanges: Exchanges
   readonly instruments: Instruments
   readonly languages: Languages
@@ -29,7 +29,7 @@ export class ReferenceData {
     this.countries = new Countries({ client: resourceClient })
     this.cultures = new Cultures({ client: resourceClient })
     this.currencies = new Currencies({ client: resourceClient })
-    this.currencypairs = new CurrencyPairs({ client: resourceClient })
+    this.currencyPairs = new CurrencyPairs({ client: resourceClient })
     this.exchanges = new Exchanges({ client: resourceClient })
     this.instruments = new Instruments({ client: resourceClient })
     this.languages = new Languages({ client: resourceClient })
