@@ -230,7 +230,7 @@ export const InstrumentSummaryInfoContractFutures = props({
   PrimaryListing: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: array(enums(['ContractFutures'])),
+  TradableAs: optional(array(enums(['ContractFutures']))),
 })
 
 export interface InstrumentSummaryInfoContractFutures extends GuardType<typeof InstrumentSummaryInfoContractFutures> {}
