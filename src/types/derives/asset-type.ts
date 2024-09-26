@@ -373,6 +373,11 @@ export const AssetTypeValues = [
   'Rights',
 
   /**
+   * SRD. (Service de Règlement Différé) on Stock.
+   */
+  'SrdOnStock',
+
+  /**
    * Stock
    */
   'Stock',

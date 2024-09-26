@@ -38,12 +38,14 @@ import {
   type InstrumentSummaryInfoType,
 } from '../../types/records/instrument-summary-info.ts'
 import { ContractFuturesSpaces } from './instruments/contract-futures-spaces.ts'
+import { ContractOptionSpaces } from './instruments/contract-option-spaces.ts'
 import { InstrumentsDetails } from './instruments/details.ts'
 import { TradingSchedule } from './instruments/trading-schedule.ts'
 
 export class Instruments {
   readonly #client: ResourceClient
 
+  readonly contractoptionspaces: ContractOptionSpaces
   readonly details: InstrumentsDetails
   readonly futuresspaces: ContractFuturesSpaces
   readonly tradingschedule: TradingSchedule
@@ -51,6 +53,7 @@ export class Instruments {
   constructor({ client }: { readonly client: ResourceClient }) {
     this.#client = client.appendPath('v1/instruments')
 
+    this.contractoptionspaces = new ContractOptionSpaces({ client: this.#client })
     this.details = new InstrumentsDetails({ client: this.#client })
     this.futuresspaces = new ContractFuturesSpaces({ client: this.#client })
     this.tradingschedule = new TradingSchedule({ client: this.#client })
@@ -83,6 +86,21 @@ export class Instruments {
       readonly limit?: undefined | number
       readonly AccountKey?: undefined | string
       readonly AssetTypes?: undefined | readonly []
+      readonly CanParticipateInMultiLegOrder?: undefined | boolean
+      readonly Class?: undefined | ReadonlyArray<ClassType>
+      readonly ExchangeId?: undefined | string
+      readonly IncludeNonTradable?: undefined | boolean
+      readonly Keywords?: undefined | ReadonlyArray<string>
+      readonly Tags?: undefined | ReadonlyArray<string>
+      readonly Uics?: undefined | ReadonlyArray<number>
+    },
+  ): Promise<ReadonlyArray<InstrumentSummaryInfoType>>
+
+  async get(
+    options?: undefined | {
+      readonly limit?: undefined | number
+      readonly AccountKey?: undefined | string
+      readonly AssetTypes?: undefined | ReadonlyArray<AssetType>
       readonly CanParticipateInMultiLegOrder?: undefined | boolean
       readonly Class?: undefined | ReadonlyArray<ClassType>
       readonly ExchangeId?: undefined | string
