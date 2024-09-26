@@ -5,10 +5,10 @@ import { SaxoBankClient } from '../../../saxobank-client.ts'
 import { AssetTypeValues } from '../../../types/derives/asset-type.ts'
 
 describe('reference-data/instruments', () => {
+  const { instruments: resource } = new SaxoBankClient({ authorization: new SaxoBank24HourToken() }).referenceData
+
   for (const assetType of AssetTypeValues) {
     test(assetType, async () => {
-      const resource = new SaxoBankClient({ authorization: new SaxoBank24HourToken() }).referenceData.instruments
-
       const instruments = await resource.get({ AssetTypes: [assetType] })
 
       try {
