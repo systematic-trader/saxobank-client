@@ -6,14 +6,16 @@ import { Chart } from './service-groups/chart.ts'
 import { ClientServices } from './service-groups/client-services.ts'
 import { Portfolio } from './service-groups/portfolio.ts'
 import { ReferenceData } from './service-groups/reference-data.ts'
+import { Trade } from './service-groups/trade.ts'
 
 export class SaxoBankClient {
   readonly #httpClient: HTTPClient
 
-  readonly portfolio: Portfolio
   readonly chart: Chart
-  readonly referenceData: ReferenceData
   readonly clientServices: ClientServices
+  readonly portfolio: Portfolio
+  readonly referenceData: ReferenceData
+  readonly trade: Trade
 
   constructor({
     authorization,
@@ -33,9 +35,10 @@ export class SaxoBankClient {
       prefixURL,
     })
 
-    this.portfolio = new Portfolio({ client: resourceClient })
     this.chart = new Chart({ client: resourceClient })
-    this.referenceData = new ReferenceData({ client: resourceClient })
     this.clientServices = new ClientServices({ client: resourceClient })
+    this.portfolio = new Portfolio({ client: resourceClient })
+    this.referenceData = new ReferenceData({ client: resourceClient })
+    this.trade = new Trade({ client: resourceClient })
   }
 }
