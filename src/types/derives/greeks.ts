@@ -105,4 +105,7 @@ export const Greeks = props({
 
   /** Not documented */
   Rho: number(),
+
+  /** Not documented */
+  Phi: optional(number()),
 })
