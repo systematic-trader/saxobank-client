@@ -1,24 +1,19 @@
 import { expect } from 'std/expect/expect.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { SaxoBank24HourToken } from '../../../../authentication/saxobank-24-hour-token.ts'
-import { SaxoBankClient } from '../../../../saxobank-client.ts'
-import { extractEntries } from '../../../../utils.ts'
-import type { CostParameters } from '../cost.ts'
+import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
+import { SaxoBankClient } from '../../../saxobank-client.ts'
+import { extractEntries } from '../../../utils.ts'
+import type { InfoPricesBaseParameters } from '../info-prices.ts'
 
-describe('client-services/trading-conditions/cost', () => {
+describe('trade/info-prices', () => {
   const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),
   })
 
   // todo rewrite this to be dynamic based on the instruments resource - as it is now, the tests will break over time as instruments are added/removed/changed
-  test('Getting costs for asset type', async ({ step }) => {
-    const [account] = await saxoBankClient.portfolio.accounts.me.get()
-    if (account === undefined) {
-      throw new Error('No account found')
-    }
-
-    const cases: Record<CostParameters['AssetType'], Record<string, { readonly Uic: number }>> = {
+  test('Getting info proces for asset type', async ({ step }) => {
+    const cases: Record<InfoPricesBaseParameters['AssetType'], Record<string, { readonly Uic: number }>> = {
       Bond: {
         'Nykredit Realkredit 5% 01 Oct 2056, DKK': { Uic: 36413429 },
         'Germany 0% 10 Oct 2025, EUR': { Uic: 36938891 },
@@ -150,8 +145,6 @@ describe('client-services/trading-conditions/cost', () => {
       },
     } as const
 
-    const holdingPeriods = [0, 1, 7]
-
     for (const [AssetType, subcases] of extractEntries(cases)) {
       if (Object.keys(subcases).length === 0) {
         continue
@@ -159,22 +152,104 @@ describe('client-services/trading-conditions/cost', () => {
 
       await step(AssetType, async ({ step: substep }) => {
         for (const [caseLabel, { Uic }] of extractEntries(subcases)) {
-          for (const holdingPeriod of holdingPeriods) {
-            const periodLabel = holdingPeriod === 0 ? 'intraday' : `${holdingPeriod} days`
-            const label = `${caseLabel} (${Uic}) - ${periodLabel}`
+          const label = `${caseLabel} (${Uic})`
 
-            await substep(label, async () => {
-              const cost = await saxoBankClient.clientServices.tradingConditions.cost.get({
-                AccountKey: account.AccountKey,
-                Amount: 80,
-                AssetType,
-                Price: 58,
-                Uic,
-                HoldingPeriodInDays: holdingPeriod,
+          switch (AssetType) {
+            case 'Bond':
+            case 'CfdOnCompanyWarrant':
+            case 'CfdOnEtc':
+            case 'CfdOnEtf':
+            case 'CfdOnEtn':
+            case 'CfdOnFund':
+            case 'CfdOnFutures':
+            case 'CfdOnIndex':
+            case 'CfdOnRights':
+            case 'CfdOnStock':
+            case 'CompanyWarrant':
+            case 'ContractFutures':
+            case 'Etc':
+            case 'Etf':
+            case 'Etn':
+            case 'Fund':
+            case 'FuturesOption':
+            case 'FxForwards':
+            case 'FxSpot':
+            case 'Rights':
+            case 'Stock':
+            case 'StockIndexOption':
+            case 'StockOption': {
+              await substep(label, async () => {
+                const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                  Amount: 80,
+                  AssetType,
+                  Uic,
+                })
+
+                expect(infoPrices).toBeDefined()
               })
 
-              expect(cost).toBeDefined()
-            })
+              break
+            }
+
+            case 'FxNoTouchOption':
+            case 'FxOneTouchOption': {
+              const today = new Date()
+              const expityDate = Date.UTC(today.getFullYear(), today.getMonth() + 2, 1)
+
+              await substep(label, async () => {
+                const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                  Amount: 80,
+                  AssetType,
+                  Uic,
+                  ExpiryDate: new Date(expityDate).toISOString(),
+                })
+
+                expect(infoPrices).toBeDefined()
+              })
+
+              break
+            }
+
+            case 'FxSwap': {
+              const today = new Date()
+              const nearLeg = Date.UTC(today.getFullYear(), today.getMonth() + 2, 1)
+              const farLeg = Date.UTC(today.getFullYear(), today.getMonth() + 3, 1)
+
+              await substep(label, async () => {
+                const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                  Amount: 80,
+                  AssetType,
+                  Uic,
+                  ForwardDateNearLeg: new Date(nearLeg).toISOString(),
+                  ForwardDateFarLeg: new Date(farLeg).toISOString(),
+                })
+
+                expect(infoPrices).toBeDefined()
+              })
+
+              break
+            }
+
+            case 'FxVanillaOption': {
+              const today = new Date()
+              const expityDate = Date.UTC(today.getFullYear(), today.getMonth() + 2, 1)
+
+              for (const action of ['Call', 'Put'] as const) {
+                await substep(`${action}: ${label}`, async () => {
+                  const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                    Amount: 80,
+                    AssetType,
+                    Uic,
+                    PutCall: action,
+                    ExpiryDate: new Date(expityDate).toISOString(),
+                  })
+
+                  expect(infoPrices).toBeDefined()
+                })
+              }
+
+              break
+            }
           }
         }
       })
