@@ -12,13 +12,13 @@ export interface DisplayAndFormat extends GuardType<typeof DisplayAndFormat> {}
 
 export const DisplayAndFormat = props({
   /** The currency in which the data is displayed. */
-  Currency: Currency3,
+  Currency: optional(Currency3),
 
   /** The number of decimals in the chart data. */
   Decimals: integer(),
 
   /** Description of the data. */
-  Description: string(),
+  Description: optional(string()),
 
   /** The format in which data is delivered. */
   Format: PriceDisplayFormatType,
@@ -27,5 +27,5 @@ export const DisplayAndFormat = props({
   NumeratorDecimals: optional(integer()),
 
   /** The symbol of the instrument. */
-  Symbol: string(),
+  Symbol: optional(string()),
 })

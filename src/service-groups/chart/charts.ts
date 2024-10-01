@@ -1,5 +1,4 @@
 import {
-  array,
   assertReturn,
   enums,
   type GuardType,
@@ -13,59 +12,76 @@ import {
 import type { ResourceClient } from '../../resource-client.ts'
 import type { ChartFieldGroupSpec } from '../../types/derives/chart-field-group-spec.ts'
 import { ChartRequestMode } from '../../types/derives/chart-request-mode.ts'
-import { ChartSampleBidAskOHLC, ChartSampleOHLC } from '../../types/derives/chart-sample.ts'
-import { DisplayAndFormat } from '../../types/derives/display-and-format.ts'
 import { Horizon } from '../../types/derives/horizon.ts'
-import { ChartResponse } from '../../types/records/chart-response.ts'
+import {
+  ChartResponseBond,
+  ChartResponseCfdOnCompanyWarrant,
+  ChartResponseCfdOnEtc,
+  ChartResponseCfdOnEtf,
+  ChartResponseCfdOnEtn,
+  ChartResponseCfdOnFund,
+  ChartResponseCfdOnFutures,
+  ChartResponseCfdOnIndex,
+  ChartResponseCfdOnRights,
+  ChartResponseCfdOnStock,
+  ChartResponseCompanyWarrant,
+  ChartResponseContractFutures,
+  ChartResponseEtc,
+  ChartResponseEtf,
+  ChartResponseEtn,
+  ChartResponseFund,
+  ChartResponseFxSpot,
+  ChartResponseRights,
+  ChartResponseStock,
+  ChartResponseStockIndex,
+} from '../../types/records/chart-response.ts'
 import { extractKeys } from '../../utils.ts'
 
-const ChartResponseOHLC = ChartResponse.merge({
-  Data: array(ChartSampleOHLC),
-})
-
-const ChartResponseOHLCBond = ChartResponse.merge({
-  DisplayAndFormat: DisplayAndFormat.pick(['Decimals', 'Format']),
-  Data: array(ChartSampleOHLC),
-})
-
-const ChartResponseBidAskOHLC = ChartResponse.merge({
-  Data: array(ChartSampleBidAskOHLC),
-})
-
-const AssetTypeMap = {
-  Bond: ChartResponseOHLCBond,
-
-  CompanyWarrant: ChartResponseOHLC,
-  CfdOnCompanyWarrant: ChartResponseOHLC,
-
-  ContractFutures: ChartResponseOHLC,
-  CfdOnFutures: ChartResponseBidAskOHLC,
-
-  Etc: ChartResponseOHLC,
-  CfdOnEtc: ChartResponseOHLC,
-
-  Etf: ChartResponseOHLC,
-  CfdOnEtf: ChartResponseOHLC,
-
-  Etn: ChartResponseOHLC,
-  CfdOnEtn: ChartResponseOHLC,
-
-  Fund: ChartResponseOHLC,
-  CfdOnFund: ChartResponseOHLC,
-
-  FxSpot: ChartResponseBidAskOHLC,
-
-  Rights: ChartResponseOHLC,
-  CfdOnRights: ChartResponseOHLC,
-
-  Stock: ChartResponseOHLC,
-  CfdOnStock: ChartResponseOHLC,
-
-  StockIndex: ChartResponseOHLC,
-  CfdOnIndex: ChartResponseBidAskOHLC,
+const ChartResponse = {
+  Bond: ChartResponseBond,
+  CfdOnCompanyWarrant: ChartResponseCfdOnCompanyWarrant,
+  CfdOnEtc: ChartResponseCfdOnEtc,
+  CfdOnEtf: ChartResponseCfdOnEtf,
+  CfdOnEtn: ChartResponseCfdOnEtn,
+  CfdOnFund: ChartResponseCfdOnFund,
+  CfdOnFutures: ChartResponseCfdOnFutures,
+  CfdOnIndex: ChartResponseCfdOnIndex,
+  CfdOnRights: ChartResponseCfdOnRights,
+  CfdOnStock: ChartResponseCfdOnStock,
+  CompanyWarrant: ChartResponseCompanyWarrant,
+  ContractFutures: ChartResponseContractFutures,
+  Etc: ChartResponseEtc,
+  Etf: ChartResponseEtf,
+  Etn: ChartResponseEtn,
+  Fund: ChartResponseFund,
+  FxSpot: ChartResponseFxSpot,
+  Rights: ChartResponseRights,
+  Stock: ChartResponseStock,
+  StockIndex: ChartResponseStockIndex,
 } as const
 
-type ChartResponseByAssetType<T extends keyof typeof AssetTypeMap> = GuardType<typeof AssetTypeMap[T]>
+type ChartResponse = {
+  Bond: ChartResponseBond
+  CfdOnCompanyWarrant: ChartResponseCfdOnCompanyWarrant
+  CfdOnEtc: ChartResponseCfdOnEtc
+  CfdOnEtf: ChartResponseCfdOnEtf
+  CfdOnEtn: ChartResponseCfdOnEtn
+  CfdOnFund: ChartResponseCfdOnFund
+  CfdOnFutures: ChartResponseCfdOnFutures
+  CfdOnIndex: ChartResponseCfdOnIndex
+  CfdOnRights: ChartResponseCfdOnRights
+  CfdOnStock: ChartResponseCfdOnStock
+  CompanyWarrant: ChartResponseCompanyWarrant
+  ContractFutures: ChartResponseContractFutures
+  Etc: ChartResponseEtc
+  Etf: ChartResponseEtf
+  Etn: ChartResponseEtn
+  Fund: ChartResponseFund
+  FxSpot: ChartResponseFxSpot
+  Rights: ChartResponseRights
+  Stock: ChartResponseStock
+  StockIndex: ChartResponseStockIndex
+}
 
 const ChartsParametersModeAndTimeGuard = union([
   props({
@@ -80,7 +96,7 @@ const ChartsParametersModeAndTimeGuard = union([
 ])
 
 const ChartsParametersGuard = props({
-  AssetType: enums(extractKeys(AssetTypeMap)),
+  AssetType: enums(extractKeys(ChartResponse)),
   Horizon: Horizon,
   Uic: integer(),
   AccountKey: optional(string()),
@@ -98,11 +114,11 @@ export class Charts {
     this.#client = client.appendPath('v3/charts')
   }
 
-  async get<ChartAssetType extends keyof typeof AssetTypeMap>(
+  async get<AssetType extends keyof ChartResponse>(
     parameters:
       & {
         /** Asset type of the instrument. */
-        readonly AssetType: ChartAssetType
+        readonly AssetType: AssetType
 
         /** The time period that each sample covers, in minutes. */
         readonly Horizon: ChartsParameters['Horizon']
@@ -138,7 +154,9 @@ export class Charts {
           readonly Time?: undefined
         })
       ),
-  ): Promise<ChartResponseByAssetType<ChartAssetType>> {
+  ): Promise<ChartResponse[AssetType]>
+
+  async get(parameters: ChartsParameters): Promise<ChartResponse[keyof ChartResponse]> {
     const { AssetType, AccountKey, Count, Horizon, Uic } = assertReturn(ChartsParametersGuard, {
       AssetType: parameters.AssetType,
       AccountKey: parameters.AccountKey,
@@ -154,18 +172,53 @@ export class Charts {
 
     const FieldGroups: readonly ChartFieldGroupSpec[] = ['ChartInfo', 'Data', 'DisplayAndFormat']
 
-    return await this.#client.get<unknown>({
-      searchParams: {
-        AccountKey,
-        AssetType,
-        Count,
-        Horizon,
-        Uic,
-        Mode,
-        Time,
-        FieldGroups,
-      },
-      guard: AssetTypeMap[parameters.AssetType],
-    }) as unknown as Promise<ChartResponseByAssetType<ChartAssetType>>
+    const searchParams = {
+      AccountKey,
+      AssetType,
+      Count,
+      Horizon,
+      Uic,
+      Mode,
+      Time,
+      FieldGroups,
+    }
+
+    switch (parameters.AssetType) {
+      case 'Bond':
+      case 'CfdOnCompanyWarrant':
+      case 'CfdOnEtc':
+      case 'CfdOnEtf':
+      case 'CfdOnEtn':
+      case 'CfdOnFund':
+      case 'CfdOnRights':
+      case 'CfdOnStock':
+      case 'CompanyWarrant':
+      case 'ContractFutures':
+      case 'Etc':
+      case 'Etf':
+      case 'Etn':
+      case 'Fund':
+      case 'Rights':
+      case 'Stock':
+      case 'StockIndex': {
+        return await this.#client.get({
+          searchParams,
+          guard: ChartResponse[parameters.AssetType],
+        })
+      }
+
+      case 'CfdOnFutures':
+      case 'CfdOnIndex':
+      case 'FxSpot': {
+        return await this.#client.get({
+          searchParams,
+          guard: ChartResponse[parameters.AssetType],
+        })
+      }
+
+      default: {
+        throw new Error('Unsupported asset type')
+      }
+    }
   }
 }
