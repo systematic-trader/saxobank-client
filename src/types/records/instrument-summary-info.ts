@@ -302,6 +302,7 @@ export interface InstrumentSummaryInfoFund extends GuardType<typeof InstrumentSu
 
 export const InstrumentSummaryInfoFuturesOption = props({
   AssetType: literal('FuturesOption'),
+  CurrencyCode: Currency3,
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
@@ -426,6 +427,7 @@ export interface InstrumentSummaryInfoStockIndex extends GuardType<typeof Instru
 
 export const InstrumentSummaryInfoStockIndexOption = props({
   AssetType: literal('StockIndexOption'),
+  CurrencyCode: Currency3,
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),
@@ -441,6 +443,7 @@ export interface InstrumentSummaryInfoStockIndexOption
 
 export const InstrumentSummaryInfoStockOption = props({
   AssetType: literal('StockOption'),
+  CurrencyCode: Currency3,
   Description: string(),
   ExchangeId: string(),
   GroupId: integer(),

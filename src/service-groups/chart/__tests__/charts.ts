@@ -50,59 +50,30 @@ describe('charts/chart', () => {
       await step(assetType, async ({ step: substep }) => {
         let index = 0
         for (const instrument of instruments) {
-          switch (instrument.AssetType) {
-            case 'Bond':
-            case 'CompanyWarrant':
-            case 'CfdOnCompanyWarrant':
-            case 'ContractFutures':
-            case 'CfdOnFutures':
-            case 'Etc':
-            case 'CfdOnEtc':
-            case 'Etf':
-            case 'CfdOnEtf':
-            case 'Etn':
-            case 'CfdOnEtn':
-            case 'Fund':
-            case 'CfdOnFund':
-            case 'FxSpot':
-            case 'Rights':
-            case 'CfdOnRights':
-            case 'Stock':
-            case 'CfdOnStock':
-            case 'StockIndex':
-            case 'CfdOnIndex': {
-              const label = `${
-                progress(++index, instruments.length)
-              }: ${instrument.Description} (UIC=${instrument.Identifier})`
+          const label = `${
+            progress(++index, instruments.length)
+          }: ${instrument.Description} (UIC=${instrument.Identifier})`
 
-              await substep(label, async () => {
-                try {
-                  const chart = await saxoBankClient.chart.charts.get({
-                    AssetType: assetType,
-                    Uic: instrument.Identifier,
-                    Horizon: 60,
-                    Count: 3,
-                  })
-
-                  expect(chart).toBeDefined()
-                } catch (error) {
-                  if (error instanceof HTTPClientError && error.statusCode === 403) {
-                    // deno-lint-ignore no-console
-                    console.log(`No access to charts for UIC=${instrument.Identifier} (skipping)`)
-                    return
-                  }
-
-                  throw error
-                }
+          await substep(label, async () => {
+            try {
+              const chart = await saxoBankClient.chart.charts.get({
+                AssetType: assetType,
+                Uic: instrument.Identifier,
+                Horizon: 60,
+                Count: 3,
               })
 
-              break
-            }
+              expect(chart).toBeDefined()
+            } catch (error) {
+              if (error instanceof HTTPClientError && error.statusCode === 403) {
+                // deno-lint-ignore no-console
+                console.log(`No access to charts for UIC=${instrument.Identifier} (skipping)`)
+                return
+              }
 
-            default: {
-              throw new Error(`Unsupported asset type`)
+              throw error
             }
-          }
+          })
         }
       })
     }

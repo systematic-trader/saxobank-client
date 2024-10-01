@@ -1,9 +1,29 @@
-import { expect } from 'std/expect/expect.ts'
+import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
 import { SaxoBank24HourToken } from '../../../../authentication/saxobank-24-hour-token.ts'
 import { SaxoBankClient } from '../../../../saxobank-client.ts'
-import { extractEntries } from '../../../../utils.ts'
+import type { OptionDetails } from '../../../../types/records/option-details.ts'
 import type { CostParameters } from '../cost.ts'
+
+const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 100
+
+const HOLDING_PERIOD_CASES = [0, 1, 365]
+
+function progress(current: number, total: number) {
+  return `${String(current).padStart(String(total).length, '0')}/${total}`
+}
+
+function findSuitableOptionInstrument(optionSpaces: NonNullable<OptionDetails['OptionSpace']>) {
+  for (const optionSpace of optionSpaces) {
+    for (const option of optionSpace.SpecificOptions) {
+      if (option.TradingStatus === 'Tradable' || option.TradingStatus === 'ReduceOnly') {
+        return option
+      }
+    }
+  }
+
+  return undefined
+}
 
 describe('client-services/trading-conditions/cost', () => {
   const saxoBankClient = new SaxoBankClient({
@@ -11,171 +31,139 @@ describe('client-services/trading-conditions/cost', () => {
     authorization: new SaxoBank24HourToken(),
   })
 
-  // todo rewrite this to be dynamic based on the instruments resource - as it is now, the tests will break over time as instruments are added/removed/changed
   test('Getting costs for asset type', async ({ step }) => {
+    const assetTypeCandidates: CostParameters['AssetType'][] = [
+      'Bond',
+      'CfdOnCompanyWarrant',
+      'CfdOnEtc',
+      'CfdOnEtf',
+      'CfdOnEtn',
+      'CfdOnFund',
+      'CfdOnFutures',
+      'CfdOnIndex',
+      'CfdOnRights',
+      'CfdOnStock',
+      'CompanyWarrant',
+      'ContractFutures',
+      'Etc',
+      'Etf',
+      'Etn',
+      'Fund',
+      'FuturesOption',
+      'FxNoTouchOption',
+      'FxOneTouchOption',
+      'FxForwards',
+      'FxSpot',
+      'FxSwap',
+      'FxVanillaOption',
+      'Rights',
+      'Stock',
+      'StockIndexOption',
+      'StockOption',
+    ] as const
+
     const [account] = await saxoBankClient.portfolio.accounts.me.get()
     if (account === undefined) {
       throw new Error('No account found')
     }
 
-    const cases: Record<CostParameters['AssetType'], Record<string, { readonly Uic: number }>> = {
-      Bond: {
-        'Nykredit Realkredit 5% 01 Oct 2056, DKK': { Uic: 36413429 },
-        'Germany 0% 10 Oct 2025, EUR': { Uic: 36938891 },
-      },
+    for (const assetType of assetTypeCandidates) {
+      await step(assetType, async ({ step }) => {
+        const instruments = await saxoBankClient.referenceData.instruments.get({
+          AssetTypes: [assetType] as const,
+          limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+        })
 
-      CfdOnIndex: {
-        'Denmark 25': { Uic: 5889634 },
-        'Germany Mid-Cap 50': { Uic: 31582 },
-      },
+        let index = 0
+        for (const instrument of instruments) {
+          const instrumentLabel = `${
+            progress(++index, instruments.length)
+          }: ${instrument.Description} (UIC=${instrument.Identifier})`
 
-      CompanyWarrant: {
-        'STENOCARE A/S - Warrant': { Uic: 36067046 },
-        'Valaris Ltd.': { Uic: 22736639 },
-      },
-      CfdOnCompanyWarrant: {
-        'Diana Shipping Inc - Warrant': { Uic: 39509019 },
-        'COMPAGNIE FINANCIERE RICHEMONT SA-WRT-Reduce Only': { Uic: 20278036 },
-      },
+          await step(instrumentLabel, async ({ step }) => {
+            for (const holdingPeriod of HOLDING_PERIOD_CASES) {
+              const holdingPeriodFormatted = holdingPeriod === 0
+                ? 'intraday'
+                : holdingPeriod === 1
+                ? `1 day`
+                : `${holdingPeriod} days`
+              const holdingPeriodLabel = `Holding period: ${holdingPeriodFormatted}`
 
-      Stock: {
-        'Apple Inc.': { Uic: 211 },
-        'Tesla Inc.': { Uic: 47556 },
-        'NVIDIA Corp.': { Uic: 1249 },
-      },
-      CfdOnStock: {
-        'Apple Inc.': { Uic: 211 },
-        'Tesla Inc.': { Uic: 47556 },
-        'NVIDIA Corp.': { Uic: 1249 },
-      },
+              await step(holdingPeriodLabel, async () => {
+                switch (instrument.AssetType) {
+                  case 'Bond':
+                  case 'CfdOnCompanyWarrant':
+                  case 'CfdOnEtc':
+                  case 'CfdOnEtf':
+                  case 'CfdOnEtn':
+                  case 'CfdOnFund':
+                  case 'CfdOnFutures':
+                  case 'CfdOnIndex':
+                  case 'CfdOnRights':
+                  case 'CfdOnStock':
+                  case 'CompanyWarrant':
+                  case 'ContractFutures':
+                  case 'Etc':
+                  case 'Etf':
+                  case 'Etn':
+                  case 'Fund':
+                  case 'FxNoTouchOption':
+                  case 'FxOneTouchOption':
+                  case 'FxForwards':
+                  case 'FxSpot':
+                  case 'FxSwap':
+                  case 'FxVanillaOption':
+                  case 'Rights':
+                  case 'Stock': {
+                    const cost = await saxoBankClient.clientServices.tradingConditions.cost.get({
+                      AccountKey: account.AccountKey,
+                      Amount: 80,
+                      AssetType: instrument.AssetType,
+                      Price: 58,
+                      Uic: instrument.Identifier,
+                      HoldingPeriodInDays: holdingPeriod,
+                    })
 
-      StockIndexOption: {
-        'AEX Index Weekly (1), call, 900': { Uic: 44496271 },
-        'S&P 500 Mini Index, put, 330': { Uic: 42872592 },
-        'Russell 2000 Index Weekly, put, 1000': { Uic: 43078012 },
-      },
+                    expect(cost).toBeDefined()
 
-      StockOption: {
-        'HSBC Holdings Plc., put, 41': { Uic: 40895356 },
-        'Tesla Inc., call, 125': { Uic: 33057973 },
-        'Apple Inc., call, 145': { Uic: 31234008 },
-        'NVidia Corp., call, 59.5': { Uic: 42668317 },
-      },
+                    break
+                  }
 
-      ContractFutures: {
-        'Gold - Aug 2025': { Uic: 40758986 },
-        'Light Sweet Crude Oil (WTI) - Dec 2027': { Uic: 37393385 },
-      },
-      CfdOnFutures: {
-        'UK Crude January 2025': { Uic: 42445474 },
-        'Platinum January 2025': { Uic: 42466309 },
-      },
+                  case 'StockOption':
+                  case 'StockIndexOption':
+                  case 'FuturesOption': {
+                    const optionsResponse = await saxoBankClient.referenceData.instruments.contractoptionspaces.get({
+                      OptionRootId: instrument.Identifier,
+                      TradingStatus: ['Tradable', 'ReduceOnly'],
+                    })
 
-      Etc: {
-        'Global X Physical Gold ETC': { Uic: 19357 },
-        'WisdomTree WTI Crude Oil ETC': { Uic: 35385 },
-      },
-      CfdOnEtc: {
-        'Global X Physical Gold ETC': { Uic: 19357 },
-        'WisdomTree Physical Palladium ETC': { Uic: 35346 },
-      },
+                    if (optionsResponse === undefined || optionsResponse.OptionSpace === undefined) {
+                      throw new Error(`Could not options for UIC=${instrument.Identifier}`)
+                    }
 
-      Etf: {
-        'VanEck Vectors Gold Miners ETF': { Uic: 35663 },
-        'iShares STOXX EU 600 Oil & Gas UCITS ETF (DE)': { Uic: 39342 },
-      },
-      CfdOnEtf: {
-        'VanEck Vectors Gold Miners ETF': { Uic: 35663 },
-        'iShares STOXX EU 600 Oil & Gas UCITS ETF (DE)': { Uic: 39342 },
-      },
+                    const optionInstrument = findSuitableOptionInstrument(optionsResponse.OptionSpace)
 
-      Etn: {
-        'iPath Bloomberg Commodity Index Total Return ETN': { Uic: 4692063 },
-        'Ipath S&P VIX Short Term Future ETN': { Uic: 13727743 },
-      },
-      CfdOnEtn: {
-        'iPath Bloomberg Commodity Index Total Return ETN': { Uic: 4692063 },
-        'Ipath S&P VIX Short Term Future ETN': { Uic: 13727743 },
-      },
+                    if (optionInstrument === undefined) {
+                      throw new Error(`Could not find a suitable option for UIC=${instrument.Identifier}`)
+                    }
 
-      Fund: {
-        'North European Oil Royalty Trust': { Uic: 54064 },
-        'Sprott Physical Gold Trust': { Uic: 46813 },
-        'Alliance Trust Plc': { Uic: 54064 },
-      },
-      CfdOnFund: {
-        'Sprott Physical Uranium Trust': { Uic: 24116065 },
-        'Sprott Physical Gold Trust': { Uic: 46813 },
-        'Blackrock Sustainable American Income Trust PLC': { Uic: 24198883 },
-      },
+                    const cost = await saxoBankClient.clientServices.tradingConditions.cost.get({
+                      AccountKey: account.AccountKey,
+                      Amount: 80,
+                      AssetType: instrument.AssetType,
+                      Price: 58,
+                      Uic: optionInstrument.Uic,
+                      HoldingPeriodInDays: holdingPeriod,
+                    })
 
-      FuturesOption: {
-        'Silver, call 1725': { Uic: 36945048 },
-        'E-Mini NASDAQ-100 End-of-Month, call 19100': { Uic: 43603807 },
-      },
+                    expect(cost).toBeDefined()
 
-      FxForwards: {
-        'Gold/US Dollar': { Uic: 8176 },
-        'US Dollar/Japanese Yen': { Uic: 42 },
-      },
-      FxNoTouchOption: {
-        'Euro/British Pound': { Uic: 17 },
-        'US Dollar/Japanese Yen': { Uic: 42 },
-      },
-      FxOneTouchOption: {
-        'Euro/British Pound': { Uic: 17 },
-        'US Dollar/Japanese Yen': { Uic: 42 },
-      },
-      FxSpot: {
-        'Gold/US Dollar': { Uic: 8176 },
-        'US Dollar/Japanese Yen': { Uic: 42 },
-      },
-      FxSwap: {
-        'Gold/US Dollar': { Uic: 8176 },
-        'US Dollar/Japanese Yen': { Uic: 42 },
-      },
-      FxVanillaOption: {
-        'Euro/British Pound': { Uic: 17 },
-        'Gold/US Dollar': { Uic: 8176 },
-        'US Dollar/Japanese Yen': { Uic: 42 },
-      },
-
-      Rights: {
-        'Corporacion Financiera Alba SA - Rights': { Uic: 36115376 },
-        'Spineguard - Rights': { Uic: 42828275 },
-      },
-      CfdOnRights: {
-        'Wolford AG - Rights': { Uic: 33612435 },
-        'LG Display Co. Ltd - ADR-  Rights': { Uic: 40142100 },
-      },
-    } as const
-
-    const holdingPeriods = [0, 1, 7]
-
-    for (const [AssetType, subcases] of extractEntries(cases)) {
-      if (Object.keys(subcases).length === 0) {
-        continue
-      }
-
-      await step(AssetType, async ({ step: substep }) => {
-        for (const [caseLabel, { Uic }] of extractEntries(subcases)) {
-          for (const holdingPeriod of holdingPeriods) {
-            const periodLabel = holdingPeriod === 0 ? 'intraday' : `${holdingPeriod} days`
-            const label = `${caseLabel} (${Uic}) - ${periodLabel}`
-
-            await substep(label, async () => {
-              const cost = await saxoBankClient.clientServices.tradingConditions.cost.get({
-                AccountKey: account.AccountKey,
-                Amount: 80,
-                AssetType,
-                Price: 58,
-                Uic,
-                HoldingPeriodInDays: holdingPeriod,
+                    break
+                  }
+                }
               })
-
-              expect(cost).toBeDefined()
-            })
-          }
+            }
+          })
         }
       })
     }
