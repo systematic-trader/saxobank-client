@@ -17,7 +17,7 @@ export class ContractOptionSpaces {
     readonly ClientKey?: undefined | string
     readonly ExpiryDates?: undefined | readonly string[]
     readonly OptionSpaceSegment?: undefined | OptionSpaceSegment
-    readonly TradingStatus?: undefined | TradingStatus
+    readonly TradingStatus?: undefined | TradingStatus | readonly TradingStatus[]
     readonly UnderlyingUic?: undefined | number
   }): Promise<undefined | OptionDetails> {
     const { OptionRootId, ...searchParams } = options
