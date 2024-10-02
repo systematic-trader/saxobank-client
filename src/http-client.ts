@@ -116,16 +116,22 @@ export class HTTPClient {
     {
       guard,
       headers,
+      coerce,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
+      readonly coerce?: undefined | ((body: unknown) => unknown)
     } = {},
   ): Promise<T> {
     const response = await this.get(url, { headers })
 
     // console.log(response.headers)
 
-    const body = await response.json()
+    let body = await response.json()
+
+    if (coerce !== undefined) {
+      body = coerce(body)
+    }
 
     if (guard !== undefined) {
       return assertReturn(guard, body)
@@ -184,14 +190,20 @@ export class HTTPClient {
     {
       guard,
       headers,
+      coerce,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
+      readonly coerce?: undefined | ((body: unknown) => unknown)
     } = {},
   ): Promise<T> {
     const response = await this.post(url, { headers })
 
-    const body = await response.json()
+    let body = await response.json()
+
+    if (coerce !== undefined) {
+      body = coerce(body)
+    }
 
     if (guard !== undefined) {
       return assertReturn(guard, body)
@@ -229,10 +241,12 @@ export class HTTPClient {
       guard,
       headers,
       body,
+      coerce,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
+      readonly coerce?: undefined | ((body: unknown) => unknown)
     } = {},
   ): Promise<T> {
     const response = await this.put(url, {
@@ -243,7 +257,11 @@ export class HTTPClient {
       body,
     })
 
-    const responseBody = response.status === 204 ? undefined : await response.json()
+    let responseBody = response.status === 204 ? undefined : await response.json()
+
+    if (coerce !== undefined) {
+      responseBody = coerce(responseBody)
+    }
 
     if (guard !== undefined) {
       return assertReturn(guard, responseBody)

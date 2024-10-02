@@ -55,7 +55,7 @@ export class ResourceClient {
 
     setSearchParams(url, options.searchParams)
 
-    return await this.#client.getJSON(url, { headers, guard: options.guard })
+    return await this.#client.getJSON(url, { headers, guard: options.guard, coerce: sanitize })
   }
 
   async getPaginated<T = unknown>(options: {
@@ -115,16 +115,17 @@ export class ResourceClient {
         undefined | boolean | number | string | readonly string[]
       >
     readonly guard?: undefined | Guard<T>
-  } = {}): Promise<void> {
+  } = {}): Promise<T> {
     const url = urlJoin(this.#prefixURL, options.path)
     const headers = { ...this.#headers, ...options.headers }
 
     setSearchParams(url, options.searchParams)
 
-    await this.#client.putJSON(url, {
+    return await this.#client.putJSON(url, {
       headers,
       body: JSON.stringify(options.body),
       guard: options.guard,
+      coerce: sanitize,
     })
   }
 }
@@ -219,4 +220,78 @@ async function fetchResourceData<T = unknown>({
   })
 
   return assertedData.concat(nextData)
+}
+
+/**
+ *  The Saxo Bank API returns garbage data in some cases. This function sanitizes the data.
+ */
+function sanitize(value: unknown): unknown {
+  switch (typeof value) {
+    case 'string': {
+      const trimmedValue = value.trim()
+
+      if (trimmedValue === '') {
+        return undefined
+      }
+
+      if (trimmedValue === '.') {
+        return undefined
+      }
+
+      if (trimmedValue[trimmedValue.length - 1] === '.' && trimmedValue[trimmedValue.length - 2] === ' ') {
+        // remove whitespaces preceeding the dot, but keep the dot
+        return trimmedValue.replace(/\s*\.$/, '.')
+      }
+
+      return trimmedValue
+    }
+
+    case 'number': {
+      if (Number.isFinite(value) === false) {
+        return undefined
+      }
+
+      return value
+    }
+
+    case 'object': {
+      if (value === null) {
+        return undefined
+      }
+
+      if (Array.isArray(value)) {
+        return value.reduce((accumulation, item) => {
+          const sanitizedItem = sanitize(item)
+
+          if (sanitizedItem !== undefined) {
+            accumulation.push(sanitizedItem)
+          }
+
+          return accumulation
+        }, [])
+      }
+
+      const record = value as Record<string, unknown>
+
+      let hasDefinedProperty = false
+
+      for (const propertyKey in record) {
+        const propertyValue = record[propertyKey]
+
+        const sanitizedValue = sanitize(propertyValue)
+
+        if (sanitizedValue !== undefined) {
+          hasDefinedProperty = true
+        }
+
+        record[propertyKey] = sanitizedValue
+      }
+
+      return hasDefinedProperty ? record : undefined
+    }
+
+    default: {
+      return value
+    }
+  }
 }
