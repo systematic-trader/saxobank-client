@@ -136,7 +136,7 @@ export const InstrumentDetailsBond = props({
   BondsTypes: array(BondType),
   BondType: BondType,
   Coupon: number(),
-  CouponCurrency: union([Currency3, literal('')]),
+  CouponCurrency: Currency3,
   CouponType: BondsCouponType,
   CurrencyCode: Currency3,
   DefaultAmount: number(),

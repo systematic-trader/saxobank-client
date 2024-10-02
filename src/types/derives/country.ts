@@ -3,7 +3,6 @@ import { enums, type GuardType } from 'https://raw.githubusercontent.com/systema
 export type CountryCodeA2 = GuardType<typeof CountryCodeA2>
 
 export const CountryCodeA2 = enums([
-  '',
   'AD',
   'AE',
   'AF',
