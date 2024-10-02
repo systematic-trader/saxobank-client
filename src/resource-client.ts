@@ -227,37 +227,6 @@ async function fetchResourceData<T = unknown>({
  */
 function sanitize(value: unknown): unknown {
   switch (typeof value) {
-    case 'string': {
-      let trimmedValue = value.trim()
-
-      if (
-        trimmedValue.length > 1 &&
-        trimmedValue[trimmedValue.length - 1] === '.' &&
-        trimmedValue[trimmedValue.length - 2] === ' '
-      ) {
-        // remove whitespaces preceeding the dot, but keep the dot
-        trimmedValue = trimmedValue.replace(/\s*\.$/, '.')
-      }
-
-      if (trimmedValue === '') {
-        return undefined
-      }
-
-      if (trimmedValue === '.') {
-        return undefined
-      }
-
-      return trimmedValue
-    }
-
-    case 'number': {
-      if (Number.isFinite(value) === false) {
-        return undefined
-      }
-
-      return value
-    }
-
     case 'object': {
       if (value === null) {
         return undefined
@@ -292,6 +261,29 @@ function sanitize(value: unknown): unknown {
       }
 
       return hasDefinedProperty ? record : undefined
+    }
+
+    case 'string': {
+      let trimmedValue = value.trim()
+
+      if (
+        trimmedValue.length > 1 &&
+        trimmedValue[trimmedValue.length - 1] === '.' &&
+        trimmedValue[trimmedValue.length - 2] === ' '
+      ) {
+        // remove whitespaces preceeding the dot, but keep the dot
+        trimmedValue = trimmedValue.replace(/\s*\.$/, '.')
+      }
+
+      if (trimmedValue === '') {
+        return undefined
+      }
+
+      if (trimmedValue === '.') {
+        return undefined
+      }
+
+      return trimmedValue
     }
 
     default: {
