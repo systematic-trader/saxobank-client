@@ -18,10 +18,10 @@ export const InstrumentPriceDetails = props({
   AccruedInterest: number(),
 
   /** AskYield are only valid for the bond asset type */
-  AskYield: number(),
+  AskYield: optional(number()),
 
   /** BidYield are only valid for the bond asset type */
-  BidYield: number(),
+  BidYield: optional(number()),
 
   /** Costs applicable to shorting the CFD */
   CfdBorrowingCost: number(),
@@ -80,7 +80,7 @@ export const InstrumentPriceDetails = props({
   ForwardDateNearLeg: string({ format: 'date-iso8601' }),
 
   /** IndexRatio, Applicable for inflation linked bond */
-  IndexRatio: number(),
+  IndexRatio: optional(number()),
 
   /** Gets or sets a value indicating whether the market on which the instrument is traded is currently open */
   IsMarketOpen: boolean(),
@@ -100,10 +100,10 @@ export const InstrumentPriceDetails = props({
   MidSpotPrice: number(),
 
   /** MidYield are only valid for the bond asset type */
-  MidYield: number(),
+  MidYield: optional(number()),
 
   /** Futures only - The date on which the owner may be required to take physical delivery of the instrument commodity */
-  NoticeDate: string({ format: 'gregorian-date' }),
+  NoticeDate: optional(string({ format: 'gregorian-date' })),
 
   /** The number of currently open contracts (available for contract options and futures) */
   OpenInterest: number(),

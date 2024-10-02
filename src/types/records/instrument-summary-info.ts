@@ -355,7 +355,7 @@ export const InstrumentSummaryInfoFxVanillaOption = props({
   Identifier: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap'])),
+  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap', 'FxVanillaOption'])),
   CanParticipateInMultiLegOrder: boolean(),
   UnderlyingAssetType: AssetType.extract(['FxSpot']),
   UnderlyingUic: integer(),
