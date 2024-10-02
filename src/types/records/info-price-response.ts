@@ -2,11 +2,9 @@ import {
   type GuardType,
   integer,
   literal,
-  nullable,
   optional,
   props,
   string,
-  union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { AssetType } from '../derives/asset-type.ts'
 import { Commissions } from '../derives/commissions.ts'
@@ -25,7 +23,7 @@ export const InfoPriceResponse = props({
   AssetType: AssetType,
 
   /** The commissions */
-  Commissions: nullable(Commissions),
+  Commissions: optional(Commissions),
 
   /** Information about the instrument of the net position and how to display it. */
   DisplayAndFormat: InstrumentDisplayAndFormat.merge({
@@ -63,10 +61,10 @@ export const InfoPriceResponse = props({
   PriceInfo: PriceInfo,
 
   /** Detailed price information */
-  PriceInfoDetails: nullable(PriceInfoDetails),
+  PriceInfoDetails: optional(PriceInfoDetails),
 
   /** The source for the price information */
-  PriceSource: string(),
+  PriceSource: optional(string()),
 
   /** The quote data. */
   Quote: Quote,
@@ -79,7 +77,7 @@ export interface InfoPriceResponse extends GuardType<typeof InfoPriceResponse> {
 
 export const InfoPriceResponseBond = InfoPriceResponse.merge({
   AssetType: literal('Bond'),
-  PriceInfo: union([optional(PriceInfo), literal({})]),
+  PriceInfo: optional(PriceInfo),
   InstrumentPriceDetails: optional(InstrumentPriceDetails.pick([
     'AccruedInterest',
     'AskYield',
@@ -374,7 +372,7 @@ export const InfoPriceResponseFxForwards = InfoPriceResponse.merge({
     'SwapBid',
     'ValueDate',
   ]),
-  PriceInfo: literal({}),
+  PriceInfo: literal(undefined),
   Greeks: optional(Greeks),
 })
 
@@ -432,7 +430,7 @@ export interface InfoPriceResponseFxSpot extends GuardType<typeof InfoPriceRespo
 
 export const InfoPriceResponseFxSwap = InfoPriceResponse.merge({
   AssetType: literal('FxSwap'),
-  PriceInfo: optional(literal(null)),
+  PriceInfo: optional(literal(undefined)),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'FarLegAsk',
     'FarLegBid',
@@ -455,7 +453,7 @@ export interface InfoPriceResponseFxSwap extends GuardType<typeof InfoPriceRespo
 
 export const InfoPriceResponseFxVanillaOption = InfoPriceResponse.merge({
   AssetType: literal('FxVanillaOption'),
-  PriceInfo: literal({}),
+  PriceInfo: literal(undefined),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'ExpiryDate',
     'IsMarketOpen',

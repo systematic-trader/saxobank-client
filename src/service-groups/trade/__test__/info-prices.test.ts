@@ -5,7 +5,7 @@ import { SaxoBankClient } from '../../../saxobank-client.ts'
 import type { OptionDetails } from '../../../types/records/option-details.ts'
 import type { InfoPricesParameters } from '../info-prices.ts'
 
-const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 500
+const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 150
 
 function progress(current: number, total: number) {
   return `${String(current).padStart(String(total).length, '0')}/${total}`
