@@ -62,7 +62,7 @@ export const OptionDetails = props({
   OrderDistances,
   PriceToContractFactor: number(),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: array(integer()),
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   SettlementStyle,
   StandardAmounts: array(number()),

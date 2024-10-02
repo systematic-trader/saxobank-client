@@ -77,7 +77,7 @@ export const Greeks = props({
    * Refers to the combined time decay of all the options in a particular trading position
    * I.e. the sum of the individual theta values for each option.
    */
-  Theta: number(),
+  Theta: optional(number()),
 
   /** The currency of the Theta value */
   ThetaCurrency: optional(Currency3),
@@ -92,7 +92,7 @@ export const Greeks = props({
    * Sensitivity of a position with respect to the implied volatility used to price FX Options.
    * This shows how much money is made (positive number) or lost (negative number) when volatility goes up by one percentage point.
    */
-  Vega: number(),
+  Vega: optional(number()),
 
   /** The currency of the Vega value */
   VegaCurrency: optional(Currency3),
@@ -104,7 +104,7 @@ export const Greeks = props({
   VegaDisplayDecimals: optional(integer()),
 
   /** Not documented */
-  Rho: number(),
+  Rho: optional(number()),
 
   /** Not documented */
   Phi: optional(number()),
