@@ -6,6 +6,7 @@ import {
   optional,
   props,
   string,
+  union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { AssetType } from '../derives/asset-type.ts'
 import { Commissions } from '../derives/commissions.ts'
@@ -24,7 +25,7 @@ export const InfoPriceResponse = props({
   AssetType: AssetType,
 
   /** The commissions */
-  Commissions: Commissions,
+  Commissions: nullable(Commissions),
 
   /** Information about the instrument of the net position and how to display it. */
   DisplayAndFormat: InstrumentDisplayAndFormat.merge({
@@ -62,7 +63,7 @@ export const InfoPriceResponse = props({
   PriceInfo: PriceInfo,
 
   /** Detailed price information */
-  PriceInfoDetails: PriceInfoDetails,
+  PriceInfoDetails: nullable(PriceInfoDetails),
 
   /** The source for the price information */
   PriceSource: string(),
@@ -78,7 +79,8 @@ export interface InfoPriceResponse extends GuardType<typeof InfoPriceResponse> {
 
 export const InfoPriceResponseBond = InfoPriceResponse.merge({
   AssetType: literal('Bond'),
-  InstrumentPriceDetails: InstrumentPriceDetails.pick([
+  PriceInfo: union([optional(PriceInfo), literal({})]),
+  InstrumentPriceDetails: optional(InstrumentPriceDetails.pick([
     'AccruedInterest',
     'AskYield',
     'AverageVolume30Days',
@@ -88,7 +90,8 @@ export const InfoPriceResponseBond = InfoPriceResponse.merge({
     'PriceFeedType',
     'ShortTradeDisabled',
     'ValueDate',
-  ]),
+    'IndexRatio',
+  ])),
 })
 
 export interface InfoPriceResponseBond extends GuardType<typeof InfoPriceResponseBond> {}
@@ -170,12 +173,13 @@ export interface InfoPriceResponseCfdOnStock extends GuardType<typeof InfoPriceR
 
 export const InfoPriceResponseStockIndexOption = InfoPriceResponse.merge({
   AssetType: literal('StockIndexOption'),
-  InstrumentPriceDetails: InstrumentPriceDetails.pick([
+  InstrumentPriceDetails: optional(InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'OpenInterest',
     'ShortTradeDisabled',
     'ValueDate',
-  ]),
+  ])),
+  PriceInfo: optional(PriceInfo),
   Greeks: optional(Greeks),
 })
 
@@ -211,11 +215,12 @@ export interface InfoPriceResponseContractFutures extends GuardType<typeof InfoP
 
 export const InfoPriceResponseCfdOnFutures = InfoPriceResponse.merge({
   AssetType: literal('CfdOnFutures'),
-  InstrumentPriceDetails: InstrumentPriceDetails.pick([
+  PriceInfo: optional(PriceInfo),
+  InstrumentPriceDetails: optional(InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'ShortTradeDisabled',
     'ValueDate',
-  ]),
+  ])),
 })
 
 export interface InfoPriceResponseCfdOnFutures extends GuardType<typeof InfoPriceResponseCfdOnFutures> {}
@@ -428,7 +433,6 @@ export interface InfoPriceResponseFxSpot extends GuardType<typeof InfoPriceRespo
 export const InfoPriceResponseFxSwap = InfoPriceResponse.merge({
   AssetType: literal('FxSwap'),
   PriceInfo: optional(literal(null)),
-  PriceInfoDetails: nullable(PriceInfoDetails),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'FarLegAsk',
     'FarLegBid',
@@ -478,7 +482,6 @@ export const InfoPriceResponseRights = InfoPriceResponse.merge({
     'ShortTradeDisabled',
     'ValueDate',
   ]),
-  Commissions: nullable(Commissions),
 })
 
 export interface InfoPriceResponseRights extends GuardType<typeof InfoPriceResponseRights> {}

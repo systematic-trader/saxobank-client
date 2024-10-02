@@ -14,7 +14,7 @@ export const Greeks = props({
    * Shows the equivalent FX Spot exposure of a given position.
    * This is the sensitivity of a position’s value with respect to the spot rate.
    */
-  Delta: number(),
+  Delta: optional(number()),
 
   /** The currency of the Delta value */
   DeltaCurrency: optional(Currency3),
@@ -26,7 +26,7 @@ export const Greeks = props({
   DeltaDisplayDecimals: optional(integer()),
 
   /** This is the second derivative of the position value with respect to spot, i.e. it shows how much the delta changes when spot changes (i.e. how much will the delta change when spot moves up by one percentage point */
-  Gamma: number(),
+  Gamma: optional(number()),
 
   /** The currency of the Gamma value */
   GammaCurrency: optional(Currency3),

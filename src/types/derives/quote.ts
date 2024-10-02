@@ -1,7 +1,6 @@
 import {
   type GuardType,
   integer,
-  literal,
   number,
   optional,
   props,
@@ -18,13 +17,13 @@ const Base = props({
   Amount: integer(),
 
   /** If set, it defines the number of minutes by which the price is delayed. */
-  DelayedByMinutes: integer(),
+  DelayedByMinutes: optional(integer()),
 
   /** Gets or sets the error code. */
   ErrorCode: ErrorCode,
 
   /** Not documented */
-  MarketState: MarketState,
+  MarketState: optional(MarketState),
 
   /** The source for the price information */
   PriceSource: string(),
@@ -57,35 +56,51 @@ export const Quote = union([
     BidSize: number(),
 
     Mid: number(),
+    MarketState: MarketState,
   })),
 
-  // Neither ask nor bid are given
-  Base.merge(props({
-    PriceTypeAsk: PriceQuality.exclude(['Tradable', 'Indicative', 'OldIndicative']),
-    AskSize: optional(literal(0)),
-
-    PriceTypeBid: PriceQuality.exclude(['Tradable', 'Indicative', 'OldIndicative']),
-    BidSize: optional(literal(0)),
-  })),
-
-  // Ask is given, bid is not given
+  // Ask is given, bid might not be given
   Base.merge(props({
     PriceTypeAsk: PriceQuality.extract(['Tradable', 'Indicative', 'OldIndicative']),
     Ask: number(),
     AskSize: number(),
 
     PriceTypeBid: PriceQuality.exclude(['Tradable', 'Indicative', 'OldIndicative']),
-    BidSize: optional(literal(0)),
+    Bid: optional(number()),
+    BidSize: optional(number()),
+
+    Mid: optional(number()),
+    MarketState: MarketState,
   })),
 
-  // Ask is not given, bid is given
+  // Bid is given, ask might not be given
   Base.merge(props({
     PriceTypeAsk: PriceQuality.exclude(['Tradable', 'Indicative', 'OldIndicative']),
-    AskSize: optional(literal(0)),
+    Ask: optional(number()),
+    AskSize: optional(number()),
 
     PriceTypeBid: PriceQuality.extract(['Tradable', 'Indicative', 'OldIndicative']),
     Bid: number(),
     BidSize: number(),
+
+    Mid: optional(number()),
+    MarketState: MarketState,
+  })),
+
+  // Neither ask nor bid may be given
+  Base.merge(props({
+    Amount: optional(Base.pluck('Amount')),
+
+    PriceTypeAsk: PriceQuality.exclude(['Tradable', 'Indicative', 'OldIndicative']),
+    Ask: optional(number()),
+    AskSize: optional(number()),
+
+    PriceTypeBid: PriceQuality.exclude(['Tradable', 'Indicative', 'OldIndicative']),
+    Bid: optional(number()),
+    BidSize: optional(number()),
+
+    Mid: optional(number()),
+    MarketState: optional(MarketState),
   })),
 ])
 
