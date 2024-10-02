@@ -170,7 +170,7 @@ export const InstrumentPriceDetails = props({
   AverageVolume30Days: number(),
 
   /** Not documented */
-  AverageVolume: number(),
+  AverageVolume: optional(number()),
 
   /** Not documented */
   RelativeVolume: optional(number()),

@@ -465,7 +465,7 @@ export const InstrumentSummaryInfoFxNoTouchOption = props({
   Identifier: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap'])),
+  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap', 'FxVanillaOption'])),
   UnderlyingAssetType: AssetType.extract(['FxSpot']),
   UnderlyingUic: integer(),
 })
@@ -481,7 +481,7 @@ export const InstrumentSummaryInfoFxOneTouchOption = props({
   Identifier: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap'])),
+  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap', 'FxVanillaOption'])),
   UnderlyingAssetType: AssetType.extract(['FxSpot']),
   UnderlyingUic: integer(),
 })
@@ -499,7 +499,7 @@ export const InstrumentSummaryInfoFxForwards = props({
   Identifier: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap'])),
+  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap', 'FxVanillaOption'])),
   UnderlyingAssetType: AssetType.extract(['FxSpot']),
   UnderlyingUic: integer(),
 })
@@ -516,7 +516,7 @@ export const InstrumentSummaryInfoFxSwap = props({
   Identifier: integer(),
   SummaryType: SummaryType,
   Symbol: string(),
-  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap'])),
+  TradableAs: array(AssetType.extract(['FxSpot', 'FxForwards', 'FxSwap', 'FxVanillaOption'])),
   UnderlyingAssetType: AssetType.extract(['FxSpot']),
   UnderlyingUic: integer(),
 })

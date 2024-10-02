@@ -5,6 +5,7 @@ import {
   integer,
   literal,
   number,
+  type ObjectGuard,
   optional,
   props,
   string,
@@ -12,99 +13,11 @@ import {
 import type { ResourceClient } from '../../resource-client.ts'
 import type { InfoPriceGroupSpec } from '../../types/derives/info-price-group-spec.ts'
 import type { OrderAmountType } from '../../types/derives/order-amount-type.ts'
-import {
-  InfoPriceResponseBond,
-  InfoPriceResponseCfdOnCompanyWarrant,
-  InfoPriceResponseCfdOnEtc,
-  InfoPriceResponseCfdOnEtf,
-  InfoPriceResponseCfdOnEtn,
-  InfoPriceResponseCfdOnFund,
-  InfoPriceResponseCfdOnFutures,
-  InfoPriceResponseCfdOnIndex,
-  InfoPriceResponseCfdOnRights,
-  InfoPriceResponseCfdOnStock,
-  InfoPriceResponseCompanyWarrant,
-  InfoPriceResponseContractFutures,
-  InfoPriceResponseEtc,
-  InfoPriceResponseEtf,
-  InfoPriceResponseEtn,
-  InfoPriceResponseFund,
-  InfoPriceResponseFuturesOption,
-  InfoPriceResponseFxForwards,
-  InfoPriceResponseFxNoTouchOption,
-  InfoPriceResponseFxOneTouchOption,
-  InfoPriceResponseFxSpot,
-  InfoPriceResponseFxSwap,
-  InfoPriceResponseFxVanillaOption,
-  InfoPriceResponseRights,
-  InfoPriceResponseStock,
-  InfoPriceResponseStockIndexOption,
-  InfoPriceResponseStockOption,
-} from '../../types/records/info-price-response.ts'
 
 import { PutCall } from '../../types/derives/put-call.ts'
 import { ToOpenClose } from '../../types/derives/to-open-close.ts'
+import { InfoPriceResponse } from '../../types/records/info-price-response.ts'
 import { extractKeys } from '../../utils.ts'
-
-const InfoPriceResponse = {
-  Bond: InfoPriceResponseBond,
-  CfdOnIndex: InfoPriceResponseCfdOnIndex,
-  CompanyWarrant: InfoPriceResponseCompanyWarrant,
-  CfdOnCompanyWarrant: InfoPriceResponseCfdOnCompanyWarrant,
-  Stock: InfoPriceResponseStock,
-  CfdOnStock: InfoPriceResponseCfdOnStock,
-  StockIndexOption: InfoPriceResponseStockIndexOption,
-  StockOption: InfoPriceResponseStockOption,
-  ContractFutures: InfoPriceResponseContractFutures,
-  CfdOnFutures: InfoPriceResponseCfdOnFutures,
-  Etc: InfoPriceResponseEtc,
-  CfdOnEtc: InfoPriceResponseCfdOnEtc,
-  Etf: InfoPriceResponseEtf,
-  CfdOnEtf: InfoPriceResponseCfdOnEtf,
-  Etn: InfoPriceResponseEtn,
-  CfdOnEtn: InfoPriceResponseCfdOnEtn,
-  Fund: InfoPriceResponseFund,
-  CfdOnFund: InfoPriceResponseCfdOnFund,
-  FuturesOption: InfoPriceResponseFuturesOption,
-  FxForwards: InfoPriceResponseFxForwards,
-  FxNoTouchOption: InfoPriceResponseFxNoTouchOption,
-  FxOneTouchOption: InfoPriceResponseFxOneTouchOption,
-  FxSpot: InfoPriceResponseFxSpot,
-  FxSwap: InfoPriceResponseFxSwap,
-  FxVanillaOption: InfoPriceResponseFxVanillaOption,
-  Rights: InfoPriceResponseRights,
-  CfdOnRights: InfoPriceResponseCfdOnRights,
-} as const
-
-type InfoPriceResponse = {
-  Bond: InfoPriceResponseBond
-  CfdOnIndex: InfoPriceResponseCfdOnIndex
-  CompanyWarrant: InfoPriceResponseCompanyWarrant
-  CfdOnCompanyWarrant: InfoPriceResponseCfdOnCompanyWarrant
-  Stock: InfoPriceResponseStock
-  CfdOnStock: InfoPriceResponseCfdOnStock
-  StockIndexOption: InfoPriceResponseStockIndexOption
-  StockOption: InfoPriceResponseStockOption
-  ContractFutures: InfoPriceResponseContractFutures
-  CfdOnFutures: InfoPriceResponseCfdOnFutures
-  Etc: InfoPriceResponseEtc
-  CfdOnEtc: InfoPriceResponseCfdOnEtc
-  Etf: InfoPriceResponseEtf
-  CfdOnEtf: InfoPriceResponseCfdOnEtf
-  Etn: InfoPriceResponseEtn
-  CfdOnEtn: InfoPriceResponseCfdOnEtn
-  Fund: InfoPriceResponseFund
-  CfdOnFund: InfoPriceResponseCfdOnFund
-  FuturesOption: InfoPriceResponseFuturesOption
-  FxForwards: InfoPriceResponseFxForwards
-  FxNoTouchOption: InfoPriceResponseFxNoTouchOption
-  FxOneTouchOption: InfoPriceResponseFxOneTouchOption
-  FxSpot: InfoPriceResponseFxSpot
-  FxSwap: InfoPriceResponseFxSwap
-  FxVanillaOption: InfoPriceResponseFxVanillaOption
-  Rights: InfoPriceResponseRights
-  CfdOnRights: InfoPriceResponseCfdOnRights
-}
 
 const InfoPricesBaseParameters = props({
   AssetType: enums(extractKeys(InfoPriceResponse)),
@@ -463,329 +376,123 @@ export class InfoPrices {
       'Quote',
     ]
 
+    const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType] as ObjectGuard, parameters)
+
+    const searchParams = {
+      AmountType,
+      FieldGroups,
+      ...assertedParameters,
+    }
+
+    const response = await this.#client.get<object>({ searchParams })
+
     switch (parameters.AssetType) {
       case 'Bond': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnIndex': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CompanyWarrant': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnCompanyWarrant': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'Stock': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnStock': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'StockIndexOption': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'StockOption': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'ContractFutures': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnFutures': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'Etc': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnEtc': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'Etf': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnEtf': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'Etn': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnEtn': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'Fund': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnFund': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'FuturesOption': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'FxForwards': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'FxNoTouchOption': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'FxOneTouchOption': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'FxSpot': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'FxSwap': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'FxVanillaOption': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'Rights': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnRights': {
-        const assertedParameters = assertReturn(InfoPricesParameters[parameters.AssetType], parameters)
-        return await this.#client.get({
-          searchParams: {
-            AmountType,
-            FieldGroups,
-            ...assertedParameters,
-          },
-          guard: InfoPriceResponse[parameters.AssetType],
-        })
+        return assertReturn(InfoPriceResponse[parameters.AssetType], response)
       }
 
       default: {
