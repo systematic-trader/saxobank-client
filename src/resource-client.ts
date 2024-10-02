@@ -233,7 +233,7 @@ function sanitize(value: unknown): unknown {
       }
 
       if (Array.isArray(value)) {
-        return value.reduce((accumulation, item) => {
+        const arrayValue = value.reduce((accumulation, item) => {
           const sanitizedItem = sanitize(item)
 
           if (sanitizedItem !== undefined) {
@@ -242,9 +242,13 @@ function sanitize(value: unknown): unknown {
 
           return accumulation
         }, [])
+
+        return arrayValue.length > 0 ? arrayValue : undefined
       }
 
       const record = value as Record<string, unknown>
+
+      const sanitizedRecord = value as Record<string, unknown>
 
       let hasDefinedProperty = false
 
@@ -255,12 +259,11 @@ function sanitize(value: unknown): unknown {
 
         if (sanitizedValue !== undefined) {
           hasDefinedProperty = true
+          sanitizedRecord[propertyKey] = sanitizedValue
         }
-
-        record[propertyKey] = sanitizedValue
       }
 
-      return hasDefinedProperty ? record : undefined
+      return hasDefinedProperty ? sanitizedRecord : undefined
     }
 
     case 'string': {
