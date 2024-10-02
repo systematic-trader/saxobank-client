@@ -2,16 +2,14 @@ import {
   boolean,
   type GuardType,
   integer,
-  literal,
   number,
   optional,
   props,
-  union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { LineStatus } from '../derives/line-status.ts'
 import { CalculationReliability } from '../derives/calculation-reliability.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { InitialMarginResponse } from '../derives/initial-margin-response.ts'
+import { LineStatus } from '../derives/line-status.ts'
 import { MarginCollateralNotAvailableDetail } from '../derives/margin-collateral-not-available-detail.ts'
 import { MarginOverviewByGroup } from '../derives/margin-overview-by-group.ts'
 import { SpendingPower } from '../derives/spending-power.ts'
@@ -159,7 +157,7 @@ export const BalanceResponse = props({
   SettlementValue: number(),
 
   /** Available spending power on the account/client. */
-  SpendingPowerDetail: union([SpendingPower, literal({})]),
+  SpendingPowerDetail: optional(SpendingPower),
 
   /** The utilization state and risk credit limit. */
   TotalRiskLine: optional(LineStatus),

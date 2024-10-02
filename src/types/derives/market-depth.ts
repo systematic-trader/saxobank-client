@@ -3,8 +3,8 @@ import {
   boolean,
   type GuardType,
   integer,
-  nullable,
   number,
+  optional,
   props,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
@@ -47,16 +47,16 @@ export const MarketDepth = props({
   UsingOrders: boolean(),
 
   /** Not documented */
-  AskPriceSourceTypes: array(nullable(PriceSourceType)),
+  AskPriceSourceTypes: array(optional(PriceSourceType)),
 
   /** Not documented */
-  AskPriceSources: array(nullable(string())),
+  AskPriceSources: array(optional(string())),
 
   /** Not documented */
-  BidPriceSourceTypes: array(nullable(PriceSourceType)),
+  BidPriceSourceTypes: array(optional(PriceSourceType)),
 
   /** Not documented */
-  BidPriceSources: array(nullable(string())),
+  BidPriceSources: array(optional(string())),
 
   /** Not documented */
   Level2PriceFeed: boolean(),

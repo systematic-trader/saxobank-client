@@ -26,7 +26,7 @@ const Base = props({
   MarketState: optional(MarketState),
 
   /** The source for the price information */
-  PriceSource: string(),
+  PriceSource: optional(string()),
 
   /**
    * Suggested price based on best available price information.
