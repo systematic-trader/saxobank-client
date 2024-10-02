@@ -6,7 +6,6 @@ import {
   props,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { AssetType } from '../derives/asset-type.ts'
 import { Commissions } from '../derives/commissions.ts'
 import { Greeks } from '../derives/greeks.ts'
 import { HistoricalChanges } from '../derives/historical-changes.ts'
@@ -18,65 +17,24 @@ import { PriceInfo } from '../derives/price-info.ts'
 import { Quote } from '../derives/quote.ts'
 import { TradingErrorCode } from '../derives/trading-error-code.ts'
 
-export const InfoPriceResponse = props({
-  /** Asset Type of the instrument */
-  AssetType: AssetType,
-
-  /** The commissions */
-  Commissions: optional(Commissions),
-
-  /** Information about the instrument of the net position and how to display it. */
-  DisplayAndFormat: InstrumentDisplayAndFormat.merge({
-    /** Not documented */
-    LotSizeText: optional(string()),
-  }),
-
-  /**
-   * Error code, only there if instrument doesn't exist.
-   *
-   * Is usually None, but can indicate whether an order for that amount will be to large or to small.
-   */
-  ErrorCode: optional(TradingErrorCode),
-
-  /** Error message, only there if instrument doesn't exist */
-  ErrorMessage: optional(string()),
-
-  /** The historical price changes */
-  HistoricalChanges: optional(HistoricalChanges),
-
-  /**
-   * Instrument Specific Price Details.
-   * Contents vary by AssetType
-   */
-  InstrumentPriceDetails: InstrumentPriceDetails,
-
-  /** Time of last price update. */
-  LastUpdated: string({ format: 'date-iso8601' }),
-
-  /** The market depth */
-  MarketDepth: optional(MarketDepth),
-
-  /** Brief price information. */
-  PriceInfo: PriceInfo,
-
-  /** Detailed price information */
-  PriceInfoDetails: optional(PriceInfoDetails),
-
-  /** The source for the price information */
-  PriceSource: optional(string()),
-
-  /** The quote data. */
-  Quote: Quote,
-
-  /** Uic of instrument */
-  Uic: integer(),
+const DisplayAndFormat = InstrumentDisplayAndFormat.merge({
+  /** Not documented */
+  LotSizeText: optional(string()),
 })
 
-export interface InfoPriceResponse extends GuardType<typeof InfoPriceResponse> {}
-
-export const InfoPriceResponseBond = InfoPriceResponse.merge({
+export const InfoPriceResponseBond = props({
   AssetType: literal('Bond'),
+  Uic: integer(),
   PriceInfo: optional(PriceInfo),
+  PriceInfoDetails: optional(PriceInfoDetails),
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: optional(InstrumentPriceDetails.pick([
     'AccruedInterest',
     'AskYield',
@@ -93,8 +51,19 @@ export const InfoPriceResponseBond = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseBond extends GuardType<typeof InfoPriceResponseBond> {}
 
-export const InfoPriceResponseCfdOnIndex = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnIndex = props({
   AssetType: literal('CfdOnIndex'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'PaidCfdInterest',
@@ -106,8 +75,19 @@ export const InfoPriceResponseCfdOnIndex = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnIndex extends GuardType<typeof InfoPriceResponseCfdOnIndex> {}
 
-export const InfoPriceResponseCompanyWarrant = InfoPriceResponse.merge({
+export const InfoPriceResponseCompanyWarrant = props({
   AssetType: literal('CompanyWarrant'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: optional(Commissions),
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -120,8 +100,19 @@ export const InfoPriceResponseCompanyWarrant = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCompanyWarrant extends GuardType<typeof InfoPriceResponseCompanyWarrant> {}
 
-export const InfoPriceResponseCfdOnCompanyWarrant = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnCompanyWarrant = props({
   AssetType: literal('CfdOnCompanyWarrant'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -137,8 +128,19 @@ export const InfoPriceResponseCfdOnCompanyWarrant = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnCompanyWarrant extends GuardType<typeof InfoPriceResponseCfdOnCompanyWarrant> {}
 
-export const InfoPriceResponseStock = InfoPriceResponse.merge({
+export const InfoPriceResponseStock = props({
   AssetType: literal('Stock'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -151,8 +153,19 @@ export const InfoPriceResponseStock = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseStock extends GuardType<typeof InfoPriceResponseStock> {}
 
-export const InfoPriceResponseCfdOnStock = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnStock = props({
   AssetType: literal('CfdOnStock'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -168,22 +181,43 @@ export const InfoPriceResponseCfdOnStock = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnStock extends GuardType<typeof InfoPriceResponseCfdOnStock> {}
 
-export const InfoPriceResponseStockIndexOption = InfoPriceResponse.merge({
+export const InfoPriceResponseStockIndexOption = props({
   AssetType: literal('StockIndexOption'),
+  Uic: integer(),
+  PriceInfo: optional(PriceInfo),
+  PriceInfoDetails: optional(PriceInfoDetails),
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: optional(InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'OpenInterest',
     'ShortTradeDisabled',
     'ValueDate',
   ])),
-  PriceInfo: optional(PriceInfo),
   Greeks: optional(Greeks),
 })
 
 export interface InfoPriceResponseStockIndexOption extends GuardType<typeof InfoPriceResponseStockIndexOption> {}
 
-export const InfoPriceResponseStockOption = InfoPriceResponse.merge({
+export const InfoPriceResponseStockOption = props({
   AssetType: literal('StockOption'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'OpenInterest',
@@ -195,8 +229,19 @@ export const InfoPriceResponseStockOption = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseStockOption extends GuardType<typeof InfoPriceResponseStockOption> {}
 
-export const InfoPriceResponseContractFutures = InfoPriceResponse.merge({
+export const InfoPriceResponseContractFutures = props({
   AssetType: literal('ContractFutures'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'IsMarketOpen',
@@ -210,9 +255,19 @@ export const InfoPriceResponseContractFutures = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseContractFutures extends GuardType<typeof InfoPriceResponseContractFutures> {}
 
-export const InfoPriceResponseCfdOnFutures = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnFutures = props({
   AssetType: literal('CfdOnFutures'),
+  Uic: integer(),
   PriceInfo: optional(PriceInfo),
+  PriceInfoDetails: optional(PriceInfoDetails),
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: optional(Commissions),
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: optional(InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'ShortTradeDisabled',
@@ -222,8 +277,19 @@ export const InfoPriceResponseCfdOnFutures = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnFutures extends GuardType<typeof InfoPriceResponseCfdOnFutures> {}
 
-export const InfoPriceResponseEtc = InfoPriceResponse.merge({
+export const InfoPriceResponseEtc = props({
   AssetType: literal('Etc'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -236,8 +302,19 @@ export const InfoPriceResponseEtc = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseEtc extends GuardType<typeof InfoPriceResponseEtc> {}
 
-export const InfoPriceResponseCfdOnEtc = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnEtc = props({
   AssetType: literal('CfdOnEtc'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -253,8 +330,19 @@ export const InfoPriceResponseCfdOnEtc = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnEtc extends GuardType<typeof InfoPriceResponseCfdOnEtc> {}
 
-export const InfoPriceResponseEtf = InfoPriceResponse.merge({
+export const InfoPriceResponseEtf = props({
   AssetType: literal('Etf'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -267,8 +355,19 @@ export const InfoPriceResponseEtf = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseEtf extends GuardType<typeof InfoPriceResponseEtf> {}
 
-export const InfoPriceResponseCfdOnEtf = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnEtf = props({
   AssetType: literal('CfdOnEtf'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -284,8 +383,19 @@ export const InfoPriceResponseCfdOnEtf = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnEtf extends GuardType<typeof InfoPriceResponseCfdOnEtf> {}
 
-export const InfoPriceResponseEtn = InfoPriceResponse.merge({
+export const InfoPriceResponseEtn = props({
   AssetType: literal('Etn'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: optional(Commissions),
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -298,8 +408,19 @@ export const InfoPriceResponseEtn = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseEtn extends GuardType<typeof InfoPriceResponseEtn> {}
 
-export const InfoPriceResponseCfdOnEtn = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnEtn = props({
   AssetType: literal('CfdOnEtn'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: optional(Commissions),
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -315,8 +436,19 @@ export const InfoPriceResponseCfdOnEtn = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnEtn extends GuardType<typeof InfoPriceResponseCfdOnEtn> {}
 
-export const InfoPriceResponseFund = InfoPriceResponse.merge({
+export const InfoPriceResponseFund = props({
   AssetType: literal('Fund'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: optional(Commissions),
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -329,8 +461,19 @@ export const InfoPriceResponseFund = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFund extends GuardType<typeof InfoPriceResponseFund> {}
 
-export const InfoPriceResponseCfdOnFund = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnFund = props({
   AssetType: literal('CfdOnFund'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -346,8 +489,19 @@ export const InfoPriceResponseCfdOnFund = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseCfdOnFund extends GuardType<typeof InfoPriceResponseCfdOnFund> {}
 
-export const InfoPriceResponseFuturesOption = InfoPriceResponse.merge({
+export const InfoPriceResponseFuturesOption = props({
   AssetType: literal('FuturesOption'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'OpenInterest',
@@ -359,8 +513,18 @@ export const InfoPriceResponseFuturesOption = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFuturesOption extends GuardType<typeof InfoPriceResponseFuturesOption> {}
 
-export const InfoPriceResponseFxForwards = InfoPriceResponse.omit(['PriceInfo']).merge({
+export const InfoPriceResponseFxForwards = props({
   AssetType: literal('FxForwards'),
+  Uic: integer(),
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'ShortTradeDisabled',
@@ -376,9 +540,18 @@ export const InfoPriceResponseFxForwards = InfoPriceResponse.omit(['PriceInfo'])
 
 export interface InfoPriceResponseFxForwards extends GuardType<typeof InfoPriceResponseFxForwards> {}
 
-export const InfoPriceResponseFxNoTouchOption = InfoPriceResponse.merge({
+export const InfoPriceResponseFxNoTouchOption = props({
   AssetType: literal('FxNoTouchOption'),
-  PriceInfo: optional(PriceInfo.omit(['High', 'Low', 'NetChange', 'PercentChange'])),
+  Uic: integer(),
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'ExpiryDate',
     'IsMarketOpen',
@@ -395,9 +568,18 @@ export const InfoPriceResponseFxNoTouchOption = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFxNoTouchOption extends GuardType<typeof InfoPriceResponseFxNoTouchOption> {}
 
-export const InfoPriceResponseFxOneTouchOption = InfoPriceResponse.merge({
+export const InfoPriceResponseFxOneTouchOption = props({
   AssetType: literal('FxOneTouchOption'),
-  PriceInfo: optional(PriceInfo.omit(['High', 'Low', 'NetChange', 'PercentChange'])),
+  Uic: integer(),
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'ExpiryDate',
     'IsMarketOpen',
@@ -414,8 +596,19 @@ export const InfoPriceResponseFxOneTouchOption = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFxOneTouchOption extends GuardType<typeof InfoPriceResponseFxOneTouchOption> {}
 
-export const InfoPriceResponseFxSpot = InfoPriceResponse.merge({
+export const InfoPriceResponseFxSpot = props({
   AssetType: literal('FxSpot'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'IsMarketOpen',
     'ShortTradeDisabled',
@@ -426,8 +619,17 @@ export const InfoPriceResponseFxSpot = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFxSpot extends GuardType<typeof InfoPriceResponseFxSpot> {}
 
-export const InfoPriceResponseFxSwap = InfoPriceResponse.omit(['PriceInfo']).merge({
+export const InfoPriceResponseFxSwap = props({
   AssetType: literal('FxSwap'),
+  Uic: integer(),
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'FarLegAsk',
     'FarLegBid',
@@ -448,8 +650,16 @@ export const InfoPriceResponseFxSwap = InfoPriceResponse.omit(['PriceInfo']).mer
 
 export interface InfoPriceResponseFxSwap extends GuardType<typeof InfoPriceResponseFxSwap> {}
 
-export const InfoPriceResponseFxVanillaOption = InfoPriceResponse.omit(['PriceInfo']).merge({
+export const InfoPriceResponseFxVanillaOption = props({
   AssetType: literal('FxVanillaOption'),
+  Uic: integer(),
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'ExpiryDate',
     'IsMarketOpen',
@@ -466,8 +676,19 @@ export const InfoPriceResponseFxVanillaOption = InfoPriceResponse.omit(['PriceIn
 
 export interface InfoPriceResponseFxVanillaOption extends GuardType<typeof InfoPriceResponseFxVanillaOption> {}
 
-export const InfoPriceResponseRights = InfoPriceResponse.merge({
+export const InfoPriceResponseRights = props({
   AssetType: literal('Rights'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: optional(MarketDepth),
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: optional(HistoricalChanges),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -480,8 +701,19 @@ export const InfoPriceResponseRights = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseRights extends GuardType<typeof InfoPriceResponseRights> {}
 
-export const InfoPriceResponseCfdOnRights = InfoPriceResponse.merge({
+export const InfoPriceResponseCfdOnRights = props({
   AssetType: literal('CfdOnRights'),
+  Uic: integer(),
+  PriceInfo: PriceInfo,
+  PriceInfoDetails: PriceInfoDetails,
+  DisplayAndFormat,
+  LastUpdated: string({ format: 'date-iso8601' }),
+  MarketDepth: MarketDepth,
+  PriceSource: optional(string()),
+  Quote: Quote,
+  ErrorCode: optional(TradingErrorCode),
+  Commissions: Commissions,
+  HistoricalChanges: HistoricalChanges,
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'AverageVolume',
     'AverageVolume30Days',
@@ -496,3 +728,63 @@ export const InfoPriceResponseCfdOnRights = InfoPriceResponse.merge({
 })
 
 export interface InfoPriceResponseCfdOnRights extends GuardType<typeof InfoPriceResponseCfdOnRights> {}
+
+export const InfoPriceResponse = {
+  Bond: InfoPriceResponseBond,
+  CfdOnIndex: InfoPriceResponseCfdOnIndex,
+  CompanyWarrant: InfoPriceResponseCompanyWarrant,
+  CfdOnCompanyWarrant: InfoPriceResponseCfdOnCompanyWarrant,
+  Stock: InfoPriceResponseStock,
+  CfdOnStock: InfoPriceResponseCfdOnStock,
+  StockIndexOption: InfoPriceResponseStockIndexOption,
+  StockOption: InfoPriceResponseStockOption,
+  ContractFutures: InfoPriceResponseContractFutures,
+  CfdOnFutures: InfoPriceResponseCfdOnFutures,
+  Etc: InfoPriceResponseEtc,
+  CfdOnEtc: InfoPriceResponseCfdOnEtc,
+  Etf: InfoPriceResponseEtf,
+  CfdOnEtf: InfoPriceResponseCfdOnEtf,
+  Etn: InfoPriceResponseEtn,
+  CfdOnEtn: InfoPriceResponseCfdOnEtn,
+  Fund: InfoPriceResponseFund,
+  CfdOnFund: InfoPriceResponseCfdOnFund,
+  FuturesOption: InfoPriceResponseFuturesOption,
+  FxForwards: InfoPriceResponseFxForwards,
+  FxNoTouchOption: InfoPriceResponseFxNoTouchOption,
+  FxOneTouchOption: InfoPriceResponseFxOneTouchOption,
+  FxSpot: InfoPriceResponseFxSpot,
+  FxSwap: InfoPriceResponseFxSwap,
+  FxVanillaOption: InfoPriceResponseFxVanillaOption,
+  Rights: InfoPriceResponseRights,
+  CfdOnRights: InfoPriceResponseCfdOnRights,
+} as const
+
+export type InfoPriceResponse = {
+  Bond: InfoPriceResponseBond
+  CfdOnIndex: InfoPriceResponseCfdOnIndex
+  CompanyWarrant: InfoPriceResponseCompanyWarrant
+  CfdOnCompanyWarrant: InfoPriceResponseCfdOnCompanyWarrant
+  Stock: InfoPriceResponseStock
+  CfdOnStock: InfoPriceResponseCfdOnStock
+  StockIndexOption: InfoPriceResponseStockIndexOption
+  StockOption: InfoPriceResponseStockOption
+  ContractFutures: InfoPriceResponseContractFutures
+  CfdOnFutures: InfoPriceResponseCfdOnFutures
+  Etc: InfoPriceResponseEtc
+  CfdOnEtc: InfoPriceResponseCfdOnEtc
+  Etf: InfoPriceResponseEtf
+  CfdOnEtf: InfoPriceResponseCfdOnEtf
+  Etn: InfoPriceResponseEtn
+  CfdOnEtn: InfoPriceResponseCfdOnEtn
+  Fund: InfoPriceResponseFund
+  CfdOnFund: InfoPriceResponseCfdOnFund
+  FuturesOption: InfoPriceResponseFuturesOption
+  FxForwards: InfoPriceResponseFxForwards
+  FxNoTouchOption: InfoPriceResponseFxNoTouchOption
+  FxOneTouchOption: InfoPriceResponseFxOneTouchOption
+  FxSpot: InfoPriceResponseFxSpot
+  FxSwap: InfoPriceResponseFxSwap
+  FxVanillaOption: InfoPriceResponseFxVanillaOption
+  Rights: InfoPriceResponseRights
+  CfdOnRights: InfoPriceResponseCfdOnRights
+}

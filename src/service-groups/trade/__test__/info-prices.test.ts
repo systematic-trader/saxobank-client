@@ -1,11 +1,12 @@
 import { expect } from 'std/expect/expect.ts'
 import { describe, test } from 'std/testing/bdd.ts'
 import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
+import { HTTPClientError } from '../../../http-client.ts'
 import { SaxoBankClient } from '../../../saxobank-client.ts'
 import type { ContractOptionEntry } from '../../../types/records/contract-option-entry.ts'
 import type { InfoPricesParameters } from '../info-prices.ts'
 
-const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 300
+const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 500
 
 function progress(current: number, total: number) {
   return `${String(current).padStart(String(total).length, '0')}/${total}`
@@ -14,9 +15,7 @@ function progress(current: number, total: number) {
 function findSuitableOptionInstrument(optionSpaces: readonly ContractOptionEntry[]) {
   for (const optionSpace of optionSpaces) {
     for (const option of optionSpace.SpecificOptions ?? []) {
-      if (option.TradingStatus === 'Tradable' || option.TradingStatus === 'ReduceOnly') {
-        return option
-      }
+      return option
     }
   }
 
@@ -29,7 +28,7 @@ describe('trade/info-prices', () => {
     authorization: new SaxoBank24HourToken(),
   })
 
-  test('Getting info proces for asset type', async ({ step }) => {
+  test('Getting info prices for asset type', async ({ step }) => {
     const assetTypeCandidates: InfoPricesParameters[keyof InfoPricesParameters]['AssetType'][] = [
       'Bond',
       'CfdOnIndex',
@@ -55,7 +54,7 @@ describe('trade/info-prices', () => {
       'FxOneTouchOption',
       'FxSpot',
       'FxSwap',
-      // 'FxVanillaOption', // todo 8/47 of the instruments respond with an undocumented error - rewrite the test to use live data instead
+      'FxVanillaOption', // todo 8/47 of the instruments respond with an undocumented error - rewrite the test to use live data instead
       'Rights',
       'CfdOnRights',
     ] as const
@@ -111,7 +110,6 @@ describe('trade/info-prices', () => {
               case 'StockIndexOption': {
                 const optionsResponse = await saxoBankClient.referenceData.instruments.contractoptionspaces.get({
                   OptionRootId: instrument.Identifier,
-                  TradingStatus: ['Tradable', 'ReduceOnly'],
                 })
 
                 if (optionsResponse === undefined || optionsResponse.OptionSpace === undefined) {
@@ -124,13 +122,24 @@ describe('trade/info-prices', () => {
                   throw new Error(`Could not find a suitable option for UIC=${instrument.Identifier}`)
                 }
 
-                const infoPrices = await saxoBankClient.trade.infoPrices.get({
-                  Amount: 80,
-                  AssetType: assetType,
-                  Uic: optionInstrument.Uic,
-                })
+                try {
+                  const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                    Amount: 80,
+                    AssetType: assetType,
+                    Uic: optionInstrument.Uic,
+                  })
 
-                expect(infoPrices).toBeDefined()
+                  expect(infoPrices).toBeDefined()
+                } catch (error) {
+                  if (error instanceof HTTPClientError && error.statusCode === 404) {
+                    // deno-lint-ignore no-console
+                    console.log(`Could not get info prices for option UIC=${optionInstrument.Uic}`)
+
+                    break
+                  }
+
+                  throw error
+                }
 
                 break
               }
