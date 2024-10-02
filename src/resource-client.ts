@@ -268,8 +268,8 @@ function sanitize(value: unknown): unknown {
 
       if (
         trimmedValue.length > 1 &&
-        trimmedValue[trimmedValue.length - 1] === '.' &&
-        trimmedValue[trimmedValue.length - 2] === ' '
+        trimmedValue.at(-1) === '.' &&
+        trimmedValue.at(-2) === ' '
       ) {
         // remove whitespaces preceeding the dot, but keep the dot
         trimmedValue = trimmedValue.replace(/\s*\.$/, '.')
