@@ -2,6 +2,7 @@ import {
   array,
   type GuardType,
   integer,
+  optional,
   props,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { AssetType } from '../derives/asset-type.ts'
@@ -14,5 +15,5 @@ export const RelatedOptionRoot = props({
   AssetType,
   OptionRootId: integer(),
   OptionType,
-  SupportedStrategies: array(OptionsStrategyType),
+  SupportedStrategies: optional(array(OptionsStrategyType)),
 })

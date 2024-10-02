@@ -23,7 +23,7 @@ export const ContractOptionEntry = props({
   /** The Last Trade Date */
   LastTradeDate: format('date-iso8601'),
   /** List of specific options for the specified expiry date. This array will only be available for the dates specified in the request (OptionSpace, ExpiryDates) */
-  SpecificOptions: array(ContractOption),
+  SpecificOptions: optional(array(ContractOption)),
   /** The current tick size scheme of the expiry group. */
   TickSizeScheme: optional(TickSizeScheme),
 })

@@ -2,18 +2,18 @@ import { expect } from 'std/expect/expect.ts'
 import { describe, test } from 'std/testing/bdd.ts'
 import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 import { SaxoBankClient } from '../../../saxobank-client.ts'
-import type { OptionDetails } from '../../../types/records/option-details.ts'
+import type { ContractOptionEntry } from '../../../types/records/contract-option-entry.ts'
 import type { InfoPricesParameters } from '../info-prices.ts'
 
-const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 150
+const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 300
 
 function progress(current: number, total: number) {
   return `${String(current).padStart(String(total).length, '0')}/${total}`
 }
 
-function findSuitableOptionInstrument(optionSpaces: NonNullable<OptionDetails['OptionSpace']>) {
+function findSuitableOptionInstrument(optionSpaces: readonly ContractOptionEntry[]) {
   for (const optionSpace of optionSpaces) {
-    for (const option of optionSpace.SpecificOptions) {
+    for (const option of optionSpace.SpecificOptions ?? []) {
       if (option.TradingStatus === 'Tradable' || option.TradingStatus === 'ReduceOnly') {
         return option
       }

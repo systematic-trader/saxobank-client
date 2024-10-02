@@ -31,7 +31,6 @@ export const InfoPriceResponse = props({
     LotSizeText: optional(string()),
   }),
 
-  // todo test this
   /**
    * Error code, only there if instrument doesn't exist.
    *
@@ -360,7 +359,7 @@ export const InfoPriceResponseFuturesOption = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFuturesOption extends GuardType<typeof InfoPriceResponseFuturesOption> {}
 
-export const InfoPriceResponseFxForwards = InfoPriceResponse.merge({
+export const InfoPriceResponseFxForwards = InfoPriceResponse.omit(['PriceInfo']).merge({
   AssetType: literal('FxForwards'),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'IsMarketOpen',
@@ -372,7 +371,6 @@ export const InfoPriceResponseFxForwards = InfoPriceResponse.merge({
     'SwapBid',
     'ValueDate',
   ]),
-  PriceInfo: literal(undefined),
   Greeks: optional(Greeks),
 })
 
@@ -380,7 +378,7 @@ export interface InfoPriceResponseFxForwards extends GuardType<typeof InfoPriceR
 
 export const InfoPriceResponseFxNoTouchOption = InfoPriceResponse.merge({
   AssetType: literal('FxNoTouchOption'),
-  PriceInfo: PriceInfo.omit(['High', 'Low', 'NetChange', 'PercentChange']),
+  PriceInfo: optional(PriceInfo.omit(['High', 'Low', 'NetChange', 'PercentChange'])),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'ExpiryDate',
     'IsMarketOpen',
@@ -399,7 +397,7 @@ export interface InfoPriceResponseFxNoTouchOption extends GuardType<typeof InfoP
 
 export const InfoPriceResponseFxOneTouchOption = InfoPriceResponse.merge({
   AssetType: literal('FxOneTouchOption'),
-  PriceInfo: PriceInfo.omit(['High', 'Low', 'NetChange', 'PercentChange']),
+  PriceInfo: optional(PriceInfo.omit(['High', 'Low', 'NetChange', 'PercentChange'])),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'ExpiryDate',
     'IsMarketOpen',
@@ -428,9 +426,8 @@ export const InfoPriceResponseFxSpot = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFxSpot extends GuardType<typeof InfoPriceResponseFxSpot> {}
 
-export const InfoPriceResponseFxSwap = InfoPriceResponse.merge({
+export const InfoPriceResponseFxSwap = InfoPriceResponse.omit(['PriceInfo']).merge({
   AssetType: literal('FxSwap'),
-  PriceInfo: optional(literal(undefined)),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'FarLegAsk',
     'FarLegBid',
@@ -451,9 +448,8 @@ export const InfoPriceResponseFxSwap = InfoPriceResponse.merge({
 
 export interface InfoPriceResponseFxSwap extends GuardType<typeof InfoPriceResponseFxSwap> {}
 
-export const InfoPriceResponseFxVanillaOption = InfoPriceResponse.merge({
+export const InfoPriceResponseFxVanillaOption = InfoPriceResponse.omit(['PriceInfo']).merge({
   AssetType: literal('FxVanillaOption'),
-  PriceInfo: literal(undefined),
   InstrumentPriceDetails: InstrumentPriceDetails.pick([
     'ExpiryDate',
     'IsMarketOpen',

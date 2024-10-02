@@ -20,22 +20,22 @@ export interface MarketDepth extends GuardType<typeof MarketDepth> {}
  */
 export const MarketDepth = props({
   /** List of prices of the current offers to sell in the market. */
-  Ask: array(number()),
+  Ask: optional(array(number())),
 
   /** List of order counts of the current offers to sell in the market. */
-  AskOrders: array(number()),
+  AskOrders: optional(array(number())),
 
   /** List of amounts of the current offers to sell in the market. */
-  AskSize: array(number()),
+  AskSize: optional(array(number())),
 
   /** List of prices of the current offers to buy in the market. */
-  Bid: array(number()),
+  Bid: optional(array(number())),
 
   /** List of order counts of the current offers to buy in the market. */
-  BidOrders: array(number()),
+  BidOrders: optional(array(number())),
 
   /** List of amounts of the current offers to buy in the market. */
-  BidSize: array(number()),
+  BidSize: optional(array(number())),
 
   /** Number of current bids on the instrument. */
   NoOfBids: integer(),
@@ -47,16 +47,16 @@ export const MarketDepth = props({
   UsingOrders: boolean(),
 
   /** Not documented */
-  AskPriceSourceTypes: array(optional(PriceSourceType)),
+  AskPriceSourceTypes: optional(array(PriceSourceType)),
 
   /** Not documented */
-  AskPriceSources: array(optional(string())),
+  AskPriceSources: optional(array(string())),
 
   /** Not documented */
-  BidPriceSourceTypes: array(optional(PriceSourceType)),
+  BidPriceSourceTypes: optional(array(PriceSourceType)),
 
   /** Not documented */
-  BidPriceSources: array(optional(string())),
+  BidPriceSources: optional(array(string())),
 
   /** Not documented */
   Level2PriceFeed: boolean(),
