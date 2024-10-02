@@ -248,7 +248,7 @@ function sanitize(value: unknown): unknown {
 
       const record = value as Record<string, unknown>
 
-      const sanitizedRecord = value as Record<string, unknown>
+      const sanitizedRecord = {} as Record<string, unknown>
 
       let hasDefinedProperty = false
 
