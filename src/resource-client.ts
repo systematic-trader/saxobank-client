@@ -231,7 +231,8 @@ function sanitize(value: unknown): unknown {
       let trimmedValue = value.trim()
 
       if (
-        trimmedValue.length > 1 && trimmedValue[trimmedValue.length - 1] === '.' &&
+        trimmedValue.length > 1 &&
+        trimmedValue[trimmedValue.length - 1] === '.' &&
         trimmedValue[trimmedValue.length - 2] === ' '
       ) {
         // remove whitespaces preceeding the dot, but keep the dot
