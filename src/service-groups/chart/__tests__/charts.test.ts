@@ -5,13 +5,13 @@ import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-to
 import { HTTPClientError } from '../../../http-client.ts'
 import type { ChartsParameters } from '../charts.ts'
 
-const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 500
+const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 250
 
 function progress(current: number, total: number) {
   return `${String(current).padStart(String(total).length, '0')}/${total}`
 }
 
-describe('charts/chart', () => {
+describe('chart/charts', () => {
   const saxoBankClient = new SaxoBankClient({
     prefixURL: 'https://gateway.saxobank.com/sim/openapi',
     authorization: new SaxoBank24HourToken(),
@@ -20,25 +20,25 @@ describe('charts/chart', () => {
   test('Getting chart data for asset type', async ({ step }) => {
     const assetTypeCandidates: ChartsParameters['AssetType'][] = [
       'Bond',
-      'CompanyWarrant',
       'CfdOnCompanyWarrant',
-      'ContractFutures',
-      'CfdOnFutures',
-      'Etc',
       'CfdOnEtc',
-      'Etf',
       'CfdOnEtf',
-      'Etn',
       'CfdOnEtn',
-      'Fund',
       'CfdOnFund',
+      'CfdOnFutures',
+      'CfdOnIndex',
+      'CfdOnRights',
+      'CfdOnStock',
+      'CompanyWarrant',
+      'ContractFutures',
+      'Etc',
+      'Etf',
+      'Etn',
+      'Fund',
       'FxSpot',
       'Rights',
-      'CfdOnRights',
       'Stock',
-      'CfdOnStock',
       'StockIndex',
-      'CfdOnIndex',
     ] as const
 
     for (const assetType of assetTypeCandidates) {
