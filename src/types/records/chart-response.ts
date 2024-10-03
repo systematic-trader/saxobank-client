@@ -6,141 +6,231 @@ import {
   props,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { ChartInfo } from '../derives/chart-info.ts'
-import { ChartSample, ChartSampleBidAskOHLC, ChartSampleOHLC } from '../derives/chart-sample.ts'
+import { ChartSampleBidAskOHLC, ChartSampleOHLC } from '../derives/chart-sample.ts'
 import { DisplayAndFormat } from '../derives/display-and-format.ts'
 
-export interface ChartResponse extends GuardType<typeof ChartResponse> {}
-
-export const ChartResponse = props({
-  /** Object holding information about the OHLC samples such as the exchange id of the price source, when the first sample begins, the horizon in minutes and how long the samples are delayed by. */
+export const ChartResponseBond = props({
   ChartInfo,
-
-  /** Array holding the individual OHLC samples. For Forex Instruments both Bid and Ask values are returned. For other instruments the values are the last traded values. */
-  Data: array(ChartSample),
-
-  /** This field holds a version number of the data. */
-  DataVersion: integer(),
-
-  /** Object holding information relevant to displaying the instrument and formatting the samples for charting it. Currently holds the symbol of the instrument, how many decimals samples have, a description of the instrument and what currency it is traded in. */
-  DisplayAndFormat,
-})
-
-export const ChartResponseBond = ChartResponse.merge({
   Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseBond extends GuardType<typeof ChartResponseBond> {}
 
-export const ChartResponseCompanyWarrant = ChartResponse.merge({
+export const ChartResponseCfdOnCompanyWarrant = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
-})
-
-export interface ChartResponseCompanyWarrant extends GuardType<typeof ChartResponseCompanyWarrant> {}
-
-export const ChartResponseCfdOnCompanyWarrant = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseCfdOnCompanyWarrant extends GuardType<typeof ChartResponseCfdOnCompanyWarrant> {}
 
-export const ChartResponseContractFutures = ChartResponse.merge({
+export const ChartResponseCfdOnEtc = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
-})
-
-export interface ChartResponseContractFutures extends GuardType<typeof ChartResponseContractFutures> {}
-
-export const ChartResponseCfdOnFutures = ChartResponse.merge({
-  Data: optional(array(ChartSampleBidAskOHLC)),
-})
-
-export interface ChartResponseCfdOnFutures extends GuardType<typeof ChartResponseCfdOnFutures> {}
-
-export const ChartResponseEtc = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
-})
-
-export interface ChartResponseEtc extends GuardType<typeof ChartResponseEtc> {}
-
-export const ChartResponseCfdOnEtc = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseCfdOnEtc extends GuardType<typeof ChartResponseCfdOnEtc> {}
 
-export const ChartResponseEtf = ChartResponse.merge({
+export const ChartResponseCfdOnEtf = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
-})
-
-export interface ChartResponseEtf extends GuardType<typeof ChartResponseEtf> {}
-
-export const ChartResponseCfdOnEtf = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseCfdOnEtf extends GuardType<typeof ChartResponseCfdOnEtf> {}
 
-export const ChartResponseEtn = ChartResponse.merge({
+export const ChartResponseCfdOnEtn = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
-})
-
-export interface ChartResponseEtn extends GuardType<typeof ChartResponseEtn> {}
-
-export const ChartResponseCfdOnEtn = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseCfdOnEtn extends GuardType<typeof ChartResponseCfdOnEtn> {}
 
-export const ChartResponseFund = ChartResponse.merge({
+export const ChartResponseCfdOnFund = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
-})
-
-export interface ChartResponseFund extends GuardType<typeof ChartResponseFund> {}
-
-export const ChartResponseCfdOnFund = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseCfdOnFund extends GuardType<typeof ChartResponseCfdOnFund> {}
 
-export const ChartResponseFxSpot = ChartResponse.merge({
+export const ChartResponseCfdOnFutures = props({
+  ChartInfo,
   Data: optional(array(ChartSampleBidAskOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
-export interface ChartResponseFxSpot extends GuardType<typeof ChartResponseFxSpot> {}
+export interface ChartResponseCfdOnFutures extends GuardType<typeof ChartResponseCfdOnFutures> {}
 
-export const ChartResponseRights = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
+export const ChartResponseCfdOnIndex = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleBidAskOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
-export interface ChartResponseRights extends GuardType<typeof ChartResponseRights> {}
+export interface ChartResponseCfdOnIndex extends GuardType<typeof ChartResponseCfdOnIndex> {}
 
-export const ChartResponseCfdOnRights = ChartResponse.merge({
+export const ChartResponseCfdOnRights = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseCfdOnRights extends GuardType<typeof ChartResponseCfdOnRights> {}
 
-export const ChartResponseStock = ChartResponse.merge({
+export const ChartResponseCfdOnStock = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
-})
-
-export interface ChartResponseStock extends GuardType<typeof ChartResponseStock> {}
-
-export const ChartResponseCfdOnStock = ChartResponse.merge({
-  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseCfdOnStock extends GuardType<typeof ChartResponseCfdOnStock> {}
 
-export const ChartResponseStockIndex = ChartResponse.merge({
+export const ChartResponseCompanyWarrant = props({
+  ChartInfo,
   Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseCompanyWarrant extends GuardType<typeof ChartResponseCompanyWarrant> {}
+
+export const ChartResponseContractFutures = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseContractFutures extends GuardType<typeof ChartResponseContractFutures> {}
+
+export const ChartResponseEtc = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseEtc extends GuardType<typeof ChartResponseEtc> {}
+
+export const ChartResponseEtf = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseEtf extends GuardType<typeof ChartResponseEtf> {}
+
+export const ChartResponseEtn = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseEtn extends GuardType<typeof ChartResponseEtn> {}
+
+export const ChartResponseFund = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseFund extends GuardType<typeof ChartResponseFund> {}
+
+export const ChartResponseFxSpot = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleBidAskOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseFxSpot extends GuardType<typeof ChartResponseFxSpot> {}
+
+export const ChartResponseRights = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseRights extends GuardType<typeof ChartResponseRights> {}
+
+export const ChartResponseStock = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
+})
+
+export interface ChartResponseStock extends GuardType<typeof ChartResponseStock> {}
+
+export const ChartResponseStockIndex = props({
+  ChartInfo,
+  Data: optional(array(ChartSampleOHLC)),
+  DataVersion: integer(),
+  DisplayAndFormat,
 })
 
 export interface ChartResponseStockIndex extends GuardType<typeof ChartResponseStockIndex> {}
 
-export const ChartResponseCfdOnIndex = ChartResponse.merge({
-  Data: optional(array(ChartSampleBidAskOHLC)),
-})
+export const ChartResponse = {
+  Bond: ChartResponseBond,
+  CfdOnCompanyWarrant: ChartResponseCfdOnCompanyWarrant,
+  CfdOnEtc: ChartResponseCfdOnEtc,
+  CfdOnEtf: ChartResponseCfdOnEtf,
+  CfdOnEtn: ChartResponseCfdOnEtn,
+  CfdOnFund: ChartResponseCfdOnFund,
+  CfdOnFutures: ChartResponseCfdOnFutures,
+  CfdOnIndex: ChartResponseCfdOnIndex,
+  CfdOnRights: ChartResponseCfdOnRights,
+  CfdOnStock: ChartResponseCfdOnStock,
+  CompanyWarrant: ChartResponseCompanyWarrant,
+  ContractFutures: ChartResponseContractFutures,
+  Etc: ChartResponseEtc,
+  Etf: ChartResponseEtf,
+  Etn: ChartResponseEtn,
+  Fund: ChartResponseFund,
+  FxSpot: ChartResponseFxSpot,
+  Rights: ChartResponseRights,
+  Stock: ChartResponseStock,
+  StockIndex: ChartResponseStockIndex,
+} as const
 
-export interface ChartResponseCfdOnIndex extends GuardType<typeof ChartResponseCfdOnIndex> {}
+export type ChartResponse = {
+  Bond: ChartResponseBond
+  CfdOnCompanyWarrant: ChartResponseCfdOnCompanyWarrant
+  CfdOnEtc: ChartResponseCfdOnEtc
+  CfdOnEtf: ChartResponseCfdOnEtf
+  CfdOnEtn: ChartResponseCfdOnEtn
+  CfdOnFund: ChartResponseCfdOnFund
+  CfdOnFutures: ChartResponseCfdOnFutures
+  CfdOnIndex: ChartResponseCfdOnIndex
+  CfdOnRights: ChartResponseCfdOnRights
+  CfdOnStock: ChartResponseCfdOnStock
+  CompanyWarrant: ChartResponseCompanyWarrant
+  ContractFutures: ChartResponseContractFutures
+  Etc: ChartResponseEtc
+  Etf: ChartResponseEtf
+  Etn: ChartResponseEtn
+  Fund: ChartResponseFund
+  FxSpot: ChartResponseFxSpot
+  Rights: ChartResponseRights
+  Stock: ChartResponseStock
+  StockIndex: ChartResponseStockIndex
+}

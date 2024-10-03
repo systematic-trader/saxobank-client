@@ -13,75 +13,8 @@ import type { ResourceClient } from '../../resource-client.ts'
 import type { ChartFieldGroupSpec } from '../../types/derives/chart-field-group-spec.ts'
 import { ChartRequestMode } from '../../types/derives/chart-request-mode.ts'
 import { Horizon } from '../../types/derives/horizon.ts'
-import {
-  ChartResponseBond,
-  ChartResponseCfdOnCompanyWarrant,
-  ChartResponseCfdOnEtc,
-  ChartResponseCfdOnEtf,
-  ChartResponseCfdOnEtn,
-  ChartResponseCfdOnFund,
-  ChartResponseCfdOnFutures,
-  ChartResponseCfdOnIndex,
-  ChartResponseCfdOnRights,
-  ChartResponseCfdOnStock,
-  ChartResponseCompanyWarrant,
-  ChartResponseContractFutures,
-  ChartResponseEtc,
-  ChartResponseEtf,
-  ChartResponseEtn,
-  ChartResponseFund,
-  ChartResponseFxSpot,
-  ChartResponseRights,
-  ChartResponseStock,
-  ChartResponseStockIndex,
-} from '../../types/records/chart-response.ts'
+import { ChartResponse } from '../../types/records/chart-response.ts'
 import { extractKeys } from '../../utils.ts'
-
-const ChartResponse = {
-  Bond: ChartResponseBond,
-  CfdOnCompanyWarrant: ChartResponseCfdOnCompanyWarrant,
-  CfdOnEtc: ChartResponseCfdOnEtc,
-  CfdOnEtf: ChartResponseCfdOnEtf,
-  CfdOnEtn: ChartResponseCfdOnEtn,
-  CfdOnFund: ChartResponseCfdOnFund,
-  CfdOnFutures: ChartResponseCfdOnFutures,
-  CfdOnIndex: ChartResponseCfdOnIndex,
-  CfdOnRights: ChartResponseCfdOnRights,
-  CfdOnStock: ChartResponseCfdOnStock,
-  CompanyWarrant: ChartResponseCompanyWarrant,
-  ContractFutures: ChartResponseContractFutures,
-  Etc: ChartResponseEtc,
-  Etf: ChartResponseEtf,
-  Etn: ChartResponseEtn,
-  Fund: ChartResponseFund,
-  FxSpot: ChartResponseFxSpot,
-  Rights: ChartResponseRights,
-  Stock: ChartResponseStock,
-  StockIndex: ChartResponseStockIndex,
-} as const
-
-type ChartResponse = {
-  Bond: ChartResponseBond
-  CfdOnCompanyWarrant: ChartResponseCfdOnCompanyWarrant
-  CfdOnEtc: ChartResponseCfdOnEtc
-  CfdOnEtf: ChartResponseCfdOnEtf
-  CfdOnEtn: ChartResponseCfdOnEtn
-  CfdOnFund: ChartResponseCfdOnFund
-  CfdOnFutures: ChartResponseCfdOnFutures
-  CfdOnIndex: ChartResponseCfdOnIndex
-  CfdOnRights: ChartResponseCfdOnRights
-  CfdOnStock: ChartResponseCfdOnStock
-  CompanyWarrant: ChartResponseCompanyWarrant
-  ContractFutures: ChartResponseContractFutures
-  Etc: ChartResponseEtc
-  Etf: ChartResponseEtf
-  Etn: ChartResponseEtn
-  Fund: ChartResponseFund
-  FxSpot: ChartResponseFxSpot
-  Rights: ChartResponseRights
-  Stock: ChartResponseStock
-  StockIndex: ChartResponseStockIndex
-}
 
 const ChartsParametersModeAndTimeGuard = union([
   props({
