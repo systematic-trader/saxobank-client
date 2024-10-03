@@ -11,96 +11,8 @@ import {
 
 import type { ResourceClient } from '../../../resource-client.ts'
 import type { TradingConditionFieldGroup } from '../../../types/derives/trading-condition-field-group.ts'
-import {
-  CostResponseBond,
-  CostResponseCfdOnCompanyWarrant,
-  CostResponseCfdOnEtc,
-  CostResponseCfdOnEtf,
-  CostResponseCfdOnEtn,
-  CostResponseCfdOnFund,
-  CostResponseCfdOnFutures,
-  CostResponseCfdOnIndex,
-  CostResponseCfdOnRights,
-  CostResponseCfdOnStock,
-  CostResponseCompanyWarrant,
-  CostResponseContractFutures,
-  CostResponseEtc,
-  CostResponseEtf,
-  CostResponseEtn,
-  CostResponseFund,
-  CostResponseFuturesOption,
-  CostResponseFxForwards,
-  CostResponseFxNoTouchOption,
-  CostResponseFxOneTouchOption,
-  CostResponseFxSpot,
-  CostResponseFxSwap,
-  CostResponseFxVanillaOption,
-  CostResponseRights,
-  CostResponseStock,
-  CostResponseStockIndexOption,
-  CostResponseStockOption,
-} from '../../../types/records/cost-response.ts'
+import { CostResponse } from '../../../types/records/cost-response.ts'
 import { extractKeys } from '../../../utils.ts'
-
-const CostResponse = {
-  Bond: CostResponseBond,
-  CfdOnCompanyWarrant: CostResponseCfdOnCompanyWarrant,
-  CfdOnEtc: CostResponseCfdOnEtc,
-  CfdOnEtf: CostResponseCfdOnEtf,
-  CfdOnEtn: CostResponseCfdOnEtn,
-  CfdOnFund: CostResponseCfdOnFund,
-  CfdOnFutures: CostResponseCfdOnFutures,
-  CfdOnIndex: CostResponseCfdOnIndex,
-  CfdOnRights: CostResponseCfdOnRights,
-  CfdOnStock: CostResponseCfdOnStock,
-  CompanyWarrant: CostResponseCompanyWarrant,
-  ContractFutures: CostResponseContractFutures,
-  Etc: CostResponseEtc,
-  Etf: CostResponseEtf,
-  Etn: CostResponseEtn,
-  Fund: CostResponseFund,
-  FuturesOption: CostResponseFuturesOption,
-  FxForwards: CostResponseFxForwards,
-  FxNoTouchOption: CostResponseFxNoTouchOption,
-  FxOneTouchOption: CostResponseFxOneTouchOption,
-  FxSpot: CostResponseFxSpot,
-  FxSwap: CostResponseFxSwap,
-  FxVanillaOption: CostResponseFxVanillaOption,
-  Rights: CostResponseRights,
-  Stock: CostResponseStock,
-  StockIndexOption: CostResponseStockIndexOption,
-  StockOption: CostResponseStockOption,
-} as const
-
-type CostResponse = {
-  Bond: CostResponseBond
-  CfdOnCompanyWarrant: CostResponseCfdOnCompanyWarrant
-  CfdOnEtc: CostResponseCfdOnEtc
-  CfdOnEtf: CostResponseCfdOnEtf
-  CfdOnEtn: CostResponseCfdOnEtn
-  CfdOnFund: CostResponseCfdOnFund
-  CfdOnFutures: CostResponseCfdOnFutures
-  CfdOnIndex: CostResponseCfdOnIndex
-  CfdOnRights: CostResponseCfdOnRights
-  CfdOnStock: CostResponseCfdOnStock
-  CompanyWarrant: CostResponseCompanyWarrant
-  ContractFutures: CostResponseContractFutures
-  Etc: CostResponseEtc
-  Etf: CostResponseEtf
-  Etn: CostResponseEtn
-  Fund: CostResponseFund
-  FuturesOption: CostResponseFuturesOption
-  FxForwards: CostResponseFxForwards
-  FxNoTouchOption: CostResponseFxNoTouchOption
-  FxOneTouchOption: CostResponseFxOneTouchOption
-  FxSpot: CostResponseFxSpot
-  FxSwap: CostResponseFxSwap
-  FxVanillaOption: CostResponseFxVanillaOption
-  Rights: CostResponseRights
-  Stock: CostResponseStock
-  StockIndexOption: CostResponseStockIndexOption
-  StockOption: CostResponseStockOption
-}
 
 const CostParametersGuard = props({
   AccountKey: string(),
@@ -161,221 +73,118 @@ export class Cost {
       Price,
     }
 
+    const response = await this.#client.get({
+      path,
+      searchParams,
+    })
+
     switch (parameters.AssetType) {
       case 'Bond': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnCompanyWarrant': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnEtc': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnEtf': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnEtn': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnFund': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnFutures': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnIndex': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnRights': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CfdOnStock': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'CompanyWarrant': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'ContractFutures': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'Etc': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'Etf': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'Etn': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'Fund': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'FuturesOption': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'FxForwards': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'FxNoTouchOption': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'FxOneTouchOption': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'FxSpot': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'FxSwap': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'FxVanillaOption': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'Rights': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'Stock': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'StockIndexOption': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
 
       case 'StockOption': {
-        return await this.#client.get({
-          path,
-          searchParams,
-          guard: CostResponse[parameters.AssetType],
-        })
+        return assertReturn(CostResponse[parameters.AssetType], response)
       }
     }
   }
