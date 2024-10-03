@@ -365,12 +365,14 @@ async function rateLimitFetch(
         continue
       }
 
-      penaltyPromise = new Promise((resolve) =>
-        setTimeout(() => {
+      penaltyPromise = new Promise((resolve) => {
+        const timer = setTimeout(() => {
           penaltyMap!.delete(rateLimit.name)
           resolve()
         }, rateLimit.sleep)
-      )
+
+        Deno.unrefTimer(timer)
+      })
 
       penaltyMap.set(rateLimit.name, penaltyPromise)
 
