@@ -9,18 +9,17 @@ import {
   props,
   record,
   string,
-  union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { BuySell } from '../derives/buy-sell.ts'
 import { CostAssumption } from '../derives/cost-assumption.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { InstrumentDisplayAndFormat } from '../derives/instrument-display-and-format.ts'
+import { InstrumentMarginRequirements } from '../derives/instrument-margin-requirements.ts'
 import { LongShortCost } from '../derives/long-short-cost.ts'
+import { MarginTierRequirement } from '../derives/margin-tier-requirement.ts'
 import { PriceDisplayFormatType } from '../derives/price-display-format-type.ts'
 
-export interface CostResponseBase extends GuardType<typeof CostResponseBase> {}
-
-export const CostResponseBase = props({
+const CostResponseBase = props({
   /** Currency of the selected account, used when listing currency conversion fees for the selected instrument back to the account currency. */
   AccountCurrency: Currency3,
 
@@ -50,41 +49,9 @@ export const CostResponseBase = props({
 
   /** Instrument UIC. */
   Uic: integer(),
-
-  /** Not documented */
-  InstrumentMarginRequirements: optional(
-    array(
-      union([
-        props({
-          MarginType: literal('Absolute'),
-          ExtraWeek: number(),
-          Initial: number(),
-          IntraWeek: number(),
-        }),
-
-        props({
-          MarginType: literal('Percentage'),
-          ExtraWeek: number(),
-          Initial: number(),
-          IntraWeek: number(),
-        }),
-      ]),
-    ),
-  ),
-
-  /** Not documented */
-  MarginTierRequirement: optional(
-    props({
-      TierCurrency: Currency3,
-      Entries: array(props({
-        TierLowerBound: number(),
-        IntraWeekMarginRate: number(),
-        InitialMarginRate: number(),
-        ExtraWeekMarginRate: number(),
-      })),
-    }),
-  ),
 })
+
+interface CostResponseBase extends GuardType<typeof CostResponseBase> {}
 
 export const CostResponseBond = CostResponseBase.merge({
   AssetType: literal('Bond'),
@@ -100,6 +67,7 @@ export const CostResponseCfdOnCompanyWarrant = CostResponseBase.merge({
   Cost: props({
     Long: LongShortCost,
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnCompanyWarrant extends GuardType<typeof CostResponseCfdOnCompanyWarrant> {}
@@ -110,6 +78,7 @@ export const CostResponseCfdOnEtc = CostResponseBase.merge({
     Long: LongShortCost,
     Short: optional(LongShortCost),
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnEtc extends GuardType<typeof CostResponseCfdOnEtc> {}
@@ -120,6 +89,7 @@ export const CostResponseCfdOnEtf = CostResponseBase.merge({
     Long: LongShortCost,
     Short: optional(LongShortCost),
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnEtf extends GuardType<typeof CostResponseCfdOnEtf> {}
@@ -129,6 +99,7 @@ export const CostResponseCfdOnEtn = CostResponseBase.merge({
   Cost: props({
     Long: LongShortCost,
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnEtn extends GuardType<typeof CostResponseCfdOnEtn> {}
@@ -139,6 +110,7 @@ export const CostResponseCfdOnFund = CostResponseBase.merge({
     Long: LongShortCost,
     Short: optional(LongShortCost),
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnFund extends GuardType<typeof CostResponseCfdOnFund> {}
@@ -149,6 +121,7 @@ export const CostResponseCfdOnFutures = CostResponseBase.merge({
     Long: LongShortCost,
     Short: LongShortCost,
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnFutures extends GuardType<typeof CostResponseCfdOnFutures> {}
@@ -159,6 +132,7 @@ export const CostResponseCfdOnIndex = CostResponseBase.merge({
     Long: LongShortCost,
     Short: LongShortCost,
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnIndex extends GuardType<typeof CostResponseCfdOnIndex> {}
@@ -178,6 +152,7 @@ export const CostResponseCfdOnStock = CostResponseBase.merge({
     Long: LongShortCost,
     Short: optional(LongShortCost),
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseCfdOnStock extends GuardType<typeof CostResponseCfdOnStock> {}
@@ -197,6 +172,7 @@ export const CostResponseContractFutures = CostResponseBase.merge({
     Long: LongShortCost,
     Short: LongShortCost,
   }),
+  InstrumentMarginRequirements,
 })
 
 export interface CostResponseContractFutures extends GuardType<typeof CostResponseContractFutures> {}
@@ -253,6 +229,7 @@ export const CostResponseFxForwards = CostResponseBase.merge({
     Long: LongShortCost,
     Short: LongShortCost,
   }),
+  MarginTierRequirement,
 })
 
 export interface CostResponseFxForwards extends GuardType<typeof CostResponseFxForwards> {}
@@ -267,6 +244,7 @@ export const CostResponseFxNoTouchOption = CostResponseBase.merge({
       TotalCost: literal(0),
     }),
   ),
+  MarginTierRequirement,
 })
 
 export interface CostResponseFxNoTouchOption extends GuardType<typeof CostResponseFxNoTouchOption> {}
@@ -281,6 +259,7 @@ export const CostResponseFxOneTouchOption = CostResponseBase.merge({
       TotalCost: literal(0),
     }),
   ),
+  MarginTierRequirement,
 })
 
 export interface CostResponseFxOneTouchOption extends GuardType<typeof CostResponseFxOneTouchOption> {}
@@ -291,6 +270,7 @@ export const CostResponseFxSpot = CostResponseBase.merge({
     Long: LongShortCost,
     Short: LongShortCost,
   }),
+  MarginTierRequirement,
 })
 
 export interface CostResponseFxSpot extends GuardType<typeof CostResponseFxSpot> {}
@@ -301,6 +281,7 @@ export const CostResponseFxSwap = CostResponseBase.merge({
     enums(['Long', 'Short']),
     LongShortCost.omit(['TotalCostPct']),
   ),
+  MarginTierRequirement,
 })
 
 export interface CostResponseFxSwap extends GuardType<typeof CostResponseFxSwap> {}
@@ -311,6 +292,7 @@ export const CostResponseFxVanillaOption = CostResponseBase.merge({
     enums(['Long', 'Short']),
     LongShortCost.omit(['TotalCostPct']),
   ),
+  MarginTierRequirement,
 })
 
 export interface CostResponseFxVanillaOption extends GuardType<typeof CostResponseFxVanillaOption> {}
