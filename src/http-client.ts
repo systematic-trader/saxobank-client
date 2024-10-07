@@ -6,7 +6,7 @@ export class HTTPError extends Error {
   readonly statusCode: number
   readonly statusText: string
 
-  constructor(message: string, statusCode: number, statusText: string) {
+  constructor(message: HTTPError['message'], statusCode: HTTPError['statusCode'], statusText: HTTPError['statusText']) {
     super(message)
     this.statusCode = statusCode
     this.statusText = statusText
@@ -16,9 +16,16 @@ export class HTTPError extends Error {
 }
 
 export class HTTPClientError extends HTTPError {
+  readonly headers: Record<string, string>
   readonly body: unknown
 
-  constructor(statusCode: number, statusText: string, href: string, body: unknown) {
+  constructor(
+    statusCode: HTTPClientError['statusCode'],
+    statusText: HTTPClientError['statusText'],
+    href: string,
+    body: HTTPClientError['body'],
+    headers: HTTPClientError['headers'],
+  ) {
     let message = `${statusCode} ${statusText} - ${href}`
 
     if (typeof body === 'string') {
@@ -31,6 +38,7 @@ export class HTTPClientError extends HTTPError {
 
     super(message, statusCode, statusText)
     this.body = body
+    this.headers = headers
 
     this.name = 'HTTPClientError'
   }
@@ -39,7 +47,11 @@ export class HTTPClientError extends HTTPError {
 export class HTTPServiceError extends HTTPError {
   readonly body: unknown
 
-  constructor(statusCode: number, statusText: string, body: unknown) {
+  constructor(
+    statusCode: HTTPServiceError['statusCode'],
+    statusText: HTTPServiceError['statusText'],
+    body: HTTPServiceError['body'],
+  ) {
     let message = `${statusCode} ${statusText}`
 
     if (typeof body === 'string') {
@@ -98,8 +110,10 @@ export class HTTPClient {
     url: string | URL,
     {
       headers: argumentHeaders,
+      signal,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
+      readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<Response> {
     const headers = mergeHeaders(
@@ -108,7 +122,7 @@ export class HTTPClient {
       argumentHeaders,
     )
 
-    return await rateLimitFetch(this, url, { method: 'GET', headers })
+    return await rateLimitFetch(this, url, { method: 'GET', headers, signal })
   }
 
   async getJSON<T = unknown>(
@@ -117,13 +131,15 @@ export class HTTPClient {
       guard,
       headers,
       coerce,
+      signal,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly coerce?: undefined | ((body: unknown) => unknown)
+      readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<T> {
-    const response = await this.get(url, { headers })
+    const response = await this.get(url, { headers, signal })
 
     // console.log(response.headers)
 
@@ -144,22 +160,26 @@ export class HTTPClient {
     url: string | URL,
     {
       headers,
+      signal,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
+      readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<Blob> {
-    return await this.get(url, { headers }).then((response) => response.blob())
+    return await this.get(url, { headers, signal }).then((response) => response.blob())
   }
 
   async getText(
     url: string | URL,
     {
       headers,
+      signal,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
+      readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<string> {
-    return await this.get(url, { headers }).then((response) => response.text())
+    return await this.get(url, { headers, signal }).then((response) => response.text())
   }
 
   async post(
@@ -167,9 +187,11 @@ export class HTTPClient {
     {
       headers: argumentHeaders,
       body,
+      signal,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
+      readonly signal?: undefined | AbortSignal
     },
   ): Promise<Response> {
     const headers = mergeHeaders(
@@ -182,6 +204,7 @@ export class HTTPClient {
       method: 'POST',
       headers,
       body,
+      signal,
     })
   }
 
@@ -191,13 +214,15 @@ export class HTTPClient {
       guard,
       headers,
       coerce,
+      signal,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly coerce?: undefined | ((body: unknown) => unknown)
+      readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<T> {
-    const response = await this.post(url, { headers })
+    const response = await this.post(url, { headers, signal })
 
     let body = await response.json()
 
@@ -217,9 +242,11 @@ export class HTTPClient {
     {
       headers: argumentHeaders,
       body,
+      signal,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
+      readonly signal?: undefined | AbortSignal
     },
   ): Promise<Response> {
     const headers = mergeHeaders(
@@ -232,6 +259,7 @@ export class HTTPClient {
       method: 'PUT',
       headers,
       body,
+      signal,
     })
   }
 
@@ -242,11 +270,13 @@ export class HTTPClient {
       headers,
       body,
       coerce,
+      signal,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
       readonly coerce?: undefined | ((body: unknown) => unknown)
+      readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<T> {
     const response = await this.put(url, {
@@ -255,6 +285,7 @@ export class HTTPClient {
         ...headers,
       },
       body,
+      signal,
     })
 
     let responseBody = response.status === 204 ? undefined : await response.json()
@@ -274,8 +305,10 @@ export class HTTPClient {
     url: string | URL,
     {
       headers: argumentHeaders,
+      signal,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
+      readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<Response> {
     const headers = mergeHeaders(
@@ -284,7 +317,7 @@ export class HTTPClient {
       argumentHeaders,
     )
 
-    return await rateLimitFetch(this, url, { method: 'DELETE', headers })
+    return await rateLimitFetch(this, url, { method: 'DELETE', headers, signal })
   }
 }
 
@@ -325,10 +358,13 @@ async function rateLimitFetch(
     readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
     readonly headers?: undefined | Headers
     readonly body?: RequestInit['body']
+    readonly signal?: undefined | AbortSignal
   },
 ): Promise<Response> {
   while (true) {
     const response = await fetch(url, options)
+
+    // console.log(response.headers)
 
     if (response.status === 429) {
       // console.log('response.status:', response.status)
@@ -342,6 +378,7 @@ async function rateLimitFetch(
           response.statusText,
           response.url,
           await response.text(),
+          Object.fromEntries(response.headers),
         )
       }
 
@@ -397,7 +434,13 @@ async function rateLimitFetch(
         throw new HTTPServiceError(response.status, response.statusText, body)
       }
 
-      throw new HTTPClientError(response.status, response.statusText, response.url, body)
+      throw new HTTPClientError(
+        response.status,
+        response.statusText,
+        response.url,
+        body,
+        Object.fromEntries(response.headers),
+      )
     }
 
     return response
