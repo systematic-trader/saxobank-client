@@ -12,6 +12,16 @@ import { Environment } from './environment.ts'
 import type { HTTPClient } from './http-client.ts'
 import { urlJoin } from './utils.ts'
 
+type PrimitiveValue = string | number | boolean
+
+type NestedValue = PrimitiveValue | ReadonlyArray<NestedValue> | NestedObject
+
+interface NestedObject {
+  readonly [key: string]: NestedValue | undefined
+}
+
+export type RequestBody = NestedValue
+
 export class ResourceClient {
   readonly #client: HTTPClient
   readonly #headers: Record<string, string>
@@ -99,6 +109,31 @@ export class ResourceClient {
     })
   }
 
+  async post<T = unknown>(options: {
+    readonly path?: undefined | string
+    readonly headers?: undefined | Record<string, string>
+    readonly searchParams?:
+      | undefined
+      | Record<
+        string,
+        undefined | boolean | number | string | readonly string[]
+      >
+    readonly body?: RequestBody
+    readonly guard?: undefined | Guard<T>
+  } = {}): Promise<T> {
+    const url = urlJoin(this.#prefixURL, options.path)
+    const headers = { ...this.#headers, ...options.headers }
+
+    setSearchParams(url, options.searchParams)
+
+    return await this.#client.postJSON(url, {
+      headers,
+      body: JSON.stringify(options.body),
+      guard: options.guard,
+      coerce: sanitize,
+    })
+  }
+
   async put<T = unknown>(options: {
     readonly path?: undefined | string
     readonly headers?: undefined | Record<string, string>
@@ -108,7 +143,26 @@ export class ResourceClient {
         string,
         undefined | boolean | number | string | readonly string[]
       >
-    readonly body?:
+    readonly body?: RequestBody
+    readonly guard?: undefined | Guard<T>
+  } = {}): Promise<T> {
+    const url = urlJoin(this.#prefixURL, options.path)
+    const headers = { ...this.#headers, ...options.headers }
+
+    setSearchParams(url, options.searchParams)
+
+    return await this.#client.putJSON(url, {
+      headers,
+      body: JSON.stringify(options.body),
+      guard: options.guard,
+      coerce: sanitize,
+    })
+  }
+
+  async delete<T = unknown>(options: {
+    readonly path?: undefined | string
+    readonly headers?: undefined | Record<string, string>
+    readonly searchParams?:
       | undefined
       | Record<
         string,
@@ -121,9 +175,8 @@ export class ResourceClient {
 
     setSearchParams(url, options.searchParams)
 
-    return await this.#client.putJSON(url, {
+    return await this.#client.deleteJSON(url, {
       headers,
-      body: JSON.stringify(options.body),
       guard: options.guard,
       coerce: sanitize,
     })
