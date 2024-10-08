@@ -214,28 +214,37 @@ export class HTTPClient {
     {
       guard,
       headers,
+      body,
       coerce,
       signal,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
+      readonly body?: RequestInit['body']
       readonly coerce?: undefined | ((body: unknown) => unknown)
       readonly signal?: undefined | AbortSignal
     } = {},
   ): Promise<T> {
-    const response = await this.post(url, { headers, signal })
+    const response = await this.post(url, {
+      headers: {
+        'content-type': 'application/json',
+        ...headers,
+      },
+      body,
+      signal,
+    })
 
-    let body = await response.json()
+    let responseBody = await response.json()
 
     if (coerce !== undefined) {
-      body = coerce(body)
+      responseBody = coerce(responseBody)
     }
 
     if (guard !== undefined) {
-      return assertReturn(guard, body)
+      return assertReturn(guard, responseBody)
     }
 
-    return body
+    return responseBody
   }
 
   async put(
