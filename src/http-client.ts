@@ -520,9 +520,107 @@ function getRateLimitExceeded(
   if (entry.remaining === 0) {
     return {
       name: entry.name,
-      sleep: entry.sleep === undefined || entry.sleep === 0 ? 50 : entry.sleep,
+      // Always sleep at least 1000 milliseconds
+      sleep: entry.sleep === undefined || entry.sleep < 1000 ? 1000 : entry.sleep,
     }
   }
 
   return undefined
 }
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
+// const RateLimitRefs2 = new WeakMap<
+//   HTTPClient,
+//   Map<string, undefined | number>
+// >()
+
+// async function rateLimitFetch2(
+//   reference: HTTPClient,
+//   url: string | URL,
+//   options: {
+//     readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+//     readonly headers?: undefined | Headers
+//     readonly body?: RequestInit['body']
+//     readonly signal?: undefined | AbortSignal
+//   },
+// ): Promise<Response> {
+//   const response = await fetch(url, options)
+
+//   // console.log(response.headers)
+
+//   if (response.status === 429) {
+//     // console.log('response.status:', response.status)
+//     // console.log('response.headers:', response.headers)
+
+//     const rateLimit = getRateLimitExceeded(response.headers)
+
+//     if (rateLimit === undefined) {
+//       throw new HTTPClientError(
+//         response.status,
+//         response.statusText,
+//         response.url,
+//         await response.text(),
+//         Object.fromEntries(response.headers),
+//       )
+//     }
+
+//     // Prevent memory leak
+//     await response.body?.cancel()
+
+//     // console.log('rateLimit:', `${rateLimit.name} - ${rateLimit.sleep}`)
+
+//     let sleepMap = RateLimitRefs2.get(reference)
+
+//     if (sleepMap === undefined) {
+//       sleepMap = new Map()
+//       RateLimitRefs2.set(reference, sleepMap)
+//     }
+
+//     let wakeUp = sleepMap.get(rateLimit.name)
+
+//     if (wakeUp === undefined) {
+//       wakeUp = Date.now() + rateLimit.sleep
+//       sleepMap.set(rateLimit.name, wakeUp)
+//     }
+
+//     const sleep = wakeUp - Date.now()
+
+//     await new Promise<void>((resolve) => {
+//       const timer = setTimeout(() => {
+//         sleepMap!.delete(rateLimit.name)
+//         resolve()
+//       }, sleep)
+
+//       Deno.unrefTimer(timer)
+//     })
+
+//     return rateLimitFetch2(reference, url, options)
+//   } else if (response.ok === false) {
+//     // console.log('response.ok:', response.ok)
+//     // console.log('response.status:', response.status)
+//     // console.log(response.headers)
+
+//     const body = response.headers
+//         .get('Content-Type')
+//         ?.toLocaleLowerCase()
+//         .includes('application/json')
+//       ? await response.json()
+//       : await response.text()
+
+//     if (response.status >= 500) {
+//       throw new HTTPServiceError(response.status, response.statusText, body)
+//     }
+
+//     throw new HTTPClientError(
+//       response.status,
+//       response.statusText,
+//       response.url,
+//       body,
+//       Object.fromEntries(response.headers),
+//     )
+//   }
+
+//   return response
+// }
