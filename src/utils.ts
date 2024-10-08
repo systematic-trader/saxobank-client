@@ -40,3 +40,41 @@ export function fromEntries<T extends readonly [keyof never, unknown]>(
 ): { readonly [key in T[0]]: Extract<T, readonly [key, unknown]>[1] } {
   return Object.fromEntries(entries) as { readonly [key in T[0]]: Extract<T, readonly [key, unknown]>[1] }
 }
+
+export const TIMEOUT_DEFAULT_UNREF = true
+
+export function sleep(milliseconds: number, unref: undefined | boolean = TIMEOUT_DEFAULT_UNREF): Promise<void> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, milliseconds)
+
+    if (unref) {
+      Deno.unrefTimer(timer)
+    }
+  })
+}
+
+export function defer({ ms, unref = TIMEOUT_DEFAULT_UNREF, handle }: {
+  ms: number
+  unref?: undefined | boolean
+  handle: () => void | Promise<void>
+}): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      try {
+        const result = handle()
+
+        if (result instanceof Promise) {
+          result.then(() => resolve()).catch(reject)
+        } else {
+          resolve()
+        }
+      } catch (error) {
+        reject(error)
+      }
+    }, ms)
+
+    if (unref) {
+      Deno.unrefTimer(timer)
+    }
+  })
+}

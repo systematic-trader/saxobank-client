@@ -1,6 +1,7 @@
 import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { SaxoBank24HourToken } from './authentication/saxobank-24-hour-token.ts'
 import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
+import { defer } from './utils.ts'
 
 export class HTTPError extends Error {
   readonly statusCode: number
@@ -402,13 +403,11 @@ async function rateLimitFetch(
         continue
       }
 
-      penaltyPromise = new Promise((resolve) => {
-        const timer = setTimeout(() => {
+      penaltyPromise = defer({
+        ms: rateLimit.sleep,
+        handle: () => {
           penaltyMap!.delete(rateLimit.name)
-          resolve()
-        }, rateLimit.sleep)
-
-        Deno.unrefTimer(timer)
+        },
       })
 
       penaltyMap.set(rateLimit.name, penaltyPromise)
