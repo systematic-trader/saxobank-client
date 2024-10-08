@@ -41,11 +41,12 @@ export function fromEntries<T extends readonly [keyof never, unknown]>(
   return Object.fromEntries(entries) as { readonly [key in T[0]]: Extract<T, readonly [key, unknown]>[1] }
 }
 
-export const TIMEOUT_DEFAULT_UNREF = true
-
-export function sleep(milliseconds: number, unref: undefined | boolean = TIMEOUT_DEFAULT_UNREF): Promise<void> {
+export function sleep({ ms, unref = sleep.unref }: {
+  readonly ms: number
+  readonly unref: undefined | boolean
+}): Promise<void> {
   return new Promise((resolve) => {
-    const timer = setTimeout(resolve, milliseconds)
+    const timer = setTimeout(resolve, ms)
 
     if (unref) {
       Deno.unrefTimer(timer)
@@ -53,10 +54,12 @@ export function sleep(milliseconds: number, unref: undefined | boolean = TIMEOUT
   })
 }
 
-export function defer({ ms, unref = TIMEOUT_DEFAULT_UNREF, handle }: {
-  ms: number
-  unref?: undefined | boolean
-  handle: () => void | Promise<void>
+sleep.unref = true
+
+export function defer({ ms, unref = defer.unref, handle }: {
+  readonly ms: number
+  readonly unref?: undefined | boolean
+  readonly handle: () => void | Promise<void>
 }): Promise<void> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -78,3 +81,5 @@ export function defer({ ms, unref = TIMEOUT_DEFAULT_UNREF, handle }: {
     }
   })
 }
+
+defer.unref = true
