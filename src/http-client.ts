@@ -320,6 +320,35 @@ export class HTTPClient {
 
     return await rateLimitFetch(this, url, { method: 'DELETE', headers, signal })
   }
+
+  async deleteJSON<T = unknown>(
+    url: string | URL,
+    {
+      guard,
+      headers,
+      coerce,
+      signal,
+    }: {
+      readonly guard?: undefined | Guard<T>
+      readonly headers?: undefined | HTTPClientHeaders
+      readonly coerce?: undefined | ((body: unknown) => unknown)
+      readonly signal?: undefined | AbortSignal
+    } = {},
+  ): Promise<T> {
+    const response = await this.delete(url, { headers, signal })
+
+    let responseBody = response.status === 204 ? undefined : await response.json()
+
+    if (coerce !== undefined) {
+      responseBody = coerce(responseBody)
+    }
+
+    if (guard !== undefined) {
+      return assertReturn(guard, responseBody)
+    }
+
+    return responseBody
+  }
 }
 
 function mergeHeaders(
