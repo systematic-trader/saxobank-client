@@ -492,7 +492,8 @@ function getRateLimitExceeded(
         continue
       }
 
-      const sleep = parseInt(value, 10) * 1000
+      const reset = parseInt(value, 10)
+      const sleep = Math.max(1, reset) * 1000 // sub-second resets are rounded to 0, but we should still wait a bit
 
       const entry = rateLimits.find((entry) => entry.name === name)
 
