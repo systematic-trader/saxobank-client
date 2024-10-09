@@ -234,7 +234,7 @@ async function fetchResourceData<T = unknown>({
     return []
   }
 
-  const resource = await client.getJSON(url, { headers })
+  const resource = await client.getJSON(url, { headers, coerce: sanitize })
 
   if (EmptyResourceDataGuard.accept(resource)) {
     return []
