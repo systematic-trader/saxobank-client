@@ -234,13 +234,13 @@ async function fetchResourceData<T = unknown>({
     return []
   }
 
-  const resource = await client.getJSON(url, { headers, coerce: sanitize })
+  const resourceBody = await client.getJSON(url, { headers, coerce: sanitize })
 
-  if (EmptyResourceDataGuard.accept(resource)) {
+  if (EmptyResourceDataGuard.accept(resourceBody)) {
     return []
   }
 
-  const { __next, Data } = assertReturn(ResourceDataGuard, resource)
+  const { __next, Data } = assertReturn(ResourceDataGuard, resourceBody)
 
   const assertedData = guard === undefined ? (Data as ReadonlyArray<T>) : Data.map((datum) => {
     return assertReturn(guard, datum)
