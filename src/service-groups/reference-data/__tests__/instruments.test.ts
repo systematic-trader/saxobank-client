@@ -4,13 +4,13 @@ import { SaxoBankApplication } from '../../../saxobank-application.ts'
 import { AssetTypeValues } from '../../../types/derives/asset-type.ts'
 
 test('reference-data/instruments', async ({ step }) => {
-  const { instruments: resource } = new SaxoBankApplication().referenceData
+  using app = new SaxoBankApplication()
 
   for (const assetType of AssetTypeValues) {
     await step({
       name: assetType,
       async fn() {
-        const instruments = await resource.get({ AssetTypes: [assetType] })
+        const instruments = await app.referenceData.instruments.get({ AssetTypes: [assetType] })
 
         try {
           expect(instruments).toBeDefined()

@@ -3,15 +3,15 @@ import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
 
 test('reference-data/exchanges', async () => {
-  const resource = new SaxoBankApplication().referenceData.exchanges
+  using app = new SaxoBankApplication()
 
-  const exchanges = await resource.get()
+  const exchanges = await app.referenceData.exchanges.get()
 
   expect(exchanges).toBeDefined()
 
   const exchange = exchanges[0]!
 
-  const result = await resource.get({ exchangeId: exchange.ExchangeId })
+  const result = await app.referenceData.exchanges.get({ exchangeId: exchange.ExchangeId })
 
   expect(result).toBeDefined()
 })

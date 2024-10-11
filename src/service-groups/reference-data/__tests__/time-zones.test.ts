@@ -3,9 +3,9 @@ import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
 
 test('reference-data/timezones', async () => {
-  const resource = new SaxoBankApplication().referenceData.timezones
+  using app = new SaxoBankApplication()
 
-  const timezones = await resource.get()
+  const timezones = await app.referenceData.timezones.get()
 
   expect(timezones).toBeDefined()
 })

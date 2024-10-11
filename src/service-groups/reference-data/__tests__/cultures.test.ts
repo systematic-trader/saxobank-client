@@ -3,9 +3,9 @@ import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
 
 test('reference-data/cultures', async () => {
-  const resource = new SaxoBankApplication().referenceData.cultures
+  using app = new SaxoBankApplication()
 
-  const cultures = await resource.get()
+  const cultures = await app.referenceData.cultures.get()
 
   expect(cultures).toBeDefined()
 })
