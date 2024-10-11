@@ -1,8 +1,7 @@
 import { expect } from 'std/expect/expect.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 import { HTTPClientError } from '../../../http-client.ts'
-import { SaxoBankClient } from '../../../saxobank-client.ts'
+import { SaxoBankApplication } from '../../../saxobank-application.ts'
 import type { ContractOptionEntry } from '../../../types/records/contract-option-entry.ts'
 import type { InfoPricesParameters } from '../info-prices.ts'
 
@@ -23,12 +22,9 @@ function findSuitableOptionInstrument(optionSpaces: readonly ContractOptionEntry
 }
 
 describe('trade/info-prices', () => {
-  const saxoBankClient = new SaxoBankClient({
-    prefixURL: 'https://gateway.saxobank.com/sim/openapi',
-    authorization: new SaxoBank24HourToken(),
-  })
-
   test('Getting info prices for asset type', async ({ step }) => {
+    using app = new SaxoBankApplication()
+
     const assetTypeCandidates: InfoPricesParameters[keyof InfoPricesParameters]['AssetType'][] = [
       'Bond',
       'CfdOnIndex',
@@ -60,7 +56,7 @@ describe('trade/info-prices', () => {
     ] as const
 
     for (const assetType of assetTypeCandidates) {
-      const instruments = await saxoBankClient.referenceData.instruments.get({
+      const instruments = await app.referenceData.instruments.get({
         AssetTypes: [assetType] as const,
         limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
       })
@@ -94,7 +90,7 @@ describe('trade/info-prices', () => {
               case 'FxSpot':
               case 'Rights':
               case 'Stock': {
-                const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                const infoPrices = await app.trade.infoPrices.get({
                   Amount: 80,
                   AssetType: assetType,
                   Uic: instrument.Identifier,
@@ -108,7 +104,7 @@ describe('trade/info-prices', () => {
               case 'FuturesOption':
               case 'StockOption':
               case 'StockIndexOption': {
-                const optionsResponse = await saxoBankClient.referenceData.instruments.contractoptionspaces.get({
+                const optionsResponse = await app.referenceData.instruments.contractoptionspaces.get({
                   OptionRootId: instrument.Identifier,
                 })
 
@@ -123,7 +119,7 @@ describe('trade/info-prices', () => {
                 }
 
                 try {
-                  const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                  const infoPrices = await app.trade.infoPrices.get({
                     Amount: 80,
                     AssetType: assetType,
                     Uic: optionInstrument.Uic,
@@ -149,7 +145,7 @@ describe('trade/info-prices', () => {
                 const today = new Date()
                 const expityDate = Date.UTC(today.getFullYear(), today.getMonth() + 2, 1)
 
-                const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                const infoPrices = await app.trade.infoPrices.get({
                   Amount: 80,
                   AssetType: assetType,
                   Uic: instrument.Identifier,
@@ -166,7 +162,7 @@ describe('trade/info-prices', () => {
                 const nearLeg = Date.UTC(today.getFullYear(), today.getMonth() + 2, 1)
                 const farLeg = Date.UTC(today.getFullYear(), today.getMonth() + 3, 1)
 
-                const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                const infoPrices = await app.trade.infoPrices.get({
                   Amount: 80,
                   AssetType: assetType,
                   Uic: instrument.Identifier,
@@ -185,7 +181,7 @@ describe('trade/info-prices', () => {
 
                 for (const action of ['Call', 'Put'] as const) {
                   await step(action, async () => {
-                    const infoPrices = await saxoBankClient.trade.infoPrices.get({
+                    const infoPrices = await app.trade.infoPrices.get({
                       Amount: 80,
                       AssetType: assetType,
                       Uic: instrument.Identifier,

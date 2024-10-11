@@ -9,7 +9,7 @@ import {
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
-import type { ResourceClient } from '../../../resource-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import type { TradingConditionFieldGroup } from '../../../types/derives/trading-condition-field-group.ts'
 import { CostResponse } from '../../../types/records/cost-response.ts'
 import { extractKeys } from '../../../utils.ts'
@@ -26,9 +26,9 @@ const CostParametersGuard = props({
 export interface CostParameters extends GuardType<typeof CostParametersGuard> {}
 
 export class Cost {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('cost')
   }
 

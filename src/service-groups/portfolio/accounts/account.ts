@@ -1,12 +1,12 @@
-import type { ResourceClient } from '../../../resource-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import { Reset } from './account/reset.ts'
 
 export class Account {
   readonly reset: Reset
 
-  constructor({ client }: { readonly client: ResourceClient }) {
-    const resourceClient = client
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
+    const serviceGroupClient = client
 
-    this.reset = new Reset({ client: resourceClient })
+    this.reset = new Reset({ client: serviceGroupClient })
   }
 }

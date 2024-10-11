@@ -1,11 +1,11 @@
-import type { ResourceClient } from '../../../resource-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import type { NetPositionFieldGroup } from '../../../types/derives/net-position-field-group.ts'
 import { NetPositionResponse } from '../../../types/records/net-position-response.ts'
 
 export class Me {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('me')
   }
 
@@ -13,7 +13,7 @@ export class Me {
    * Returns a list of net positions fulfilling the criteria specified by the query string parameters.
    * Each net position may include all related sub positions if fieldGroups includes SubPositions.
    */
-  async get(): Promise<ReadonlyArray<NetPositionResponse>> {
+  async get(): Promise<Array<NetPositionResponse>> {
     const FieldGroups: NetPositionFieldGroup[] = [
       'DisplayAndFormat',
       'ExchangeInfo',

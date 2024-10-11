@@ -1,7 +1,6 @@
 import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { SaxoBank24HourToken } from '../../../../authentication/saxobank-24-hour-token.ts'
-import { SaxoBankClient } from '../../../../saxobank-client.ts'
+import { SaxoBankApplication } from '../../../../saxobank-application.ts'
 import type { ContractOptionEntry } from '../../../../types/records/contract-option-entry.ts'
 import type { CostParameters } from '../cost.ts'
 
@@ -26,12 +25,9 @@ function findSuitableOptionInstrument(optionSpaces: readonly ContractOptionEntry
 }
 
 describe('client-services/trading-conditions/cost', () => {
-  const saxoBankClient = new SaxoBankClient({
-    prefixURL: 'https://gateway.saxobank.com/sim/openapi',
-    authorization: new SaxoBank24HourToken(),
-  })
-
   test('Getting costs for asset type', async ({ step }) => {
+    using app = new SaxoBankApplication()
+
     const assetTypeCandidates: CostParameters['AssetType'][] = [
       'Bond',
       'CfdOnCompanyWarrant',
@@ -62,14 +58,14 @@ describe('client-services/trading-conditions/cost', () => {
       'StockOption',
     ] as const
 
-    const [account] = await saxoBankClient.portfolio.accounts.me.get()
+    const [account] = await app.portfolio.accounts.me.get()
     if (account === undefined) {
       throw new Error('No account found')
     }
 
     for (const assetType of assetTypeCandidates) {
       await step(assetType, async ({ step }) => {
-        const instruments = await saxoBankClient.referenceData.instruments.get({
+        const instruments = await app.referenceData.instruments.get({
           AssetTypes: [assetType] as const,
           limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
         })
@@ -115,7 +111,7 @@ describe('client-services/trading-conditions/cost', () => {
                   case 'FxVanillaOption':
                   case 'Rights':
                   case 'Stock': {
-                    const cost = await saxoBankClient.clientServices.tradingConditions.cost.get({
+                    const cost = await app.clientServices.tradingConditions.cost.get({
                       AccountKey: account.AccountKey,
                       Amount: 80,
                       AssetType: instrument.AssetType,
@@ -132,7 +128,7 @@ describe('client-services/trading-conditions/cost', () => {
                   case 'StockOption':
                   case 'StockIndexOption':
                   case 'FuturesOption': {
-                    const optionsResponse = await saxoBankClient.referenceData.instruments.contractoptionspaces.get({
+                    const optionsResponse = await app.referenceData.instruments.contractoptionspaces.get({
                       OptionRootId: instrument.Identifier,
                       TradingStatus: ['Tradable', 'ReduceOnly'],
                     })
@@ -147,7 +143,7 @@ describe('client-services/trading-conditions/cost', () => {
                       throw new Error(`Could not find a suitable option for UIC=${instrument.Identifier}`)
                     }
 
-                    const cost = await saxoBankClient.clientServices.tradingConditions.cost.get({
+                    const cost = await app.clientServices.tradingConditions.cost.get({
                       AccountKey: account.AccountKey,
                       Amount: 80,
                       AssetType: instrument.AssetType,

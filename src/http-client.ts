@@ -1,9 +1,11 @@
 import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { SaxoBank24HourToken } from './authentication/saxobank-24-hour-token.ts'
-import type { SaxoBankAuthorization } from './authentication/saxobank-authentication.ts'
-import { defer } from './utils.ts'
+import { ensureError, mergeAbortSignals, Timeout } from './utils.ts'
 
-export class HTTPError extends Error {
+export interface HTTPClientOnErrorHandler {
+  (error: Error, retries: number): void | Promise<void>
+}
+
+export abstract class HTTPError extends Error {
   readonly statusCode: number
   readonly statusText: string
 
@@ -17,17 +19,20 @@ export class HTTPError extends Error {
 }
 
 export class HTTPClientError extends HTTPError {
+  readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  readonly href: string
   readonly headers: Record<string, string>
   readonly body: unknown
 
   constructor(
+    method: HTTPClientError['method'],
+    href: string,
     statusCode: HTTPClientError['statusCode'],
     statusText: HTTPClientError['statusText'],
-    href: string,
     body: HTTPClientError['body'],
     headers: HTTPClientError['headers'],
   ) {
-    let message = `${statusCode} ${statusText} - ${href}`
+    let message = `${statusCode} ${statusText} - ${method} ${href}`
 
     if (typeof body === 'string') {
       message = `${message}\n${body}`
@@ -39,9 +44,27 @@ export class HTTPClientError extends HTTPError {
 
     super(message, statusCode, statusText)
     this.body = body
+    this.href = href
+    this.method = method
     this.headers = headers
 
     this.name = 'HTTPClientError'
+  }
+}
+
+export class HTTPClientRequestAbortError extends Error {
+  readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  readonly href: string
+
+  constructor(
+    method: HTTPClientRequestAbortError['method'],
+    href: HTTPClientRequestAbortError['href'],
+  ) {
+    super(`Aborted ${method} ${href}`)
+    this.method = method
+    this.href = href
+
+    this.name = 'HTTPClientRequestAbortError'
   }
 }
 
@@ -70,60 +93,47 @@ export class HTTPServiceError extends HTTPError {
   }
 }
 
-export type HTTPClientHeaders = Headers | Record<string, undefined | string>
+export type HTTPClientHeaders = Record<string, undefined | string> | Headers
 
 export class HTTPClient {
-  static fromEnvironment(): HTTPClient {
-    return this.withAuthorization(new SaxoBank24HourToken())
-  }
+  #createHeaders: () => Headers | Promise<Headers>
 
-  static withAuthorization(authentication: SaxoBankAuthorization): HTTPClient {
-    return new HTTPClient({
-      authentication,
-    })
-  }
-
-  #constructorHeaders: Headers
-  #authentication: undefined | SaxoBankAuthorization
-
-  constructor({
-    authentication,
-    headers,
-  }: {
-    readonly authentication?: undefined | SaxoBankAuthorization
-    readonly headers?: undefined | HTTPClientHeaders
+  constructor({ headers }: {
+    readonly headers?:
+      | undefined
+      | HTTPClientHeaders
+      | (() => undefined | HTTPClientHeaders | Promise<undefined | HTTPClientHeaders>)
   } = {}) {
-    this.#authentication = authentication
-    this.#constructorHeaders = mergeHeaders(new Headers(), headers)
+    this.#createHeaders = typeof headers === 'function'
+      ? async () => mergeHeaders(new Headers(), await headers())
+      : () => mergeHeaders(new Headers(), headers)
   }
 
-  get #authenticationHeaders(): Headers {
-    if (this.#authentication === undefined) {
-      return new Headers()
-    }
-
-    return new Headers({
-      Authorization: `Bearer ${this.#authentication.accessToken}`,
-    })
+  async loadHeaders(): Promise<Headers> {
+    return await this.#createHeaders()
   }
 
   async get(
     url: string | URL,
     {
-      headers: argumentHeaders,
+      headers,
       signal,
+      timeout,
+      onError,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<Response> {
-    const headers = mergeHeaders(
-      this.#constructorHeaders,
-      this.#authenticationHeaders,
-      argumentHeaders,
-    )
-
-    return await rateLimitFetch(this, url, { method: 'GET', headers, signal })
+    return await fetchResponse(this, url, {
+      method: 'GET',
+      headers,
+      signal,
+      timeout,
+      onError,
+    })
   }
 
   async getJSON<T = unknown>(
@@ -133,18 +143,31 @@ export class HTTPClient {
       headers,
       coerce,
       signal,
+      timeout,
+      onError,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly coerce?: undefined | ((body: unknown) => unknown)
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<T> {
-    const response = await this.get(url, { headers, signal })
+    const response = await fetchOkResponse(this, url, {
+      method: 'GET',
+      headers: mergeHeaders(
+        { 'accept': 'application/json' },
+        headers,
+      ),
+      signal,
+      timeout,
+      onError,
+    })
 
     // console.log(response.headers)
 
-    let body = await response.json()
+    let body = await response?.json()
 
     if (coerce !== undefined) {
       body = coerce(body)
@@ -162,12 +185,24 @@ export class HTTPClient {
     {
       headers,
       signal,
+      timeout,
+      onError,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<Blob> {
-    return await this.get(url, { headers, signal }).then((response) => response.blob())
+    const response = await fetchOkResponse(this, url, {
+      method: 'GET',
+      headers,
+      signal,
+      timeout,
+      onError,
+    })
+
+    return await response.blob()
   }
 
   async getText(
@@ -175,37 +210,49 @@ export class HTTPClient {
     {
       headers,
       signal,
+      timeout,
+      onError,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<string> {
-    return await this.get(url, { headers, signal }).then((response) => response.text())
+    const response = await fetchOkResponse(this, url, {
+      method: 'GET',
+      headers,
+      signal,
+      timeout,
+      onError,
+    })
+
+    return await response.text()
   }
 
   async post(
     url: string | URL,
     {
-      headers: argumentHeaders,
+      headers,
       body,
       signal,
+      timeout,
+      onError,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     },
   ): Promise<Response> {
-    const headers = mergeHeaders(
-      this.#constructorHeaders,
-      this.#authenticationHeaders,
-      argumentHeaders,
-    )
-
-    return await rateLimitFetch(this, url, {
+    return await fetchResponse(this, url, {
       method: 'POST',
       headers,
-      body,
       signal,
+      timeout,
+      onError,
+      body,
     })
   }
 
@@ -217,24 +264,31 @@ export class HTTPClient {
       body,
       coerce,
       signal,
+      timeout,
+      onError,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
       readonly coerce?: undefined | ((body: unknown) => unknown)
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<T> {
-    const response = await this.post(url, {
-      headers: {
-        'content-type': 'application/json',
-        ...headers,
-      },
-      body,
+    const response = await fetchOkResponse(this, url, {
+      method: 'POST',
+      headers: mergeHeaders(
+        { 'accept': 'application/json' },
+        headers,
+      ),
       signal,
+      timeout,
+      onError,
+      body,
     })
 
-    let responseBody = await response.json()
+    let responseBody = response.status === 204 ? undefined : await response.json()
 
     if (coerce !== undefined) {
       responseBody = coerce(responseBody)
@@ -250,26 +304,26 @@ export class HTTPClient {
   async put(
     url: string | URL,
     {
-      headers: argumentHeaders,
+      headers,
       body,
       signal,
+      timeout,
+      onError,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     },
   ): Promise<Response> {
-    const headers = mergeHeaders(
-      this.#constructorHeaders,
-      this.#authenticationHeaders,
-      argumentHeaders,
-    )
-
-    return await rateLimitFetch(this, url, {
+    return await fetchResponse(this, url, {
       method: 'PUT',
       headers,
-      body,
       signal,
+      timeout,
+      onError,
+      body,
     })
   }
 
@@ -281,21 +335,28 @@ export class HTTPClient {
       body,
       coerce,
       signal,
+      timeout,
+      onError,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly body?: RequestInit['body']
       readonly coerce?: undefined | ((body: unknown) => unknown)
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<T> {
-    const response = await this.put(url, {
-      headers: {
-        'content-type': 'application/json',
-        ...headers,
-      },
-      body,
+    const response = await fetchOkResponse(this, url, {
+      method: 'PUT',
+      headers: mergeHeaders(
+        { 'accept': 'application/json' },
+        headers,
+      ),
       signal,
+      timeout,
+      onError,
+      body,
     })
 
     let responseBody = response.status === 204 ? undefined : await response.json()
@@ -314,20 +375,24 @@ export class HTTPClient {
   async delete(
     url: string | URL,
     {
-      headers: argumentHeaders,
+      headers,
       signal,
+      timeout,
+      onError,
     }: {
       readonly headers?: undefined | HTTPClientHeaders
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<Response> {
-    const headers = mergeHeaders(
-      this.#constructorHeaders,
-      this.#authenticationHeaders,
-      argumentHeaders,
-    )
-
-    return await rateLimitFetch(this, url, { method: 'DELETE', headers, signal })
+    return await fetchResponse(this, url, {
+      method: 'DELETE',
+      headers,
+      signal,
+      timeout,
+      onError,
+    })
   }
 
   async deleteJSON<T = unknown>(
@@ -337,14 +402,27 @@ export class HTTPClient {
       headers,
       coerce,
       signal,
+      timeout,
+      onError,
     }: {
       readonly guard?: undefined | Guard<T>
       readonly headers?: undefined | HTTPClientHeaders
       readonly coerce?: undefined | ((body: unknown) => unknown)
       readonly signal?: undefined | AbortSignal
+      readonly timeout?: undefined | number
+      readonly onError?: undefined | HTTPClientOnErrorHandler
     } = {},
   ): Promise<T> {
-    const response = await this.delete(url, { headers, signal })
+    const response = await fetchOkResponse(this, url, {
+      method: 'DELETE',
+      headers: mergeHeaders(
+        { 'accept': 'application/json' },
+        headers,
+      ),
+      signal,
+      timeout,
+      onError,
+    })
 
     let responseBody = response.status === 204 ? undefined : await response.json()
 
@@ -361,105 +439,111 @@ export class HTTPClient {
 }
 
 function mergeHeaders(
-  first: Headers,
-  ...rest: Array<Headers | HTTPClientHeaders | undefined>
+  first: HeadersInit,
+  ...rest: ReadonlyArray<HTTPClientHeaders | undefined>
 ): Headers {
-  const headers = new Headers(first)
+  const resultHeaders = new Headers(first)
 
-  for (const header of rest) {
-    if (header !== undefined) {
-      if (header instanceof Headers) {
-        for (const [key, value] of header.entries()) {
-          headers.set(key, value)
+  for (const headers of rest) {
+    if (headers !== undefined) {
+      if (headers instanceof Headers) {
+        for (const [key, value] of headers.entries()) {
+          resultHeaders.set(key, value)
         }
       } else {
-        for (const [key, value] of Object.entries(header)) {
+        for (const [key, value] of Object.entries(headers)) {
           if (typeof value === 'string') {
-            headers.set(key, value)
+            resultHeaders.set(key, value)
           }
         }
       }
     }
   }
 
-  return headers
+  return resultHeaders
 }
 
-const RateLimitRefs = new WeakMap<
-  HTTPClient,
-  Map<string, undefined | Promise<void>>
->()
+async function fetchResponse(client: HTTPClient, url: string | URL, options: {
+  readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  readonly headers?: undefined | HTTPClientHeaders
+  readonly body?: RequestInit['body']
+  readonly signal?: undefined | AbortSignal
+  readonly timeout?: undefined | number
+  readonly onError?: undefined | HTTPClientOnErrorHandler
+}, retries = 0): Promise<Response> {
+  using timeout = options.timeout === undefined ? undefined : Timeout.wait(options.timeout)
 
-async function rateLimitFetch(
-  reference: HTTPClient,
-  url: string | URL,
-  options: {
-    readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-    readonly headers?: undefined | Headers
-    readonly body?: RequestInit['body']
-    readonly signal?: undefined | AbortSignal
-  },
-): Promise<Response> {
-  while (true) {
-    const response = await fetch(url, options)
+  const signal = mergeAbortSignals(
+    options.signal,
+    timeout?.signal,
+  )
+  const { onError, method, body, headers } = options
 
-    // console.log(response.headers)
-
-    if (response.status === 429) {
-      // console.log('response.status:', response.status)
-      // console.log('response.headers:', response.headers)
-
-      const rateLimit = getRateLimitExceeded(response.headers)
-
-      if (rateLimit === undefined) {
-        throw new HTTPClientError(
-          response.status,
-          response.statusText,
-          response.url,
-          await response.text(),
-          Object.fromEntries(response.headers),
-        )
-      }
-
-      // Prevent memory leak
-      await response.body?.cancel()
-
-      // console.log('rateLimit:', `${rateLimit.name} - ${rateLimit.sleep}`)
-
-      let penaltyMap = RateLimitRefs.get(reference)
-
-      if (penaltyMap === undefined) {
-        penaltyMap = new Map()
-        RateLimitRefs.set(reference, penaltyMap)
-      }
-
-      let penaltyPromise = penaltyMap.get(rateLimit.name)
-
-      if (penaltyPromise !== undefined) {
-        await penaltyPromise
-
-        continue
-      }
-
-      penaltyPromise = defer({
-        ms: rateLimit.sleep,
-        handle: () => {
-          penaltyMap!.delete(rateLimit.name)
-        },
-      })
-
-      penaltyMap.set(rateLimit.name, penaltyPromise)
-
-      await penaltyPromise
-
-      continue
+  try {
+    if (signal !== undefined && signal.aborted === true) {
+      throw new HTTPClientRequestAbortError(options.method, url.toString())
     }
 
-    if (response.ok === false) {
-      // console.log('response.ok:', response.ok)
-      // console.log('response.status:', response.status)
-      // console.log(response.headers)
+    const readyHeaders = mergeHeaders(await client.loadHeaders(), headers)
 
+    const response = await fetch(url, {
+      method,
+      body,
+      headers: readyHeaders,
+      signal,
+    })
+
+    return response
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        const abortError = new HTTPClientRequestAbortError(method, url.toString())
+
+        const stack = error.stack?.split('\n').slice(1).join('\n')
+
+        abortError.stack = abortError.message === ''
+          ? `${abortError.name}\n${stack}`
+          : `${abortError.name}: ${abortError.message}\n${stack}`
+
+        // deno-lint-ignore no-ex-assign
+        error = abortError
+      }
+    } else {
+      // deno-lint-ignore no-ex-assign
+      error = ensureError(error)
+    }
+
+    if (onError === undefined) {
+      throw error
+    }
+
+    await onError(error as Error, retries)
+
+    return await fetchResponse(client, url, { onError, method, body, headers, signal }, retries++)
+  }
+}
+
+async function fetchOkResponse(client: HTTPClient, url: string | URL, options: {
+  readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  readonly headers?: undefined | HTTPClientHeaders
+  readonly body?: RequestInit['body']
+  readonly signal?: undefined | AbortSignal
+  readonly timeout?: undefined | number
+  readonly onError?: undefined | HTTPClientOnErrorHandler
+}, retries = 0): Promise<Response> {
+  using timeout = options.timeout === undefined ? undefined : Timeout.wait(options.timeout)
+
+  const signal = mergeAbortSignals(
+    options.signal,
+    timeout?.signal,
+  )
+
+  const { onError, method, body, headers } = options
+
+  try {
+    const response = await fetchResponse(client, url, { method, body, headers, signal })
+
+    if (response.ok === false) {
       const body = response.headers
           .get('Content-Type')
           ?.toLocaleLowerCase()
@@ -472,193 +556,23 @@ async function rateLimitFetch(
       }
 
       throw new HTTPClientError(
+        method,
+        response.url,
         response.status,
         response.statusText,
-        response.url,
         body,
         Object.fromEntries(response.headers),
       )
     }
 
     return response
+  } catch (error) {
+    if (onError === undefined) {
+      throw error
+    }
+
+    await onError(ensureError(error), retries)
+
+    return await fetchOkResponse(client, url, { onError, method, body, headers, signal }, retries++)
   }
 }
-
-function getRateLimitExceeded(
-  headers: Headers,
-): undefined | { readonly name: string; readonly sleep: number } {
-  const rateLimits: Array<{
-    name: string
-    sleep: undefined | number
-    remaining: undefined | number
-  }> = []
-
-  for (const [key, value] of headers) {
-    const regexRemaining = /x-ratelimit-(.*?)-remaining/i
-    const matchRemaining = key.match(regexRemaining)
-
-    if (matchRemaining !== null) {
-      const name = matchRemaining[1]!.toLowerCase()
-      const remaining = parseInt(value, 10)
-
-      if (name === 'appday') {
-        if (remaining === 0) {
-          throw new Error('Rate limit exceeded for appday')
-        } else {
-          continue
-        }
-      }
-
-      const entry = rateLimits.find((entry) => entry.name === name)
-
-      if (entry === undefined) {
-        rateLimits.push({ name, sleep: undefined, remaining })
-      } else {
-        entry.remaining = remaining
-      }
-
-      continue
-    }
-
-    const regexReset = /x-ratelimit-(.*?)-reset/i
-    const matchReset = key.match(regexReset)
-
-    if (matchReset !== null) {
-      const name = matchReset[1]!.toLowerCase()
-
-      if (name === 'appday') {
-        continue
-      }
-
-      const reset = parseInt(value, 10)
-      const sleep = Math.max(1, reset) * 1000 // sub-second resets are rounded to 0, but we should still wait a bit
-
-      const entry = rateLimits.find((entry) => entry.name === name)
-
-      if (entry === undefined) {
-        rateLimits.push({ name, sleep, remaining: undefined })
-      } else {
-        entry.sleep = sleep
-      }
-    }
-  }
-
-  if (rateLimits.length === 0) {
-    return undefined
-  }
-
-  if (rateLimits.length > 1) {
-    const names = rateLimits.map((entry) => entry.name).join(', ')
-
-    throw new Error(`Multiple rate limits not supported: ${names}`)
-  }
-
-  const entry = rateLimits[0]!
-
-  if (entry.remaining === 0) {
-    return {
-      name: entry.name,
-      // Always sleep at least 1000 milliseconds
-      sleep: entry.sleep === undefined || entry.sleep < 1000 ? 1000 : entry.sleep,
-    }
-  }
-
-  return undefined
-}
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
-// const RateLimitRefs2 = new WeakMap<
-//   HTTPClient,
-//   Map<string, undefined | number>
-// >()
-
-// async function rateLimitFetch2(
-//   reference: HTTPClient,
-//   url: string | URL,
-//   options: {
-//     readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-//     readonly headers?: undefined | Headers
-//     readonly body?: RequestInit['body']
-//     readonly signal?: undefined | AbortSignal
-//   },
-// ): Promise<Response> {
-//   const response = await fetch(url, options)
-
-//   // console.log(response.headers)
-
-//   if (response.status === 429) {
-//     // console.log('response.status:', response.status)
-//     // console.log('response.headers:', response.headers)
-
-//     const rateLimit = getRateLimitExceeded(response.headers)
-
-//     if (rateLimit === undefined) {
-//       throw new HTTPClientError(
-//         response.status,
-//         response.statusText,
-//         response.url,
-//         await response.text(),
-//         Object.fromEntries(response.headers),
-//       )
-//     }
-
-//     // Prevent memory leak
-//     await response.body?.cancel()
-
-//     // console.log('rateLimit:', `${rateLimit.name} - ${rateLimit.sleep}`)
-
-//     let sleepMap = RateLimitRefs2.get(reference)
-
-//     if (sleepMap === undefined) {
-//       sleepMap = new Map()
-//       RateLimitRefs2.set(reference, sleepMap)
-//     }
-
-//     let wakeUp = sleepMap.get(rateLimit.name)
-
-//     if (wakeUp === undefined) {
-//       wakeUp = Date.now() + rateLimit.sleep
-//       sleepMap.set(rateLimit.name, wakeUp)
-//     }
-
-//     const sleep = wakeUp - Date.now()
-
-//     await new Promise<void>((resolve) => {
-//       const timer = setTimeout(() => {
-//         sleepMap!.delete(rateLimit.name)
-//         resolve()
-//       }, sleep)
-
-//       Deno.unrefTimer(timer)
-//     })
-
-//     return rateLimitFetch2(reference, url, options)
-//   } else if (response.ok === false) {
-//     // console.log('response.ok:', response.ok)
-//     // console.log('response.status:', response.status)
-//     // console.log(response.headers)
-
-//     const body = response.headers
-//         .get('Content-Type')
-//         ?.toLocaleLowerCase()
-//         .includes('application/json')
-//       ? await response.json()
-//       : await response.text()
-
-//     if (response.status >= 500) {
-//       throw new HTTPServiceError(response.status, response.statusText, body)
-//     }
-
-//     throw new HTTPClientError(
-//       response.status,
-//       response.statusText,
-//       response.url,
-//       body,
-//       Object.fromEntries(response.headers),
-//     )
-//   }
-
-//   return response
-// }

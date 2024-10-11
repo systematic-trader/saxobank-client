@@ -1,9 +1,9 @@
-import type { ResourceClient } from '../../resource-client.ts'
 import { type AssetType, AssetTypeValues } from '../../types/derives/asset-type.ts'
 import type { ClassType } from '../../types/derives/class.ts'
 
 import { assertReturn } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 
+import type { ServiceGroupClient } from '../../service-group-client.ts'
 import {
   InstrumentSummaryInfoBond,
   InstrumentSummaryInfoCfdOnCompanyWarrant,
@@ -43,14 +43,14 @@ import { InstrumentsDetails } from './instruments/details.ts'
 import { TradingSchedule } from './instruments/trading-schedule.ts'
 
 export class Instruments {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
   readonly contractoptionspaces: ContractOptionSpaces
   readonly details: InstrumentsDetails
   readonly futuresspaces: ContractFuturesSpaces
   readonly tradingschedule: TradingSchedule
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('v1/instruments')
 
     this.contractoptionspaces = new ContractOptionSpaces({ client: this.#client })
@@ -81,7 +81,7 @@ export class Instruments {
     >
   >
 
-  async get<T extends AssetType>(
+  async get(
     options?: undefined | {
       readonly limit?: undefined | number
       readonly AccountKey?: undefined | string

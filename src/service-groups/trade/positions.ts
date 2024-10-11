@@ -1,7 +1,7 @@
-import type { ResourceClient } from '../../resource-client.ts'
+import type { ServiceGroupClient } from '../../service-group-client.ts'
 
 export class Positions {
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     client.appendPath('v1/positions')
   }
 }

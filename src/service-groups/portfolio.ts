@@ -1,4 +1,4 @@
-import type { ResourceClient } from '../resource-client.ts'
+import type { ServiceGroupClient } from '../service-group-client.ts'
 import { AccountGroups } from './portfolio/account-groups.ts'
 import { Accounts } from './portfolio/accounts.ts'
 import { Balances } from './portfolio/balances.ts'
@@ -22,18 +22,18 @@ export class Portfolio {
   readonly positions: Positions
   readonly users: Users
 
-  constructor({ client }: { readonly client: ResourceClient }) {
-    const resourceClient = client.appendPath('port')
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
+    const serviceGroupClient = client.appendPath('port')
 
-    this.accountGroups = new AccountGroups({ client: resourceClient })
-    this.accounts = new Accounts({ client: resourceClient })
-    this.balances = new Balances({ client: resourceClient })
-    this.clients = new Clients({ client: resourceClient })
-    this.closedPositions = new ClosedPositions({ client: resourceClient })
-    this.exposure = new Exposure({ client: resourceClient })
-    this.netPositions = new NetPositions({ client: resourceClient })
-    this.orders = new Orders({ client: resourceClient })
-    this.positions = new Positions({ client: resourceClient })
-    this.users = new Users({ client: resourceClient })
+    this.accountGroups = new AccountGroups({ client: serviceGroupClient })
+    this.accounts = new Accounts({ client: serviceGroupClient })
+    this.balances = new Balances({ client: serviceGroupClient })
+    this.clients = new Clients({ client: serviceGroupClient })
+    this.closedPositions = new ClosedPositions({ client: serviceGroupClient })
+    this.exposure = new Exposure({ client: serviceGroupClient })
+    this.netPositions = new NetPositions({ client: serviceGroupClient })
+    this.orders = new Orders({ client: serviceGroupClient })
+    this.positions = new Positions({ client: serviceGroupClient })
+    this.users = new Users({ client: serviceGroupClient })
   }
 }

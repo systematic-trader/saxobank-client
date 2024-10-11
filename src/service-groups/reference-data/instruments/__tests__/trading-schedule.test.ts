@@ -1,10 +1,9 @@
 import { expect } from 'std/expect/mod.ts'
 import { test } from 'std/testing/bdd.ts'
-import { SaxoBank24HourToken } from '../../../../authentication/saxobank-24-hour-token.ts'
-import { SaxoBankClient } from '../../../../saxobank-client.ts'
+import { SaxoBankApplication } from '../../../../saxobank-application.ts'
 
 test('reference-data/instruments/tradingschedule', async ({ step }) => {
-  const { instruments: resource } = new SaxoBankClient({ authorization: new SaxoBank24HourToken() }).referenceData
+  const { instruments: resource } = new SaxoBankApplication().referenceData
 
   const instruments = await resource.get({ AssetTypes: ['Stock'], limit: 25, IncludeNonTradable: false })
 

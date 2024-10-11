@@ -1,12 +1,11 @@
 import { expect } from 'std/expect/mod.ts'
 import { test } from 'std/testing/bdd.ts'
-import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
-import { SaxoBankClient } from '../../../saxobank-client.ts'
+import { SaxoBankApplication } from '../../../saxobank-application.ts'
 
 test('reference-data/currency-pairs', async () => {
-  const resource = new SaxoBankClient({ authorization: new SaxoBank24HourToken() }).referenceData.currencyPairs
+  using app = new SaxoBankApplication()
 
-  const currencyPairs = await resource.get()
+  const currencyPairs = await app.referenceData.currencyPairs.get()
 
   expect(currencyPairs).toBeDefined()
 })

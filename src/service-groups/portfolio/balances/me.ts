@@ -1,10 +1,10 @@
-import type { ResourceClient } from '../../../resource-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import { BalanceResponse } from '../../../types/records/balance-response.ts'
 
 export class Me {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('me')
   }
 

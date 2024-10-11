@@ -1,4 +1,4 @@
-import type { ResourceClient } from '../../../resource-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import type { AssetType } from '../../../types/derives/asset-type.ts'
 import {
   TradingSchedule as TradingScheduleGuard,
@@ -6,9 +6,9 @@ import {
 } from '../../../types/records/trading-schedule.ts'
 
 export class TradingSchedule {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('tradingschedule')
   }
 

@@ -1,4 +1,4 @@
-import type { ResourceClient } from '../../resource-client.ts'
+import type { ServiceGroupClient } from '../../service-group-client.ts'
 import { Currency } from './exposure/currency.ts'
 import { FXSpot } from './exposure/fx-spot.ts'
 import { Instruments } from './exposure/instruments.ts'
@@ -8,11 +8,11 @@ export class Exposure {
   readonly fxSpot: FXSpot
   readonly instruments: Instruments
 
-  constructor({ client }: { readonly client: ResourceClient }) {
-    const resourceClient = client.appendPath('v1/exposure')
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
+    const serviceGroupClient = client.appendPath('v1/exposure')
 
-    this.currency = new Currency({ client: resourceClient })
-    this.fxSpot = new FXSpot({ client: resourceClient })
-    this.instruments = new Instruments({ client: resourceClient })
+    this.currency = new Currency({ client: serviceGroupClient })
+    this.fxSpot = new FXSpot({ client: serviceGroupClient })
+    this.instruments = new Instruments({ client: serviceGroupClient })
   }
 }

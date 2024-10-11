@@ -1,8 +1,7 @@
 import { expect } from 'std/expect/mod.ts'
 import { describe, test } from 'std/testing/bdd.ts'
-import { SaxoBankClient } from '../../../../mod.ts'
-import { SaxoBank24HourToken } from '../../../authentication/saxobank-24-hour-token.ts'
 import { HTTPClientError } from '../../../http-client.ts'
+import { SaxoBankApplication } from '../../../saxobank-application.ts'
 import type { ChartsParameters } from '../charts.ts'
 
 const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 250
@@ -12,12 +11,9 @@ function progress(current: number, total: number) {
 }
 
 describe('chart/charts', () => {
-  const saxoBankClient = new SaxoBankClient({
-    prefixURL: 'https://gateway.saxobank.com/sim/openapi',
-    authorization: new SaxoBank24HourToken(),
-  })
-
   test('Getting chart data for asset type', async ({ step }) => {
+    using app = new SaxoBankApplication()
+
     const assetTypeCandidates: ChartsParameters['AssetType'][] = [
       'Bond',
       'CfdOnCompanyWarrant',
@@ -42,7 +38,7 @@ describe('chart/charts', () => {
     ] as const
 
     for (const assetType of assetTypeCandidates) {
-      const instruments = await saxoBankClient.referenceData.instruments.get({
+      const instruments = await app.referenceData.instruments.get({
         AssetTypes: [assetType] as const,
         limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
       })
@@ -56,7 +52,7 @@ describe('chart/charts', () => {
 
           await substep(label, async () => {
             try {
-              const chart = await saxoBankClient.chart.charts.get({
+              const chart = await app.chart.charts.get({
                 AssetType: assetType,
                 Uic: instrument.Identifier,
                 Horizon: 60,
@@ -80,7 +76,9 @@ describe('chart/charts', () => {
   })
 
   test('Getting bid/ask ohlc chart data for fx spot', async () => {
-    const chart = await saxoBankClient.chart.charts.get({
+    using app = new SaxoBankApplication()
+
+    const chart = await app.chart.charts.get({
       AssetType: 'FxSpot',
       Uic: 8176, // Gold/US Dollar
       Horizon: 60,
@@ -99,7 +97,9 @@ describe('chart/charts', () => {
   })
 
   test('Getting ohlc chart data for stock', async () => {
-    const chart = await saxoBankClient.chart.charts.get({
+    using app = new SaxoBankApplication()
+
+    const chart = await app.chart.charts.get({
       AssetType: 'Stock',
       Uic: 211, // Apple Inc.
       Horizon: 60,

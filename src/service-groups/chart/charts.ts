@@ -9,7 +9,7 @@ import {
   string,
   union,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import type { ResourceClient } from '../../resource-client.ts'
+import type { ServiceGroupClient } from '../../service-group-client.ts'
 import type { ChartFieldGroupSpec } from '../../types/derives/chart-field-group-spec.ts'
 import { ChartRequestMode } from '../../types/derives/chart-request-mode.ts'
 import { Horizon } from '../../types/derives/horizon.ts'
@@ -41,9 +41,9 @@ export type ChartsParameters =
   & GuardType<typeof ChartsParametersModeAndTimeGuard>
 
 export class Charts {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('v3/charts')
   }
 

@@ -1,15 +1,15 @@
-import type { ResourceClient } from '../../../resource-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import type { PositionFieldGroup } from '../../../types/derives/position-field-group.ts'
 import { PositionResponse } from '../../../types/records/position-response.ts'
 
 export class Me {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('me')
   }
 
-  async get(): Promise<ReadonlyArray<PositionResponse>> {
+  async get(): Promise<Array<PositionResponse>> {
     const FieldGroups: PositionFieldGroup[] = [
       'Costs',
       'DisplayAndFormat',

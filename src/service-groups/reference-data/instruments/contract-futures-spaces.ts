@@ -1,6 +1,6 @@
 import { array, props, string } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { HTTPClientError } from '../../../http-client.ts'
-import type { ResourceClient } from '../../../resource-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import { FuturesSpaceElement } from '../../../types/records/futures-space-element.ts'
 
 const ResponseBodyGuard = props({
@@ -11,9 +11,9 @@ const ResponseBodyGuard = props({
 })
 
 export class ContractFuturesSpaces {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('futuresspaces')
   }
 

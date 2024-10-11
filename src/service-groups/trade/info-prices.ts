@@ -10,10 +10,10 @@ import {
   props,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import type { ResourceClient } from '../../resource-client.ts'
 import type { InfoPriceGroupSpec } from '../../types/derives/info-price-group-spec.ts'
 import type { OrderAmountType } from '../../types/derives/order-amount-type.ts'
 
+import type { ServiceGroupClient } from '../../service-group-client.ts'
 import { PutCall } from '../../types/derives/put-call.ts'
 import { ToOpenClose } from '../../types/derives/to-open-close.ts'
 import { InfoPriceResponse } from '../../types/records/info-price-response.ts'
@@ -264,9 +264,9 @@ export type InfoPricesParameters = {
 }
 
 export class InfoPrices {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('v1/infoprices')
   }
 

@@ -1,4 +1,4 @@
-import type { ResourceClient } from '../resource-client.ts'
+import type { ServiceGroupClient } from '../service-group-client.ts'
 import { AlgoStrategies } from './reference-data/algostrategies.ts'
 import { Countries } from './reference-data/countries.ts'
 import { Cultures } from './reference-data/cultures.ts'
@@ -22,18 +22,18 @@ export class ReferenceData {
   readonly standarddates: StandardDates
   readonly timezones: TimeZones
 
-  constructor({ client }: { readonly client: ResourceClient }) {
-    const resourceClient = client.appendPath('ref')
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
+    const serviceGroupClient = client.appendPath('ref')
 
-    this.algostrategies = new AlgoStrategies({ client: resourceClient })
-    this.countries = new Countries({ client: resourceClient })
-    this.cultures = new Cultures({ client: resourceClient })
-    this.currencies = new Currencies({ client: resourceClient })
-    this.currencyPairs = new CurrencyPairs({ client: resourceClient })
-    this.exchanges = new Exchanges({ client: resourceClient })
-    this.instruments = new Instruments({ client: resourceClient })
-    this.languages = new Languages({ client: resourceClient })
-    this.standarddates = new StandardDates({ client: resourceClient })
-    this.timezones = new TimeZones({ client: resourceClient })
+    this.algostrategies = new AlgoStrategies({ client: serviceGroupClient })
+    this.countries = new Countries({ client: serviceGroupClient })
+    this.cultures = new Cultures({ client: serviceGroupClient })
+    this.currencies = new Currencies({ client: serviceGroupClient })
+    this.currencyPairs = new CurrencyPairs({ client: serviceGroupClient })
+    this.exchanges = new Exchanges({ client: serviceGroupClient })
+    this.instruments = new Instruments({ client: serviceGroupClient })
+    this.languages = new Languages({ client: serviceGroupClient })
+    this.standarddates = new StandardDates({ client: serviceGroupClient })
+    this.timezones = new TimeZones({ client: serviceGroupClient })
   }
 }

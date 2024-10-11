@@ -1,1 +1,1 @@
-export { SaxoBankClient } from './src/saxobank-client.ts'
+export * from './src/authentication2/saxobank-application.ts'

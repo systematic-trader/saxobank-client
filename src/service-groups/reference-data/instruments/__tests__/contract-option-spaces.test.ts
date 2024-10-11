@@ -1,10 +1,9 @@
 import { test } from 'std/testing/bdd.ts'
-import { SaxoBank24HourToken } from '../../../../authentication/saxobank-24-hour-token.ts'
-import { SaxoBankClient } from '../../../../saxobank-client.ts'
+import { SaxoBankApplication } from '../../../../saxobank-application.ts'
 import { OptionAssetTypeValues } from '../../../../types/records/option-details.ts'
 
 test('reference-data/instruments/contractoptionspaces', async ({ step }) => {
-  const { instruments } = new SaxoBankClient({ authorization: new SaxoBank24HourToken() }).referenceData
+  const { instruments } = new SaxoBankApplication().referenceData
 
   const optionsInstruments = await instruments.get({ AssetTypes: OptionAssetTypeValues })
 

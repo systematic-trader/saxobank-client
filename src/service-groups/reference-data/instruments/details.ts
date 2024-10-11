@@ -1,8 +1,8 @@
 import { assertReturn } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import type { ResourceClient } from '../../../resource-client.ts'
 import type { AssetType } from '../../../types/derives/asset-type.ts'
 
 import { HTTPClientError } from '../../../http-client.ts'
+import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import {
   InstrumentDetailsBond,
   InstrumentDetailsCfdOnCompanyWarrant,
@@ -34,11 +34,11 @@ import {
 } from '../../../types/records/instrument-details.ts'
 
 export class InstrumentsDetails {
-  readonly #client: ResourceClient
+  readonly #client: ServiceGroupClient
 
   #resourceURLValid: undefined | boolean = undefined
 
-  constructor({ client }: { readonly client: ResourceClient }) {
+  constructor({ client }: { readonly client: ServiceGroupClient }) {
     this.#client = client.appendPath('details')
   }
 
