@@ -136,7 +136,7 @@ export class HTTPClient {
     })
   }
 
-  async getJSON<T = unknown>(
+  async getOkJSON<T = unknown>(
     url: string | URL,
     {
       guard,
@@ -180,7 +180,7 @@ export class HTTPClient {
     return body
   }
 
-  async getBlob(
+  async getOkBlob(
     url: string | URL,
     {
       headers,
@@ -205,7 +205,7 @@ export class HTTPClient {
     return await response.blob()
   }
 
-  async getText(
+  async getOkText(
     url: string | URL,
     {
       headers,
@@ -256,7 +256,7 @@ export class HTTPClient {
     })
   }
 
-  async postJSON<T = unknown>(
+  async postOkJSON<T = unknown>(
     url: string | URL,
     {
       guard,
@@ -327,7 +327,7 @@ export class HTTPClient {
     })
   }
 
-  async putJSON<T = unknown>(
+  async putOkJSON<T = unknown>(
     url: string | URL,
     {
       guard,
@@ -395,7 +395,7 @@ export class HTTPClient {
     })
   }
 
-  async deleteJSON<T = unknown>(
+  async deleteOkJSON<T = unknown>(
     url: string | URL,
     {
       guard,

@@ -61,7 +61,7 @@ export class ServiceGroupClient {
 
     setSearchParams(url, options.searchParams)
 
-    return await this.#client.getJSON(url, {
+    return await this.#client.getOkJSON(url, {
       headers: options.headers,
       guard: options.guard,
       coerce: sanitize,
@@ -120,7 +120,7 @@ export class ServiceGroupClient {
 
     setSearchParams(url, options.searchParams)
 
-    return await this.#client.postJSON(url, {
+    return await this.#client.postOkJSON(url, {
       headers: options.headers,
       body: JSON.stringify(options.body),
       guard: options.guard,
@@ -142,7 +142,7 @@ export class ServiceGroupClient {
 
     setSearchParams(url, options.searchParams)
 
-    return await this.#client.putJSON(url, {
+    return await this.#client.putOkJSON(url, {
       headers: options.headers,
       body: JSON.stringify(options.body),
       guard: options.guard,
@@ -163,7 +163,7 @@ export class ServiceGroupClient {
 
     setSearchParams(url, options.searchParams)
 
-    return await this.#client.deleteJSON(url, {
+    return await this.#client.deleteOkJSON(url, {
       headers: options.headers,
       guard: options.guard,
       coerce: sanitize,
@@ -199,33 +199,31 @@ const TimeoutsWeakMap = new WeakMap<
 >()
 
 async function onRateLimitError(client: HTTPClient, error: Error, _retries: number): Promise<void> {
-  if (error instanceof HTTPClientError) {
-    if (error.statusCode === 429) {
-      const rateLimit = getRateLimitExceeded(error.headers)
+  if (error instanceof HTTPClientError && error.statusCode === 429) {
+    const rateLimit = getRateLimitExceeded(error.headers)
 
-      if (rateLimit === undefined) {
-        throw error
-      }
-
-      let timeouts = TimeoutsWeakMap.get(client)
-
-      if (timeouts === undefined) {
-        timeouts = new Map()
-        TimeoutsWeakMap.set(client, timeouts)
-      }
-
-      let timeout = timeouts.get(rateLimit.name)
-
-      if (timeout === undefined) {
-        timeout = Timeout.defer(rateLimit.timeout, () => {
-          timeouts.delete(rateLimit.name)
-        })
-
-        timeouts.set(rateLimit.name, timeout)
-      }
-
-      return await timeout
+    if (rateLimit === undefined) {
+      throw error
     }
+
+    let timeouts = TimeoutsWeakMap.get(client)
+
+    if (timeouts === undefined) {
+      timeouts = new Map()
+      TimeoutsWeakMap.set(client, timeouts)
+    }
+
+    let timeout = timeouts.get(rateLimit.name)
+
+    if (timeout === undefined) {
+      timeout = Timeout.defer(rateLimit.timeout, () => {
+        timeouts.delete(rateLimit.name)
+      })
+
+      timeouts.set(rateLimit.name, timeout)
+    }
+
+    return await timeout
   }
 
   throw error
@@ -370,7 +368,7 @@ async function fetchPaginatedData<T = unknown>({
 
   const startTime = Date.now()
 
-  const resourceBody = await client.getJSON(url, {
+  const resourceBody = await client.getOkJSON(url, {
     headers,
     coerce: sanitize,
     guard: bodyGuard,
