@@ -269,17 +269,17 @@ export class SaxoBankApplication implements Disposable {
       serviceURL,
       onError: async (error, retries) => {
         if (retries === 0 && error instanceof HTTPClientError && error.statusCode === 401) {
-          const resolvedSession = await this.#authorize()
+          const session = await this.#authorize()
 
-          if (resolvedSession === undefined) {
+          if (session === undefined) {
             throw error
           }
 
           if (this.settings.sessionCredentialsPath !== undefined) {
-            await writeToSessionsFile(this.settings.sessionCredentialsPath, this.settings.oauth.key, resolvedSession)
+            await writeToSessionsFile(this.settings.sessionCredentialsPath, this.settings.oauth.key, session)
           }
 
-          this.#session = resolvedSession
+          this.#session = session
 
           return
         }
@@ -490,7 +490,7 @@ async function requestAuthenticationToken(
   }
 
   try {
-    const tokensResponse = await options.client.postJSON(options.tokenURL, {
+    const tokensResponse = await options.client.postOkJSON(options.tokenURL, {
       headers: {
         'Authorization': `Basic ${btoa(`${options.settings.key}:${options.settings.secret}`)}`,
         'Content-Type': 'application/x-www-form-urlencoded',
