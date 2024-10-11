@@ -110,18 +110,49 @@ export class Timeout<T = undefined> extends Promise<undefined | T> implements Di
     return this.#controller.signal
   }
 
-  #superResolve!: (value: undefined | T) => void
-  #superReject!: (reason: unknown) => void
-
   protected constructor(
     timeout: number,
     handle?: undefined | ((signal: AbortSignal) => T | Promise<T>),
     unref: undefined | boolean = Timeout.unref,
   ) {
+    let superResolve: undefined | ((value: undefined | T) => void) = undefined
+    let superReject: undefined | ((reason: unknown) => void) = undefined
+
     super((resolve, reject) => {
-      this.#superResolve = resolve
-      this.#superReject = reject
+      superResolve = resolve
+      superReject = reject
     })
+
+    this.#resolve = (value: undefined | T): void => {
+      clearTimeout(this.#timer)
+
+      if (this.#status === 'in-progress') {
+        this.#status = 'fulfilled'
+      }
+
+      superResolve!(value)
+
+      if (this.#controller !== undefined && this.#controller.signal.aborted === false && this.#status === 'aborted') {
+        this.#controller.abort()
+      }
+    }
+
+    this.#reject = (reason: unknown): void => {
+      clearTimeout(this.#timer)
+
+      if (this.#status === 'in-progress') {
+        this.#status = 'rejected'
+      }
+
+      superReject!(reason)
+
+      if (
+        this.#controller !== undefined && this.#controller.signal.aborted === false &&
+        (this.#status === 'rejected' || this.#status === 'aborted')
+      ) {
+        this.#controller.abort()
+      }
+    }
 
     const handler: TimerHandler = handle === undefined ? () => this.#resolve(undefined as T) : () => {
       if (this.#status !== 'in-progress') {
@@ -156,36 +187,8 @@ export class Timeout<T = undefined> extends Promise<undefined | T> implements Di
     }
   }
 
-  #resolve(value: undefined | T): void {
-    clearTimeout(this.#timer)
-
-    if (this.#status === 'in-progress') {
-      this.#status = 'fulfilled'
-    }
-
-    this.#superResolve(value)
-
-    if (this.#controller !== undefined && this.#controller.signal.aborted === false && this.#status === 'aborted') {
-      this.#controller.abort()
-    }
-  }
-
-  #reject(reason: unknown): void {
-    clearTimeout(this.#timer)
-
-    if (this.#status === 'in-progress') {
-      this.#status = 'rejected'
-    }
-
-    this.#superReject(reason)
-
-    if (
-      this.#controller !== undefined && this.#controller.signal.aborted === false &&
-      (this.#status === 'rejected' || this.#status === 'aborted')
-    ) {
-      this.#controller.abort()
-    }
-  }
+  #resolve: (value: undefined | T) => void
+  #reject: (reason: unknown) => void;
 
   [Symbol.dispose](): void {
     this.cancel()
