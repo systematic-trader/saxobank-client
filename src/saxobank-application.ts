@@ -96,6 +96,56 @@ export interface SaxoBankApplicationSettings {
 }
 
 export class SaxoBankApplication implements Disposable {
+  static live(settings: undefined | SaxoBankApplicationSettings = {}): SaxoBankApplication {
+    const key = settings.key ?? Environment['SAXOBANK_LIVE_APP_KEY']
+
+    if (key === undefined) {
+      throw new Error(
+        'No SaxoBank application key provided. Did you forget to set the `SAXOBANK_LIVE_APP_KEY` environment variable?',
+      )
+    }
+
+    const secret = settings.secret ?? Environment['SAXOBANK_LIVE_APP_SECRET']
+
+    if (secret === undefined) {
+      throw new Error(
+        'No SaxoBank application secret provided. Did you forget to set the `SAXOBANK_LIVE_APP_SECRET` environment variable?',
+      )
+    }
+
+    return new this({
+      key,
+      secret,
+      ...settings,
+      type: 'Live',
+    })
+  }
+
+  static simulation(settings: undefined | SaxoBankApplicationSettings = {}): SaxoBankApplication {
+    const key = settings.key ?? Environment['SAXOBANK_SIMULATION_APP_KEY']
+
+    if (key === undefined) {
+      throw new Error(
+        'No SaxoBank application key provided. Did you forget to set the `SAXOBANK_SIMULATION_APP_KEY` environment variable?',
+      )
+    }
+
+    const secret = settings.secret ?? Environment['SAXOBANK_SIMULATION_APP_SECRET']
+
+    if (secret === undefined) {
+      throw new Error(
+        'No SaxoBank application secret provided. Did you forget to set the `SAXOBANK_SIMULATION_APP_SECRET` environment variable?',
+      )
+    }
+
+    return new this({
+      key,
+      secret,
+      ...settings,
+      type: 'Simulation',
+    })
+  }
+
   readonly settings: {
     readonly isKeptAlive: boolean
     readonly oauth: {
