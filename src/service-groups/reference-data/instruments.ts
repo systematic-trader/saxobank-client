@@ -6,6 +6,7 @@ import { assertReturn } from 'https://raw.githubusercontent.com/systematic-trade
 import type { ServiceGroupClient } from '../../service-group-client.ts'
 import {
   InstrumentSummaryInfoBond,
+  InstrumentSummaryInfoCfdIndexOption,
   InstrumentSummaryInfoCfdOnCompanyWarrant,
   InstrumentSummaryInfoCfdOnEtc,
   InstrumentSummaryInfoCfdOnEtf,
@@ -146,6 +147,10 @@ export class Instruments {
           switch (AssetType) {
             case 'Bond': {
               return assertReturn(InstrumentSummaryInfoBond, instrument)
+            }
+
+            case 'CfdIndexOption': {
+              return assertReturn(InstrumentSummaryInfoCfdIndexOption, instrument)
             }
 
             case 'CfdOnCompanyWarrant': {
