@@ -3,9 +3,13 @@ import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
 
 test('reference-data/instruments/tradingschedule', async ({ step }) => {
-  const { instruments: resource } = new SaxoBankApplication().referenceData
+  using app = new SaxoBankApplication()
 
-  const instruments = await resource.get({ AssetTypes: ['Stock'], limit: 25, IncludeNonTradable: false })
+  const instruments = await app.referenceData.instruments.get({
+    AssetTypes: ['Stock'],
+    limit: 25,
+    IncludeNonTradable: false,
+  })
 
   let count = 0
 
@@ -13,7 +17,10 @@ test('reference-data/instruments/tradingschedule', async ({ step }) => {
     await step({
       name: `Uic=${instrument.Identifier} (${++count} / ${instruments.length})`,
       async fn() {
-        const schedule = await resource.tradingschedule.get({ AssetType: 'Stock', Uic: instrument.Identifier })
+        const schedule = await app.referenceData.instruments.tradingschedule.get({
+          AssetType: 'Stock',
+          Uic: instrument.Identifier,
+        })
 
         expect(schedule).toBeDefined()
       },

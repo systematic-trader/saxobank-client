@@ -1,11 +1,12 @@
+import { expect } from 'std/expect/expect.ts'
 import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
 import { OptionAssetTypeValues } from '../../../../types/records/option-details.ts'
 
 test('reference-data/instruments/contractoptionspaces', async ({ step }) => {
-  const { instruments } = new SaxoBankApplication().referenceData
+  using app = new SaxoBankApplication()
 
-  const optionsInstruments = await instruments.get({ AssetTypes: OptionAssetTypeValues })
+  const optionsInstruments = await app.referenceData.instruments.get({ AssetTypes: OptionAssetTypeValues })
 
   let count = 0
 
@@ -13,7 +14,11 @@ test('reference-data/instruments/contractoptionspaces', async ({ step }) => {
     await step({
       name: `Uic=${optionInstrument.Identifier}  (${++count} / ${optionsInstruments.length})`,
       async fn() {
-        await instruments.contractoptionspaces.get({ OptionRootId: optionInstrument.Identifier })
+        const spaces = await app.referenceData.instruments.contractoptionspaces.get({
+          OptionRootId: optionInstrument.Identifier,
+        })
+
+        expect(spaces).toBeDefined()
       },
     })
   }

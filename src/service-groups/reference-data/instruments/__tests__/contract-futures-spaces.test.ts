@@ -3,9 +3,9 @@ import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
 
 test('reference-data/instruments/futuresspaces', async ({ step }) => {
-  const { instruments: resource } = new SaxoBankApplication().referenceData
+  using app = new SaxoBankApplication()
 
-  const instruments = await resource.get({ AssetTypes: ['ContractFutures'] })
+  const instruments = await app.referenceData.instruments.get({ AssetTypes: ['ContractFutures'] })
 
   let count = 0
 
@@ -13,7 +13,7 @@ test('reference-data/instruments/futuresspaces', async ({ step }) => {
     await step({
       name: `Uic=${instrument.Identifier} (${++count} / ${instruments.length})`,
       async fn() {
-        const spaces = await resource.futuresspaces.get({ Uic: instrument.Identifier })
+        const spaces = await app.referenceData.instruments.futuresspaces.get({ Uic: instrument.Identifier })
 
         expect(spaces).toBeDefined()
       },
