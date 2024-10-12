@@ -409,6 +409,7 @@ async function fetchPaginatedData<T = unknown>({
     guard,
     limit,
     timeout,
+    onError,
   })
 
   return Data.concat(nextData)
