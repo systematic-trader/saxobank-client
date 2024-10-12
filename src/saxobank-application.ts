@@ -297,7 +297,7 @@ export class SaxoBankApplication implements Disposable {
     }
 
     if (this.settings.isKeptAlive === true) {
-      this.#keepAlive = Timeout.defer(REFRESH_TOKEN_TIMEOUT, this.#runKeepAlive)
+      this.#keepAlive = Timeout.repeat(REFRESH_TOKEN_TIMEOUT, this.#runKeepAlive.bind(this))
     }
 
     this.#httpClient = new HTTPClient({
@@ -354,22 +354,18 @@ export class SaxoBankApplication implements Disposable {
       const currentSession = await this.#session
 
       if (currentSession === undefined) {
-        this.#keepAlive = Timeout.defer(REFRESH_TOKEN_TIMEOUT, this.#runKeepAlive)
         return
       }
 
       const refreshedSession = await this.#refresh(signal)
 
       if (refreshedSession === undefined) {
-        this.#keepAlive = Timeout.defer(REFRESH_TOKEN_TIMEOUT, this.#runKeepAlive)
         return
       }
 
       this.#session = refreshedSession
-
-      this.#keepAlive = Timeout.defer(REFRESH_TOKEN_TIMEOUT, this.#runKeepAlive)
     } catch (error) {
-      this.#session = Promise.reject(error)
+      this.#keepAlive?.abort(error)
     }
   }
 
@@ -474,12 +470,14 @@ export class SaxoBankApplication implements Disposable {
     tokenURL.searchParams.set('grant_type', 'refresh_token')
     tokenURL.searchParams.set('refresh_token', session.refreshToken)
 
-    return await requestAuthenticationToken({
+    const refreshedSession = await requestAuthenticationToken({
       client: this.#httpClient,
       tokenURL,
       settings: this.settings.oauth,
       signal,
     })
+
+    return refreshedSession
   }
 
   [Symbol.dispose](): void {
