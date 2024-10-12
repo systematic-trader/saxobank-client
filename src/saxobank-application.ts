@@ -70,14 +70,20 @@ export interface SaxoBankApplicationSettings {
     }
   }
 
-  /** Whether to keep the application alive by periodically refreshing the access token. */
-  readonly keepAlive?: undefined | boolean
+  readonly authentication?: undefined | {
+    /**
+     * Whether to keep the application alive by periodically refreshing the access token.
+     * The default is `true`.
+     */
+    readonly refresh?: undefined | boolean
 
-  /** Authentication tokens are stored between sessions by default at
-   * `saxobank-session.json` in the current working directory.
-   *  Set to `false` to disable or provide a custom path.
-   */
-  readonly persistAuthentication?: undefined | boolean | string
+    /**
+     * Authentication tokens are stored between sessions.
+     * Set to `false` to disable or provide a custom path.
+     * The default is to store in the current working directory as `saxobank-authentication.json`.
+     */
+    readonly store?: undefined | boolean | string
+  }
 
   /** Configuration for the authorization workflow. */
   readonly authorize?: undefined | {
@@ -147,7 +153,16 @@ export class SaxoBankApplication implements Disposable {
   }
 
   readonly settings: {
-    readonly isKeptAlive: boolean
+    readonly authentication: {
+      readonly refresh: boolean
+      readonly sessionPath: undefined | string
+    }
+
+    readonly authorize: {
+      readonly handle: (authorizationURL: URL) => void | Promise<void>
+      readonly timeout?: undefined | number
+    }
+
     readonly oauth: {
       readonly key: string
       readonly secret: string
@@ -158,19 +173,14 @@ export class SaxoBankApplication implements Disposable {
         readonly port: number
       }
     }
-    readonly sessionCredentialsPath: undefined | string
-    readonly serviceURL: URL
 
-    readonly authorize: {
-      readonly handle: (authorizationURL: URL) => void | Promise<void>
-      readonly timeout?: undefined | number
-    }
+    readonly serviceURL: URL
   }
 
   #session: undefined | SaxoBankApplicationOAuthSession | Promise<undefined | SaxoBankApplicationOAuthSession> =
     undefined
 
-  #keepAlive: undefined | Timeout<void> = undefined
+  #refreshRepeater: undefined | Timeout<void> = undefined
 
   readonly #httpClient: HTTPClient
 
@@ -189,11 +199,11 @@ export class SaxoBankApplication implements Disposable {
 
     const type = settings.type ?? envType ?? 'Live'
 
-    const sessionCredentialsPath = settings.persistAuthentication === false
+    const sessionCredentialsPath = settings.authentication?.store === false
       ? undefined
-      : settings.persistAuthentication === undefined || settings.persistAuthentication === true
+      : settings.authentication?.store === undefined || settings.authentication.store === true
       ? PERSISTED_SESSION_AUTHENTICATION_FILE_NAME
-      : settings.persistAuthentication
+      : settings.authentication.store
 
     const authenticationURL = new URL(ApplicationURLs[type].authenticationURL)
 
@@ -255,7 +265,14 @@ export class SaxoBankApplication implements Disposable {
     const serviceURL = new URL(ApplicationURLs[type].serviceURL)
 
     this.settings = {
-      isKeptAlive: settings.keepAlive ?? true,
+      authentication: {
+        refresh: settings.authentication?.refresh ?? true,
+        sessionPath: sessionCredentialsPath === undefined
+          ? undefined
+          : sessionCredentialsPath[0] === '/'
+          ? sessionCredentialsPath
+          : path.join(Deno.cwd(), sessionCredentialsPath),
+      },
       oauth: {
         key,
         secret,
@@ -266,11 +283,6 @@ export class SaxoBankApplication implements Disposable {
           port: listenerPort,
         },
       },
-      sessionCredentialsPath: sessionCredentialsPath === undefined
-        ? undefined
-        : sessionCredentialsPath[0] === '/'
-        ? sessionCredentialsPath
-        : path.join(Deno.cwd(), sessionCredentialsPath),
       serviceURL,
       authorize: {
         handle: settings.authorize?.handle ?? openLocalBrowser,
@@ -278,8 +290,8 @@ export class SaxoBankApplication implements Disposable {
       },
     }
 
-    if (this.settings.sessionCredentialsPath !== undefined) {
-      this.#session = readSessionsFile(this.settings.sessionCredentialsPath, this.settings.oauth.key).then(
+    if (this.settings.authentication.sessionPath !== undefined) {
+      this.#session = readSessionsFile(this.settings.authentication.sessionPath, this.settings.oauth.key).then(
         (session) => {
           if (session === undefined) {
             return undefined
@@ -296,8 +308,8 @@ export class SaxoBankApplication implements Disposable {
       )
     }
 
-    if (this.settings.isKeptAlive === true) {
-      this.#keepAlive = Timeout.repeat(REFRESH_TOKEN_TIMEOUT, this.#runKeepAlive.bind(this))
+    if (this.settings.authentication.refresh === true) {
+      this.#refreshRepeater = Timeout.repeat(REFRESH_TOKEN_TIMEOUT, this.#runKeepAlive.bind(this))
     }
 
     this.#httpClient = new HTTPClient({
@@ -325,8 +337,8 @@ export class SaxoBankApplication implements Disposable {
             throw error
           }
 
-          if (this.settings.sessionCredentialsPath !== undefined) {
-            await writeToSessionsFile(this.settings.sessionCredentialsPath, this.settings.oauth.key, session)
+          if (this.settings.authentication.sessionPath !== undefined) {
+            await writeToSessionsFile(this.settings.authentication.sessionPath, this.settings.oauth.key, session)
           }
 
           this.#session = session
@@ -347,7 +359,7 @@ export class SaxoBankApplication implements Disposable {
 
   async #runKeepAlive(signal: AbortSignal): Promise<void> {
     try {
-      if (this.settings.isKeptAlive === false) {
+      if (signal.aborted === true) {
         return
       }
 
@@ -357,15 +369,19 @@ export class SaxoBankApplication implements Disposable {
         return
       }
 
-      const refreshedSession = await this.#refresh(signal)
+      const refreshedSession = await this.#refresh(signal, currentSession)
 
       if (refreshedSession === undefined) {
         return
       }
 
+      if (this.settings.authentication.sessionPath !== undefined) {
+        await writeToSessionsFile(this.settings.authentication.sessionPath, this.settings.oauth.key, refreshedSession)
+      }
+
       this.#session = refreshedSession
     } catch (error) {
-      this.#keepAlive?.abort(error)
+      this.#refreshRepeater?.abort(error)
     }
   }
 
@@ -450,12 +466,13 @@ export class SaxoBankApplication implements Disposable {
     return handshakePromise
   }
 
-  async #refresh(signal?: undefined | AbortSignal): Promise<undefined | SaxoBankApplicationOAuthSession> {
+  async #refresh(
+    signal: undefined | AbortSignal,
+    session: undefined | SaxoBankApplicationOAuthSession,
+  ): Promise<undefined | SaxoBankApplicationOAuthSession> {
     if (signal?.aborted === true) {
       return undefined
     }
-
-    const session = await this.#session
 
     if (session === undefined) {
       return undefined
@@ -481,13 +498,13 @@ export class SaxoBankApplication implements Disposable {
   }
 
   [Symbol.dispose](): void {
-    if (this.#keepAlive === undefined) {
+    if (this.#refreshRepeater === undefined) {
       return
     }
 
-    this.#keepAlive.abort()
+    this.#refreshRepeater.abort()
 
-    this.#keepAlive = undefined
+    this.#refreshRepeater = undefined
   }
 
   dispose(): void {
