@@ -44,7 +44,6 @@
     "checkJs": false,
     "jsx": "react",
     "jsxFactory": "React.createElement",
-    "keyofStringsOnly": false,
     "lib": [
       "deno.ns",
       "deno.unstable",
@@ -57,13 +56,10 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noStrictGenericChecks": false,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "noUncheckedIndexedAccess": true,
     "strict": true,
-    "suppressExcessPropertyErrors": false,
-    "suppressImplicitAnyIndexErrors": false,
     "useUnknownInCatchVariables": true
   }
 }
