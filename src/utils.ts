@@ -47,17 +47,17 @@ export class Timeout<T = undefined> extends Promise<undefined | T> implements Di
 
   /** Create a timeout that resolves after a certain amount of time */
   static wait(timeout: number): Timeout<void> {
-    return new this(timeout)
+    return this.#create<void>(timeout)
   }
 
   /** Create a timeout that resolves with a value after a certain amount of time */
   static defer<T>(timeout: number, deferred: (signal: AbortSignal) => T | Promise<T>): Timeout<T> {
-    return new this(timeout, deferred)
+    return this.#create<T>(timeout, deferred)
   }
 
   /** Create a timeout that resolves with a value within a certain amount of time */
   static run<T>(timeout: number, handle: (signal: AbortSignal) => T | Promise<T>): Timeout<T> {
-    const instance = new this<T>(timeout)
+    const instance = this.#create<T>(timeout)
 
     try {
       const maybePromise = handle(instance.signal)
@@ -74,7 +74,44 @@ export class Timeout<T = undefined> extends Promise<undefined | T> implements Di
     return instance
   }
 
-  readonly #timer: number
+  static repeat(
+    timeout: number,
+    handle: (signal: AbortSignal) => void | Promise<void>,
+    iterations?: undefined | number,
+  ): Timeout<void> {
+    const instance = this.#create<void>(0, async (signal) => {
+      let wait: undefined | Timeout<void> = undefined
+
+      const listener = () => {
+        wait?.abort()
+        signal.removeEventListener('abort', listener)
+      }
+
+      signal.addEventListener('abort', listener)
+
+      while (signal.aborted === false) {
+        if (iterations !== undefined && iterations-- === 0) {
+          break
+        }
+
+        try {
+          await handle(signal)
+        } catch (error) {
+          instance.#reject(error)
+        }
+
+        wait = Timeout.wait(timeout)
+
+        try {
+          await wait
+        } finally {
+          wait = undefined
+        }
+      }
+    })
+
+    return instance
+  }
 
   #status: 'in-progress' | 'fulfilled' | 'rejected' | 'aborted' | 'cancelled' = 'in-progress'
 
@@ -110,97 +147,111 @@ export class Timeout<T = undefined> extends Promise<undefined | T> implements Di
     return this.#controller.signal
   }
 
-  protected constructor(
+  #resolve!: (value: undefined | T) => void
+  #reject!: (reason: unknown) => void
+  #timer!: number
+
+  static #create<T = undefined>(
     timeout: number,
     handle?: undefined | ((signal: AbortSignal) => T | Promise<T>),
     unref: undefined | boolean = Timeout.unref,
-  ) {
-    let superResolve: undefined | ((value: undefined | T) => void) = undefined
-    let superReject: undefined | ((reason: unknown) => void) = undefined
+  ): Timeout<T> {
+    let promiseResolve!: (value: undefined | T) => void
+    let promiseReject!: (reason: unknown) => void
 
-    super((resolve, reject) => {
-      superResolve = resolve
-      superReject = reject
+    const instance = new Timeout<T>((resolve, reject) => {
+      promiseResolve = resolve
+      promiseReject = reject
     })
 
-    this.#resolve = (value: undefined | T): void => {
-      clearTimeout(this.#timer)
+    instance.#resolve = (value: undefined | T): void => {
+      clearTimeout(instance.#timer)
 
-      if (this.#status === 'in-progress') {
-        this.#status = 'fulfilled'
+      if (instance.#status === 'in-progress') {
+        instance.#status = 'fulfilled'
       }
 
-      superResolve!(value)
-
-      if (this.#controller !== undefined && this.#controller.signal.aborted === false && this.#status === 'aborted') {
-        this.#controller.abort()
-      }
-    }
-
-    this.#reject = (reason: unknown): void => {
-      clearTimeout(this.#timer)
-
-      if (this.#status === 'in-progress') {
-        this.#status = 'rejected'
-      }
-
-      superReject!(reason)
+      promiseResolve(value)
 
       if (
-        this.#controller !== undefined && this.#controller.signal.aborted === false &&
-        (this.#status === 'rejected' || this.#status === 'aborted')
+        instance.#controller !== undefined && instance.#controller.signal.aborted === false &&
+        instance.#status === 'aborted'
       ) {
-        this.#controller.abort()
+        instance.#controller.abort()
       }
     }
 
-    const handler: TimerHandler = handle === undefined ? () => this.#resolve(undefined as T) : () => {
-      if (this.#status !== 'in-progress') {
-        return this.#resolve(undefined as T)
+    instance.#reject = (reason: unknown): void => {
+      clearTimeout(instance.#timer)
+
+      if (instance.#status === 'in-progress') {
+        instance.#status = 'rejected'
+      }
+
+      promiseReject(reason)
+
+      if (
+        instance.#controller !== undefined && instance.#controller.signal.aborted === false &&
+        (instance.#status === 'rejected' || instance.#status === 'aborted')
+      ) {
+        instance.#controller.abort()
+      }
+    }
+
+    const handler: TimerHandler = handle === undefined ? () => instance.#resolve(undefined as T) : () => {
+      if (instance.#status !== 'in-progress') {
+        return instance.#resolve(undefined as T)
       }
 
       try {
-        const maybePromise = handle(this.signal)
+        const maybePromise = handle(instance.signal)
 
         if (maybePromise instanceof Promise) {
-          maybePromise.then(this.#resolve).catch(this.#reject)
+          maybePromise.then(instance.#resolve).catch(instance.#reject)
         } else {
-          this.#resolve(maybePromise)
+          instance.#resolve(maybePromise)
         }
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
-          if (this.#status === 'in-progress') {
-            this.#status = 'aborted'
+          if (instance.#status === 'in-progress') {
+            instance.#status = 'aborted'
           }
 
-          return this.#resolve(undefined)
+          return instance.#resolve(undefined)
         }
 
-        this.#reject(error)
+        instance.#reject(error)
       }
     }
 
-    this.#timer = setTimeout(handler, timeout)
+    instance.#timer = setTimeout(handler, timeout)
 
-    if (unref) {
-      this.unref()
-    }
+    return unref ? instance.unref() : instance
   }
 
-  #resolve: (value: undefined | T) => void
-  #reject: (reason: unknown) => void;
+  protected constructor(
+    executor: (resolve: (value: undefined | T) => void, reject: (reason: unknown) => void) => void,
+  ) {
+    super(executor)
+  }
 
   [Symbol.dispose](): void {
     this.cancel()
   }
 
-  /** Abort the timeout by emitting 'abort' to its signal and resolving to undefined */
-  abort(): void {
-    if (this.#status === 'in-progress') {
-      this.#status = 'aborted'
+  /**
+   *  Abort the timeout by emitting 'abort' to its signal and resolving to undefined or rejecting with the given reason
+   * @param reason The reason for aborting the timeout
+   */
+  abort(reason?: unknown): void {
+    if (reason === undefined) {
+      if (this.#status === 'in-progress') {
+        this.#status = 'aborted'
+      }
+      this.#resolve(undefined as T)
+    } else {
+      this.#reject(reason)
     }
-
-    this.#resolve(undefined as T)
   }
 
   /** Cancel the timeout by resolving to undefined */
