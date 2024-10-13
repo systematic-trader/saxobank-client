@@ -1,5 +1,5 @@
-import { describe, test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../../../saxobank-application.ts'
+import { describe, test } from '../../../../../testing.ts'
 
 describe('portfolio/accounts/account/reset', () => {
   test('response passes guard', async () => {

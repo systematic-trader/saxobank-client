@@ -1,7 +1,6 @@
-import { expect } from 'std/expect/mod.ts'
-import { describe, test } from 'std/testing/bdd.ts'
 import { HTTPClientError } from '../../../http-client.ts'
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
+import { describe, expect, test } from '../../../testing.ts'
 import type { ChartsParameters } from '../charts.ts'
 
 const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 250

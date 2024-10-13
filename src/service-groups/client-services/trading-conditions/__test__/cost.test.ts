@@ -1,6 +1,5 @@
-import { expect } from 'std/expect/mod.ts'
-import { describe, test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
+import { describe, expect, test } from '../../../../testing.ts'
 import type { ContractOptionEntry } from '../../../../types/records/contract-option-entry.ts'
 import type { CostParameters } from '../cost.ts'
 

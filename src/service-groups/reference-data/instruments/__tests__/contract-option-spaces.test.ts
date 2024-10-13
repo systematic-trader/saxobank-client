@@ -1,6 +1,5 @@
-import { expect } from 'std/expect/expect.ts'
-import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
+import { expect, test } from '../../../../testing.ts'
 import { OptionAssetTypeValues } from '../../../../types/records/option-details.ts'
 
 test('reference-data/instruments/contractoptionspaces', async ({ step }) => {
