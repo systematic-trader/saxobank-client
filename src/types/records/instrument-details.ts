@@ -40,6 +40,11 @@ import { StrategyLeg } from './strategy-leg.ts'
 import { SupportedOrderTypeSetting } from './supported-order-type-setting.ts'
 import { TickSizeScheme } from './tick-size-scheme.ts'
 
+// TODO
+// 1. specify TradingStatus with specific literals
+// 2. specify InstrumentKey with specific asset types
+// 3. specify RelatedOptionRootsEnhanced with specific asset types
+
 export type InstrumentDetailsType =
   | InstrumentDetailsBond
   | InstrumentDetailsCfdOnCompanyWarrant
@@ -1395,13 +1400,13 @@ export const InstrumentDetailsRights = props({
 
 export interface InstrumentDetailsStock extends GuardType<typeof InstrumentDetailsStock> {}
 export const InstrumentDetailsStock = props({
-  AssetType: literal('Stock'),
+  AssetType: AssetType.extract(['Stock']),
   AffiliateInfoRequired: boolean(),
   AmountDecimals: integer(),
   CurrencyCode: Currency3,
   DefaultAmount: number(),
   DefaultSlippage: number(),
-  DefaultSlippageType: DefaultSlippageType,
+  DefaultSlippageType: DefaultSlippageType.extract(['Ticks']),
   Description: string(),
   Exchange: optional(ExchangeSummary),
   Format: PriceDisplayFormat,
@@ -1418,31 +1423,74 @@ export const InstrumentDetailsStock = props({
   IsPEASMEEligible: boolean(),
   IsRedemptionByAmounts: boolean(),
   IsSwitchBySameCurrency: boolean(),
-  IsSystematicInternaliser: optional(boolean()),
+  IsSystematicInternaliser: boolean(),
   IsTradable: boolean(),
   LotSize: optional(number()),
-  LotSizeType: LotSizeType,
+  LotSizeType: LotSizeType.extract(['BuyOnly', 'NotUsed', 'OddLotsNotAllowed']),
   MinimumLotSize: optional(number()),
   MinimumOrderValue: optional(number()),
   MinimumTradeSize: optional(number()),
-  NonTradableReason: NonTradableReason,
+  NonTradableReason: NonTradableReason.extract(['None', 'NotOnlineClientTradable', 'ReduceOnlyInstrument']),
   OrderDistances: OrderDistances,
-  OrderSetting: OrderSetting,
+  OrderSetting: optional(OrderSetting),
   PriceCurrency: Currency3,
   PriceToContractFactor: optional(number()),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
   RelatedOptionRoots: optional(array(integer())), // Deprecated
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
-  StandardAmounts: array(number()),
-  SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
-  SupportedOrderTypes: array(PlaceableOrderType),
-  SupportedOrderTypeSettings: array(SupportedOrderTypeSetting),
-  SupportedStrategies: optional(array(SupportedStrategyType)),
+  StandardAmounts: optional(array(number())),
+  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract(['LastTraded', 'Open']))),
+  SupportedOrderTypes: array(
+    PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+      'TriggerBreakout',
+      'TriggerLimit',
+      'TriggerStop',
+    ]),
+  ),
+  SupportedOrderTypeSettings: array(props({
+    DurationTypes: array(
+      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
+    ),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopIfTraded',
+      'StopLimit',
+      'TrailingStopIfTraded',
+      'TriggerBreakout',
+      'TriggerLimit',
+      'TriggerStop',
+    ]),
+  })),
+  SupportedStrategies: optional(
+    array(
+      SupportedStrategyType.extract([
+        'Dark',
+        'Iceberg',
+        'Implementation Shortfall',
+        'Limit on Close (LOC)',
+        'Liquidity Seeking',
+        'Market on Close (MOC)',
+        'Nordic@Mid',
+        'Pre-Market Limit',
+        'Price Peg',
+        'Target Close',
+        'TWAP',
+        'VWAP',
+        'With Volume',
+      ]),
+    ),
+  ),
   Symbol: string(),
   TickSize: optional(number()),
   TickSizeScheme: optional(TickSizeScheme),
-  TradableAs: optional(array(literal('Stock'))),
+  TradableAs: optional(array(AssetType.extract(['Stock']))),
   TradableOn: array(format('positive-integer')),
   TradingSessions: InstrumentTradeSessions,
   TradingSignals: TradingSignal,
