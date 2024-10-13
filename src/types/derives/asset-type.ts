@@ -3,9 +3,6 @@ import { enums } from 'https://raw.githubusercontent.com/systematic-trader/type-
 export type AssetType = typeof AssetTypeValues[number]
 
 export const AssetTypeValues = [
-  /* Not tradeable */
-  'Cash',
-
   /**
    * Bond
    */
@@ -27,6 +24,9 @@ export const AssetTypeValues = [
    * and will lose your entire investment.
    */
   'CBBCCategoryR',
+
+  /* Not tradeable */
+  'Cash',
 
   /**
    * A Discount Certificate with Barrier allows investors with moderate to high
