@@ -8,7 +8,4 @@ export const ToOpenClose = enums([
 
   /** Order/Position is ToOpen. */
   'ToOpen',
-
-  /** Undefined. */
-  'Undefined',
 ])

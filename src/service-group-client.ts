@@ -480,6 +480,10 @@ function sanitize(value: unknown): unknown {
         return undefined
       }
 
+      if (trimmedValue === 'Undefined') {
+        return undefined
+      }
+
       return trimmedValue
     }
 

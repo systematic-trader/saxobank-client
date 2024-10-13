@@ -9,6 +9,4 @@ export const OrderDistanceType = enums([
   'Pips',
   /**	Absolute price. */
   'Price',
-  /** */
-  'Undefined',
 ])

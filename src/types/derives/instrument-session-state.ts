@@ -33,6 +33,4 @@ export const InstrumentSessionState = enums([
   'Suspended',
   /** Orders collected at last price in absence of closing auction price */
   'TradingAtLast',
-  /** The state of the Exchange is unknown */
-  'Undefined',
 ])
