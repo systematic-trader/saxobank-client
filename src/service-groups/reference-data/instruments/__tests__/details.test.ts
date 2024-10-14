@@ -1,28 +1,17 @@
-import { expect } from 'std/expect/mod.ts'
-import { test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
+import { expect, test } from '../../../../testing.ts'
 import { AssetTypeValues } from '../../../../types/derives/asset-type.ts'
-import { Timeout } from '../../../../utils.ts'
-
-Timeout.unref = false
 
 test('reference-data/instruments/details', async ({ step }) => {
   using app = new SaxoBankApplication()
 
-  for (const assetType of AssetTypeValues) {
+  for (const assetType of AssetTypeValues.toSorted()) {
     await step({
       name: assetType,
       async fn() {
         const instruments = await app.referenceData.instruments.details.get({ AssetTypes: [assetType] })
 
-        try {
-          expect(instruments).toBeDefined()
-        } catch (error) {
-          // deno-lint-ignore no-console
-          console.log('instruments', instruments[0])
-
-          throw error
-        }
+        expect(instruments).toBeDefined()
 
         const firstInstrument = instruments[0]
 
