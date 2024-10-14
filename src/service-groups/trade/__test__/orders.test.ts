@@ -4,6 +4,9 @@ import type { InfoPricesParameters } from '../info-prices.ts'
 
 // todo write tests for different order types (can probably be simple entry orders)
 // todo write some tests that result in errors (e.g. wrong side of market + wrong duration etc)
+// todo test long/short
+
+const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 6
 
 function roundPrice(price: number, tickSize: number) {
   return Math.round(price / tickSize) * tickSize
@@ -71,25 +74,31 @@ async function findSuiteablePrice({ app, assetType, uic }: {
   }
 }
 
+function calculateMinimumAmount({ LotSize, MinimumLotSize }: {
+  readonly LotSize?: undefined | number
+  readonly MinimumLotSize?: undefined | number
+}) {
+  return Math.max(1, LotSize ?? 0, MinimumLotSize ?? 0)
+}
+
 describe('trade/orders', () => {
   using app = new SaxoBankApplication({
     type: 'Simulation',
   })
 
-  async function resetAccount({ balance = 50_000 }: { balance?: undefined | number } = {}) {
+  async function resetAccount({
+    // Some bonds are quite expensive, so we need to set a high balance to be able to place those orders
+    balance = 10_000_000,
+  }: { balance?: undefined | number } = {}) {
     // wait a while to not run into rate limit issues // todo remove this when 429-handling is implemented
     await new Promise((resolve) => setTimeout(resolve, 6_200))
 
     await app.resetAccount({ balance })
   }
 
-  beforeEach(async () => {
-    await resetAccount()
-  })
+  beforeEach(resetAccount)
 
-  afterAll(async () => {
-    await resetAccount()
-  })
+  afterAll(resetAccount)
 
   describe('placing orders using different methods', () => {
     test('Method 1: Placing a single order, with no related orders', async () => {
@@ -362,7 +371,7 @@ describe('trade/orders', () => {
     })
   })
 
-  describe.only('placing orders with different duration', () => {
+  describe('placing orders with different duration', () => {
     test('AtTheClose', () => {
       // todo I'm unable to find any instruments that support this
     })
@@ -531,6 +540,322 @@ describe('trade/orders', () => {
       })
 
       expect(placeOrderResponse).toBeDefined()
+    })
+  })
+
+  describe('placing orders for different asset types', () => {
+    // todo ensure that these are all valid asset types
+
+    test('Bond', async ({ step }) => {
+      const instruments = await app.referenceData.instruments.get({
+        AssetTypes: ['Bond'],
+        limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+      })
+
+      for (const instrument of instruments) {
+        await step(instrument.Description, async () => {
+          const [instrumentDetails] = await app.referenceData.instruments.details.get({
+            AssetTypes: ['Bond'],
+            Uics: [instrument.Identifier],
+          })
+          if (instrumentDetails === undefined) {
+            throw new Error(`Could not determine details for ${instrument.Description} (UIC=${instrument.Identifier})`)
+          }
+
+          const placeOrderResponse = await app.trade.orders.post({
+            RequestId: crypto.randomUUID(),
+
+            AssetType: 'Bond',
+            Uic: instrument.Identifier,
+            BuySell: 'Buy',
+            Amount: calculateMinimumAmount(instrumentDetails),
+            ManualOrder: false,
+            ExternalReference: crypto.randomUUID(),
+            OrderType: 'Market',
+            OrderDuration: {
+              DurationType: 'DayOrder',
+            },
+          })
+
+          expect(placeOrderResponse).toBeDefined()
+        })
+
+        await resetAccount()
+      }
+    })
+
+    test('CfdOnIndex', async ({ step }) => {
+      const instruments = await app.referenceData.instruments.get({
+        AssetTypes: ['CfdOnIndex'],
+        limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+      })
+
+      for (const instrument of instruments) {
+        await step(instrument.Description, async () => {
+          const [instrumentDetails] = await app.referenceData.instruments.details.get({
+            AssetTypes: ['CfdOnIndex'],
+            Uics: [instrument.Identifier],
+          })
+          if (instrumentDetails === undefined) {
+            throw new Error(`Could not determine details for ${instrument.Description} (UIC=${instrument.Identifier})`)
+          }
+
+          const placeOrderResponse = await app.trade.orders.post({
+            RequestId: crypto.randomUUID(),
+
+            AssetType: 'CfdOnIndex',
+            Uic: instrument.Identifier,
+            BuySell: 'Buy',
+            Amount: calculateMinimumAmount(instrumentDetails),
+            ManualOrder: false,
+            ExternalReference: crypto.randomUUID(),
+            OrderType: 'Market',
+            OrderDuration: {
+              DurationType: 'DayOrder',
+            },
+          })
+
+          expect(placeOrderResponse).toBeDefined()
+        })
+
+        await resetAccount()
+      }
+    })
+
+    test('CompanyWarrant', async ({ step }) => {
+      const instruments = await app.referenceData.instruments.get({
+        AssetTypes: ['CompanyWarrant'],
+        limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+      })
+
+      for (const instrument of instruments) {
+        await step(instrument.Description, async () => {
+          const [instrumentDetails] = await app.referenceData.instruments.details.get({
+            AssetTypes: ['CompanyWarrant'],
+            Uics: [instrument.Identifier],
+          })
+          if (instrumentDetails === undefined) {
+            throw new Error(`Could not determine details for ${instrument.Description} (UIC=${instrument.Identifier})`)
+          }
+
+          const placeOrderResponse = await app.trade.orders.post({
+            RequestId: crypto.randomUUID(),
+
+            AssetType: 'CompanyWarrant',
+            Uic: instrument.Identifier,
+            BuySell: 'Buy',
+            Amount: calculateMinimumAmount(instrumentDetails),
+            ManualOrder: false,
+            ExternalReference: crypto.randomUUID(),
+            OrderType: 'Market',
+            OrderDuration: {
+              DurationType: 'DayOrder',
+            },
+          })
+
+          expect(placeOrderResponse).toBeDefined()
+        })
+
+        await resetAccount()
+      }
+    })
+
+    test('CfdOnCompanyWarrant', () => {
+      // todo
+    })
+
+    test('Stock', async ({ step }) => {
+      const instruments = await app.referenceData.instruments.get({
+        AssetTypes: ['Stock'],
+        limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+      })
+
+      for (const instrument of instruments) {
+        await step(instrument.Description, async () => {
+          const [instrumentDetails] = await app.referenceData.instruments.details.get({
+            AssetTypes: ['Stock'],
+            Uics: [instrument.Identifier],
+          })
+          if (instrumentDetails === undefined) {
+            throw new Error(`Could not determine details for ${instrument.Description} (UIC=${instrument.Identifier})`)
+          }
+
+          const placeOrderResponse = await app.trade.orders.post({
+            RequestId: crypto.randomUUID(),
+
+            AssetType: 'Stock',
+            Uic: instrument.Identifier,
+            BuySell: 'Buy',
+            Amount: calculateMinimumAmount(instrumentDetails),
+            ManualOrder: false,
+            ExternalReference: crypto.randomUUID(),
+            OrderType: 'Market',
+            OrderDuration: {
+              DurationType: 'DayOrder',
+            },
+          })
+
+          expect(placeOrderResponse).toBeDefined()
+        })
+
+        await resetAccount()
+      }
+    })
+
+    test('CfdOnStock', async ({ step }) => {
+      const instruments = await app.referenceData.instruments.get({
+        AssetTypes: ['CfdOnStock'],
+        limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+      })
+
+      for (const instrument of instruments) {
+        await step(instrument.Description, async () => {
+          const [instrumentDetails] = await app.referenceData.instruments.details.get({
+            AssetTypes: ['CfdOnStock'],
+            Uics: [instrument.Identifier],
+          })
+          if (instrumentDetails === undefined) {
+            throw new Error(`Could not determine details for ${instrument.Description} (UIC=${instrument.Identifier})`)
+          }
+
+          const placeOrderResponse = await app.trade.orders.post({
+            RequestId: crypto.randomUUID(),
+
+            AssetType: 'CfdOnStock',
+            Uic: instrument.Identifier,
+            BuySell: 'Buy',
+            Amount: calculateMinimumAmount(instrumentDetails),
+            ManualOrder: false,
+            ExternalReference: crypto.randomUUID(),
+            OrderType: 'Market',
+            OrderDuration: {
+              DurationType: 'DayOrder',
+            },
+          })
+
+          expect(placeOrderResponse).toBeDefined()
+        })
+
+        await resetAccount()
+      }
+    })
+
+    test('StockIndexOption', () => {
+      // todo
+    })
+
+    test('StockOption', () => {
+      // todo
+    })
+
+    test.only('ContractFutures', async ({ step }) => {
+      const instruments = await app.referenceData.instruments.get({
+        AssetTypes: ['ContractFutures'],
+        limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+      })
+
+      for (const instrument of instruments) {
+        await step(instrument.Description, async () => {
+          const [instrumentDetails] = await app.referenceData.instruments.details.get({
+            AssetTypes: ['ContractFutures'],
+            Uics: [instrument.Identifier],
+          })
+          if (instrumentDetails === undefined) {
+            throw new Error(`Could not determine details for ${instrument.Description} (UIC=${instrument.Identifier})`)
+          }
+
+          const placeOrderResponse = await app.trade.orders.post({
+            RequestId: crypto.randomUUID(),
+
+            AssetType: 'ContractFutures',
+            Uic: instrument.Identifier,
+            BuySell: 'Buy',
+            Amount: calculateMinimumAmount(instrumentDetails),
+            ManualOrder: false,
+            ExternalReference: crypto.randomUUID(),
+            OrderType: 'Market',
+            OrderDuration: {
+              DurationType: 'DayOrder',
+            },
+          })
+
+          expect(placeOrderResponse).toBeDefined()
+        })
+
+        await resetAccount()
+      }
+    })
+
+    test('CfdOnFutures', () => {
+      // todo
+    })
+
+    test('Etc', () => {
+      // todo
+    })
+
+    test('CfdOnEtc', () => {
+      // todo
+    })
+
+    test('Etf', () => {
+      // todo
+    })
+
+    test('CfdOnEtf', () => {
+      // todo
+    })
+
+    test('Etn', () => {
+      // todo
+    })
+
+    test('CfdOnEtn', () => {
+      // todo
+    })
+
+    test('Fund', () => {
+      // todo
+    })
+
+    test('CfdOnFund', () => {
+      // todo
+    })
+
+    test('FuturesOption', () => {
+      // todo
+    })
+
+    test('FxForwards', () => {
+      // todo
+    })
+
+    test('FxNoTouchOption', () => {
+      // todo
+    })
+
+    test('FxOneTouchOption', () => {
+      // todo
+    })
+
+    test('FxSpot', () => {
+      // todo
+    })
+
+    test('FxSwap', () => {
+      // todo
+    })
+
+    test('FxVanillaOption', () => {
+      // todo
+    })
+
+    test('Rights', () => {
+      // todo
+    })
+
+    test('CfdOnRights', () => {
+      // todo
     })
   })
 
