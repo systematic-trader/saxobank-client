@@ -150,7 +150,6 @@ export class SaxoBankApplication implements Disposable {
       key,
       secret,
       ...settings,
-      type: 'Simulation',
     })
   }
 
@@ -519,7 +518,7 @@ export class SaxoBankApplication implements Disposable {
 }
 
 export class SaxoBankApplicationSimulation extends SaxoBankApplication {
-  constructor(settings: undefined | SaxoBankApplicationSettings = {}) {
+  constructor(settings: undefined | Omit<SaxoBankApplicationSettings, 'type'> = {}) {
     super({ ...settings, type: 'Simulation' })
   }
 
