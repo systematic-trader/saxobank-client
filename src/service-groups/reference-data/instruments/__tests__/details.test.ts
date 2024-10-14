@@ -6,24 +6,21 @@ test('reference-data/instruments/details', async ({ step }) => {
   using app = new SaxoBankApplication()
 
   for (const assetType of AssetTypeValues.toSorted()) {
-    await step({
-      name: assetType,
-      async fn() {
-        const instruments = await app.referenceData.instruments.details.get({ AssetTypes: [assetType] })
+    await step(assetType, async () => {
+      const instruments = await app.referenceData.instruments.details.get({ AssetTypes: [assetType] })
 
-        expect(instruments).toBeDefined()
+      expect(instruments).toBeDefined()
 
-        const firstInstrument = instruments[0]
+      const firstInstrument = instruments[0]
 
-        if (firstInstrument !== undefined) {
-          const instruments2 = await app.referenceData.instruments.details.get({
-            AssetTypes: [assetType],
-            Uics: [firstInstrument.Uic],
-          })
+      if (firstInstrument !== undefined) {
+        const instruments2 = await app.referenceData.instruments.details.get({
+          AssetTypes: [assetType],
+          Uics: [firstInstrument.Uic],
+        })
 
-          expect(instruments2).toBeDefined()
-        }
-      },
+        expect(instruments2).toBeDefined()
+      }
     })
   }
 })
