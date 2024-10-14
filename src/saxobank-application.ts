@@ -127,7 +127,7 @@ export class SaxoBankApplication implements Disposable {
     })
   }
 
-  static simulation(settings: undefined | SaxoBankApplicationSettings = {}): SaxoBankApplication {
+  static simulation(settings: undefined | SaxoBankApplicationSettings = {}): SaxoBankApplicationSimulation {
     const key = settings.key ?? Environment['SAXOBANK_SIMULATION_APP_KEY']
 
     if (key === undefined) {
@@ -144,7 +144,7 @@ export class SaxoBankApplication implements Disposable {
       )
     }
 
-    return new this({
+    return new SaxoBankApplicationSimulation({
       key,
       secret,
       ...settings,
@@ -183,6 +183,10 @@ export class SaxoBankApplication implements Disposable {
   #refreshRepeater: undefined | Timeout<void> = undefined
 
   readonly #httpClient: HTTPClient
+
+  get http(): HTTPClient {
+    return this.#httpClient
+  }
 
   readonly chart: Chart
   readonly clientServices: ClientServices
@@ -509,6 +513,49 @@ export class SaxoBankApplication implements Disposable {
 
   dispose(): void {
     this[Symbol.dispose]()
+  }
+}
+
+export class SaxoBankApplicationSimulation extends SaxoBankApplication {
+  constructor(settings: undefined | SaxoBankApplicationSettings = {}) {
+    super({ ...settings, type: 'Simulation' })
+  }
+
+  /**
+   * Reset the account balance to a specific value and deletes all orders and positions.
+   * @param balance The new account balance.
+   * @returns `true` if the account was reset successfully, otherwise `false` if the account was not found.
+   */
+  async resetAccount(
+    {
+      authToken = Environment['SAXOBANK_24H_AUTH_TOKEN'],
+      balance,
+    }: { readonly authToken?: undefined | string; readonly balance: number },
+  ): Promise<boolean> {
+    if (authToken === undefined) {
+      throw new Error(
+        'No SaxoBank 24h token provided. Did you forget to set the `SAXOBANK_24H_AUTH_TOKEN` environment variable?',
+      )
+    }
+
+    const [account] = await this.portfolio.accounts.me.get()
+
+    if (account === undefined) {
+      return false
+    }
+
+    const { AccountKey } = account
+
+    const url = urlJoin(this.settings.serviceURL, `port/v1/accounts/${AccountKey}/reset`)
+
+    await this.http.putOkJSON(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({ NewBalance: balance }),
+    })
+
+    return true
   }
 }
 
