@@ -27,6 +27,7 @@ import {
   InstrumentDetailsFxSpot,
   InstrumentDetailsFxSwap,
   InstrumentDetailsFxVanillaOption,
+  InstrumentDetailsMutualFund,
   InstrumentDetailsRights,
   InstrumentDetailsStock,
   InstrumentDetailsStockIndex,
@@ -226,6 +227,10 @@ function assertReturnInstrumentDetails(
 
       case 'FxVanillaOption': {
         return assertReturn(InstrumentDetailsFxVanillaOption, instrument)
+      }
+
+      case 'MutualFund': {
+        return assertReturn(InstrumentDetailsMutualFund, instrument)
       }
 
       case 'Rights': {
