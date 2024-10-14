@@ -1,5 +1,5 @@
 export { expect } from 'jsr:@std/expect'
-export { describe, test } from 'jsr:@std/testing/bdd'
+export { afterAll, afterEach, beforeAll, beforeEach, describe, test } from 'jsr:@std/testing/bdd'
 
 import { Timeout } from './timeout.ts'
 
