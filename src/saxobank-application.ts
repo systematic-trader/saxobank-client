@@ -518,8 +518,15 @@ export class SaxoBankApplication implements Disposable {
 }
 
 export class SaxoBankApplicationSimulation extends SaxoBankApplication {
+  readonly #serviceGroupClient
+
   constructor(settings: undefined | Omit<SaxoBankApplicationSettings, 'type'> = {}) {
     super({ ...settings, type: 'Simulation' })
+
+    this.#serviceGroupClient = new ServiceGroupClient({
+      client: this.http,
+      serviceURL: this.settings.serviceURL,
+    })
   }
 
   /**
@@ -560,14 +567,13 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
       accountKey = account.AccountKey
     }
 
-    const url = urlJoin(this.settings.serviceURL, `port/v1/accounts/${accountKey}/reset`)
-
-    await this.http.putOkJSON(url, {
+    await this.#serviceGroupClient.put({
+      path: `port/v1/accounts/${accountKey}/reset`,
       headers: {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ NewBalance: balance }),
+      body: { NewBalance: balance },
     })
   }
 }
