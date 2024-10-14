@@ -102,7 +102,7 @@ export interface SaxoBankApplicationSettings {
 }
 
 export class SaxoBankApplication implements Disposable {
-  static live(settings: undefined | SaxoBankApplicationSettings = {}): SaxoBankApplication {
+  static live(settings: undefined | Omit<SaxoBankApplicationSettings, 'type'> = {}): SaxoBankApplication {
     const key = settings.key ?? Environment['SAXOBANK_LIVE_APP_KEY']
 
     if (key === undefined) {
@@ -127,7 +127,9 @@ export class SaxoBankApplication implements Disposable {
     })
   }
 
-  static simulation(settings: undefined | SaxoBankApplicationSettings = {}): SaxoBankApplicationSimulation {
+  static simulation(
+    settings: undefined | Omit<SaxoBankApplicationSettings, 'type'> = {},
+  ): SaxoBankApplicationSimulation {
     const key = settings.key ?? Environment['SAXOBANK_SIMULATION_APP_KEY']
 
     if (key === undefined) {
