@@ -95,11 +95,24 @@ export class ServiceGroupClient {
       ...options.searchParams,
     }
 
+    const headers = options.headers === undefined
+      ? {
+        'content-type': 'application/json',
+      }
+      : {
+        'content-type': 'application/json',
+        ...Object.fromEntries(
+          Object.entries(options.headers).map(([key, value]) => {
+            return [key.toLowerCase(), value]
+          }),
+        ),
+      }
+
     setSearchParams(url, searchParams)
 
     return await fetchPaginatedData({
       client: this.#client,
-      headers: options.headers,
+      headers,
       url,
       guard: options.guard,
       limit: options.limit,
@@ -118,10 +131,23 @@ export class ServiceGroupClient {
   } = {}): Promise<T> {
     const url = urlJoin(this.#serviceURL, options.path)
 
+    const headers = options.headers === undefined
+      ? {
+        'content-type': 'application/json',
+      }
+      : {
+        'content-type': 'application/json',
+        ...Object.fromEntries(
+          Object.entries(options.headers).map(([key, value]) => {
+            return [key.toLowerCase(), value]
+          }),
+        ),
+      }
+
     setSearchParams(url, options.searchParams)
 
     return await this.#client.postOkJSON(url, {
-      headers: options.headers,
+      headers,
       body: JSON.stringify(options.body),
       guard: options.guard,
       coerce: sanitize,
@@ -142,8 +168,21 @@ export class ServiceGroupClient {
 
     setSearchParams(url, options.searchParams)
 
+    const headers = options.headers === undefined
+      ? {
+        'content-type': 'application/json',
+      }
+      : {
+        'content-type': 'application/json',
+        ...Object.fromEntries(
+          Object.entries(options.headers).map(([key, value]) => {
+            return [key.toLowerCase(), value]
+          }),
+        ),
+      }
+
     return await this.#client.putOkJSON(url, {
-      headers: options.headers,
+      headers,
       body: JSON.stringify(options.body),
       guard: options.guard,
       coerce: sanitize,
