@@ -1,6 +1,5 @@
-import { expect } from 'std/expect/expect.ts'
-import { afterAll, beforeEach, describe, test } from 'std/testing/bdd.ts'
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
+import { afterAll, beforeEach, describe, expect, test } from '../../../utils/testing.ts'
 import type { InfoPricesParameters } from '../info-prices.ts'
 
 // todo write tests for different order types (can probably be simple entry orders)
@@ -85,7 +84,9 @@ async function findSuiteablePrice({ app, assetType, uic }: {
 }
 
 describe('trade/orders', () => {
-  using app = SaxoBankApplication.simulation()
+  using app = new SaxoBankApplication({
+    type: 'Simulation',
+  })
 
   beforeEach(async () => {
     await resetAccount(app)
