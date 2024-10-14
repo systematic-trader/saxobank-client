@@ -538,6 +538,10 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
       )
     }
 
+    if (Number.isSafeInteger(balance) === false || balance <= 0 || balance > 10_000_000) {
+      throw new Error('The account balance must be a positive integer between 1 and 100000000')
+    }
+
     const [account] = await this.portfolio.accounts.me.get()
 
     if (account === undefined) {
