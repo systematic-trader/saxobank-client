@@ -117,7 +117,7 @@ export const InstrumentDetailsBond = props({
   OrderSetting: optional(OrderSetting),
   PriceToContractFactor: number(),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: optional(array(number())),
   SupportedOrderTypes: array(PlaceableOrderType.extract(['Limit', 'Market'])),
@@ -302,7 +302,7 @@ export const InstrumentDetailsCfdOnEtf = props({
   PriceToContractFactor: optional(number()),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   ShortTradeDisabled: optional(boolean()),
   StandardAmounts: array(number()),
@@ -376,7 +376,7 @@ export const InstrumentDetailsCfdOnEtn = props({
   PriceToContractFactor: number(),
   PrimaryListing: optional(integer()),
   RelatedInstruments: array(InstrumentKey),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   ShortTradeDisabled: boolean(),
   StandardAmounts: array(number()),
@@ -529,7 +529,7 @@ export const InstrumentDetailsCfdOnFutures = props({
   PriceToContractFactor: number(),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: optional(array(number())),
   SupportedOrderTypes: array(
@@ -557,15 +557,14 @@ export const InstrumentDetailsCfdOnFutures = props({
 
 export interface InstrumentDetailsCfdOnIndex extends GuardType<typeof InstrumentDetailsCfdOnIndex> {}
 export const InstrumentDetailsCfdOnIndex = props({
-  AssetType: literal('CfdOnIndex'),
+  AssetType: AssetType.extract(['CfdOnIndex']),
   AffiliateInfoRequired: boolean(),
   AmountDecimals: integer(),
   CurrencyCode: Currency3,
   DefaultAmount: number(),
   DefaultSlippage: number(),
-  DefaultSlippageType: DefaultSlippageType,
+  DefaultSlippageType: DefaultSlippageType.extract(['Percentage']),
   Description: string(),
-  Exchange: ExchangeSummary,
   Format: PriceDisplayFormat,
   GroupId: integer(),
   IncrementSize: number(),
@@ -577,22 +576,27 @@ export const InstrumentDetailsCfdOnIndex = props({
   IsRedemptionByAmounts: boolean(),
   IsSwitchBySameCurrency: boolean(),
   IsTradable: boolean(),
-  LotSizeType: LotSizeType,
+  LotSizeType: LotSizeType.extract(['NotUsed', 'OddLotsNotAllowed']),
   MinimumLotSize: optional(number()),
-  NonTradableReason: NonTradableReason,
+  NonTradableReason: NonTradableReason.extract(['None']),
   OrderDistances: OrderDistances,
-  OrderSetting: OrderSetting,
   PriceToContractFactor: number(),
   RelatedInstruments: array(InstrumentKey),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
-  SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
-  SupportedOrderTypes: array(PlaceableOrderType),
-  SupportedOrderTypeSettings: array(SupportedOrderTypeSetting),
+  SupportedOrderTypes: array(
+    PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+  ),
+  SupportedOrderTypeSettings: array(props({
+    DurationTypes: array(
+      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
+    ),
+    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+  })),
   Symbol: string(),
   TickSize: number(),
-  TradableAs: array(literal('CfdOnIndex')),
+  TradableAs: array(AssetType.extract(['CfdOnIndex'])),
   TradableOn: array(format('positive-integer')),
   TradingSessions: InstrumentTradeSessions,
   TradingSignals: TradingSignal,
@@ -686,7 +690,7 @@ export const InstrumentDetailsCfdOnStock = props({
   PriceToContractFactor: optional(number()),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   ShortTradeDisabled: optional(boolean()),
   StandardAmounts: array(number()),
@@ -852,7 +856,7 @@ export const InstrumentDetailsContractFutures = props({
   PriceCurrency: optional(Currency3),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
   SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
@@ -960,7 +964,7 @@ export const InstrumentDetailsEtf = props({
   PriceToContractFactor: optional(number()),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
   SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
@@ -1015,7 +1019,7 @@ export const InstrumentDetailsEtn = props({
   PriceToContractFactor: optional(number()),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
   SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
@@ -1071,7 +1075,7 @@ export const InstrumentDetailsFuturesStrategy = props({
   PriceCurrency: Currency3,
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
   StrategyType,
@@ -1462,7 +1466,7 @@ export const InstrumentDetailsStock = props({
   PriceToContractFactor: optional(number()),
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: optional(array(number())),
   SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract(['LastTraded', 'Open']))),
@@ -1549,7 +1553,7 @@ export const InstrumentDetailsStockIndex = props({
   OrderSetting: OrderSetting,
   PriceCurrency: Currency3,
   RelatedInstruments: optional(array(InstrumentKey)),
-  RelatedOptionRoots: optional(array(integer())), // Deprecated
+  RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
   SupportedOrderTypes: array(PlaceableOrderType),
