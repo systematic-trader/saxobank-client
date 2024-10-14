@@ -9,29 +9,29 @@ import {
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { AssetType } from '../derives/asset-type.ts'
-import { StringStringKeyValuePair } from '../derives/string-string-key-value-pair.ts'
+import { BuySell } from '../derives/buy-sell.ts'
+import { CalculationReliability } from '../derives/calculation-reliability.ts'
 import { CorrelationType } from '../derives/correlation-type.ts'
-import { PriceType } from '../derives/price-type.ts'
-import { InstrumentDisplayAndFormat } from '../derives/instrument-display-and-format.ts'
-import { OrderDuration } from '../derives/order-duration.ts'
-import { InstrumentExchangeDetails } from '../derives/instrument-exchange-details.ts'
 import { Greeks } from '../derives/greeks.ts'
+import { InstrumentDisplayAndFormat } from '../derives/instrument-display-and-format.ts'
+import { InstrumentExchangeDetails } from '../derives/instrument-exchange-details.ts'
 import { MarketState } from '../derives/market-state.ts'
 import { MultiLegOrderDetails } from '../derives/multi-leg-order-details.ts'
 import { NonTradableReasons } from '../derives/non-tradable-reasons.ts'
-import { OrderType } from '../derives/order-type.ts'
-import { OrderOptionsData } from '../derives/order-options-data.ts'
-import { OrderAmountType } from '../derives/order-amount-type.ts'
 import { OpenOrderRelation } from '../derives/open-order-relation.ts'
+import { OrderAmountType } from '../derives/order-amount-type.ts'
+import { OrderDuration } from '../derives/order-duration.ts'
+import { OrderOptionsData } from '../derives/order-options-data.ts'
+import { OrderStatus } from '../derives/order-status.ts'
+import { OrderTriggerPriceType } from '../derives/order-trigger-price-type.ts'
+import { OrderType } from '../derives/order-type.ts'
+import { PriceType } from '../derives/price-type.ts'
 import { RelatedOrderInfo } from '../derives/related-order-info.ts'
 import { ShortTrading } from '../derives/short-trading.ts'
 import { SleepingOrderCondition } from '../derives/sleeping-order-condition.ts'
-import { OrderStatus } from '../derives/order-status.ts'
+import { StringStringKeyValuePair } from '../derives/string-string-key-value-pair.ts'
 import { ToOpenClose } from '../derives/to-open-close.ts'
 import { TradingStatus } from '../derives/trading-status.ts'
-import { OrderTriggerPriceType } from '../derives/order-trigger-price-type.ts'
-import { BuySell } from '../derives/buy-sell.ts'
-import { CalculationReliability } from '../derives/calculation-reliability.ts'
 
 export interface OrderResponse extends GuardType<typeof OrderResponse> {}
 
@@ -43,7 +43,7 @@ export const OrderResponse = props({
   AccountKey: string(),
 
   /** Field for adviser to place relevant information. */
-  AdviceNote: string(),
+  AdviceNote: optional(string()),
 
   /** Additional order data for algorithmic orders. */
   AlgoOrderData: optional(array(StringStringKeyValuePair)),
@@ -66,10 +66,18 @@ export const OrderResponse = props({
   /** The current market bid price. */
   Bid: optional(number()),
 
-  /** Used for conditional BreakoutTrigger orders. Lower trigger price. If the instrument price falls below this level, a stop loss order will be activated. */
+  /**
+   * Used for conditional BreakoutTrigger orders.
+   * Lower trigger price.
+   * If the instrument price falls below this level, a stop loss order will be activated.
+   */
   BreakoutTriggerDownPrice: optional(number()),
 
-  /** Used for conditional BreakoutTrigger orders. Upper trigger price. If the instrument price exceeds this level, a take profit limit order will be activated. */
+  /**
+   * Used for conditional BreakoutTrigger orders.
+   * Upper trigger price.
+   * If the instrument price exceeds this level, a take profit limit order will be activated.
+   */
   BreakoutTriggerUpPrice: optional(number()),
 
   /** Indicates if the order is Buy Or Sell. */
@@ -78,7 +86,10 @@ export const OrderResponse = props({
   /** If an error was encountered this code indicates source of the calculation error. */
   CalculationReliability: CalculationReliability,
 
-  /** The monetary/cash purchase amount, only used when OrderAmountType is ValueInInstrumentCurrency. When set, ignore order Amount. */
+  /**
+   * The monetary/cash purchase amount, only used when OrderAmountType is ValueInInstrumentCurrency.
+   * When set, ignore order Amount.
+   */
   CashAmount: optional(number()),
 
   /** Unique identifier of the client. */
@@ -91,7 +102,7 @@ export const OrderResponse = props({
   ClientName: string(),
 
   /** The specific text instructions for the Trading Desk to better understand IAM users intentions for staging the order. */
-  ClientNote: string(),
+  ClientNote: optional(string()),
 
   /** The ID of the position this order was copied from */
   CopiedPositionId: optional(string()),
@@ -102,7 +113,7 @@ export const OrderResponse = props({
   /** Type of the correlation */
   CorrelationTypes: optional(array(CorrelationType)),
 
-  /** The user specific(delayed/realtime) current market price of the instrument. */
+  /** The user specific (delayed/realtime) current market price of the instrument. */
   CurrentPrice: number(),
 
   /** If set, it defines the number of minutes by which the price is delayed. */
@@ -123,7 +134,10 @@ export const OrderResponse = props({
   /** Distance to market for this order. (Dynamically updating) */
   DistanceToMarket: optional(number()),
 
-  /** The time frame during which the order is valid. If the OrderDurationType is GTD, then an ExpiryDate must also be provided. */
+  /**
+   * The time frame during which the order is valid.
+   * If the OrderDurationType is GTD, then an ExpiryDate must also be provided.
+   */
   Duration: OrderDuration,
 
   /** Information about the instrument's exchange and trading status. */
@@ -189,14 +203,19 @@ export const OrderResponse = props({
   /** The UTC date and time the order was placed */
   OrderTime: string({ format: 'date-iso8601' }),
 
-  /** Client id of the client's owner. Only set when relevant. */
+  /**
+   * Client id of the client's owner.
+   * Only set when relevant.
+   */
   OwnerId: optional(string()),
 
   /** Price at which the order is triggered. */
   Price: number(),
 
-  /** List of information about related open orders. There should be enough information that the UI can show the price of the order, and calculate distance to market. */
-  RelatedOpenOrders: array(RelatedOrderInfo),
+  /**
+   * List of information about related open orders.
+   * There should be enough information that the UI can show the price of the order, and calculate distance to market. */
+  RelatedOpenOrders: optional(array(RelatedOrderInfo)),
 
   /** Id of the related position. */
   RelatedPositionId: optional(string()),
@@ -213,10 +232,12 @@ export const OrderResponse = props({
   /** Secondary price level for StopLimit orders. */
   StopLimitPrice: optional(number()),
 
-  /** Name of 'SwitchInstrumentUic'/>. */
+  /** Name of 'SwitchInstrumentUic'. */
   SwitchInstrumentName: optional(string()),
 
-  /** Mutual funds only. When set, instructs the order is to switch (transfer) the value of a matching open position into the specified "switch" instrument (UIC). */
+  /**
+   * Mutual funds only.
+   * When set, instructs the order is to switch (transfer) the value of a matching open position into the specified "switch" instrument (UIC). */
   SwitchInstrumentUic: optional(integer()),
 
   /** Whether the position should be created to open/increase or close/decrease a position. */
