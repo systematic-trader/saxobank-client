@@ -5,18 +5,6 @@ import type { InfoPricesParameters } from '../info-prices.ts'
 // todo write tests for different order types (can probably be simple entry orders)
 // todo write some tests that result in errors (e.g. wrong side of market + wrong duration etc)
 
-async function resetAccount(app: SaxoBankApplication) {
-  const [account] = await app.portfolio.accounts.me.get()
-  if (account === undefined) {
-    throw new Error(`Could not determine account for simulation user`)
-  }
-
-  await app.portfolio.accounts.account.reset.put({
-    AccountKey: account.AccountKey,
-    NewBalance: 50000,
-  })
-}
-
 function roundPrice(price: number, tickSize: number) {
   return Math.round(price / tickSize) * tickSize
 }
@@ -88,12 +76,19 @@ describe('trade/orders', () => {
     type: 'Simulation',
   })
 
+  async function resetAccount({ balance = 50_000 }: { balance?: undefined | number } = {}) {
+    // wait a while to not run into rate limit issues // todo remove this when 429-handling is implemented
+    await new Promise((resolve) => setTimeout(resolve, 6_200))
+
+    await app.resetAccount({ balance })
+  }
+
   beforeEach(async () => {
-    await resetAccount(app)
+    await resetAccount()
   })
 
   afterAll(async () => {
-    await resetAccount(app)
+    await resetAccount()
   })
 
   describe('placing orders using different methods', () => {
@@ -503,7 +498,7 @@ describe('trade/orders', () => {
 
             expect(placeOrderResponse).toBeDefined()
 
-            await resetAccount(app)
+            await resetAccount()
           },
         )
       }
