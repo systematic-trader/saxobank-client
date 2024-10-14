@@ -525,13 +525,20 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
   /**
    * Reset the account balance to a specific value and deletes all orders and positions.
    * @param balance The new account balance.
+   * @param accountKey The account key to reset. If not provided, the account key of the authenticated account is used.
+   * @param authToken The 24h token to use for the reset. If not provided, the `SAXOBANK_24H_AUTH_TOKEN` environment variable is used.
    * @returns `true` if the account was reset successfully, otherwise `false` if the account was not found.
    */
   async resetAccount(
     {
+      accountKey,
       authToken = Environment['SAXOBANK_24H_AUTH_TOKEN'],
       balance,
-    }: { readonly authToken?: undefined | string; readonly balance: number },
+    }: {
+      readonly accountKey?: undefined | string
+      readonly authToken?: undefined | string
+      readonly balance: number
+    },
   ): Promise<boolean> {
     if (authToken === undefined) {
       throw new Error(
@@ -543,15 +550,17 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
       throw new Error('The account balance must be a positive integer between 1 and 100000000')
     }
 
-    const [account] = await this.portfolio.accounts.me.get()
+    if (accountKey === undefined) {
+      const [account] = await this.portfolio.accounts.me.get()
 
-    if (account === undefined) {
-      return false
+      if (account === undefined) {
+        return false
+      }
+
+      accountKey = account.AccountKey
     }
 
-    const { AccountKey } = account
-
-    const url = urlJoin(this.settings.serviceURL, `port/v1/accounts/${AccountKey}/reset`)
+    const url = urlJoin(this.settings.serviceURL, `port/v1/accounts/${accountKey}/reset`)
 
     await this.http.putOkJSON(url, {
       headers: {
