@@ -41,7 +41,6 @@ import { OrderSetting } from './order-setting.ts'
 import { PriceDisplayFormat } from './price-display-format.ts'
 import { RelatedOptionRoot } from './related-option-root.ts'
 import { StrategyLeg } from './strategy-leg.ts'
-import { SupportedOrderTypeSetting } from './supported-order-type-setting.ts'
 import { TickSizeScheme } from './tick-size-scheme.ts'
 
 // TODO
@@ -86,9 +85,13 @@ export const InstrumentDetailsBond = props({
   BondIndexRatio: number(),
   BondsMarginValue: number(),
   BondsReferenceRate: optional(string()),
-  BondsTypes: optional(
-    array(BondType.extract(['Convertible', 'DualCurrency', 'FloatingRateNote', 'InflationLinked', 'Perpetual'])),
-  ),
+  BondsTypes: optional(array(BondType.extract([
+    'Convertible',
+    'DualCurrency',
+    'FloatingRateNote',
+    'InflationLinked',
+    'Perpetual',
+  ]))),
   BondType: BondType.extract(['InflationLinked', 'NonInflationLinked']),
   Coupon: number(),
   CouponCurrency: optional(Currency3),
@@ -125,10 +128,21 @@ export const InstrumentDetailsBond = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: optional(array(number())),
-  SupportedOrderTypes: array(PlaceableOrderType.extract(['Limit', 'Market'])),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(OrderDurationType.extract(['DayOrder', 'FillOrKill', 'GoodTillCancel', 'GoodTillDate'])),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'FillOrKill',
+      'GoodTillCancel',
+      'GoodTillDate',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+    ]),
   })),
   Symbol: string(),
   TickSize: number(),
@@ -172,22 +186,33 @@ export const InstrumentDetailsCfdOnCompanyWarrant = props({
   MinimumTradeSize: optional(number()),
   NonTradableReason: NonTradableReason.extract(['None', 'NotOnlineClientTradable', 'ReduceOnlyInstrument']),
   OrderDistances: OrderDistances,
-  // OrderSetting: OrderSetting,
   PriceCurrency: Currency3,
   PriceToContractFactor: optional(number()),
   PrimaryListing: optional(integer()),
   RelatedInstruments: array(InstrumentKey),
   ShortTradeDisabled: optional(boolean()),
   StandardAmounts: array(number()),
-  // SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Limit', 'Market', 'StopIfTraded', 'StopLimit', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopIfTraded',
+    'StopLimit',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopIfTraded', 'StopLimit', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopIfTraded',
+      'StopLimit',
+      'TrailingStopIfTraded',
+    ]),
   })),
   SupportedStrategies: optional(array(SupportedStrategyType)),
   Symbol: string(),
@@ -237,14 +262,27 @@ export const InstrumentDetailsCfdOnEtc = props({
   RelatedInstruments: array(InstrumentKey),
   ShortTradeDisabled: boolean(),
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Limit', 'Market', 'StopIfTraded', 'StopLimit', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopIfTraded',
+    'StopLimit',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Market', 'Limit', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Market',
+      'Limit',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+    ]),
   })),
   SupportedStrategies: array(
     SupportedStrategyType.extract([
@@ -311,14 +349,27 @@ export const InstrumentDetailsCfdOnEtf = props({
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   ShortTradeDisabled: optional(boolean()),
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopLimit',
+    'StopIfTraded',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+    ]),
   })),
   SupportedStrategies: array(
     SupportedStrategyType.extract([
@@ -385,20 +436,27 @@ export const InstrumentDetailsCfdOnEtn = props({
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   ShortTradeDisabled: boolean(),
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract([
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopIfTraded',
+    'StopLimit',
+    'TrailingStopIfTraded',
+  ])),
+  SupportedOrderTypeSettings: array(props({
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
       'Limit',
       'Market',
-      'StopIfTraded',
       'StopLimit',
+      'StopIfTraded',
       'TrailingStopIfTraded',
     ]),
-  ),
-  SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
   })),
   SupportedStrategies: array(
     SupportedStrategyType.extract([
@@ -463,14 +521,27 @@ export const InstrumentDetailsCfdOnFund = props({
   RelatedInstruments: array(InstrumentKey),
   ShortTradeDisabled: boolean(),
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Market', 'Limit', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Market',
+    'Limit',
+    'StopLimit',
+    'StopIfTraded',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Market', 'Limit', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Market',
+      'Limit',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+    ]),
   })),
   SupportedStrategies: array(
     SupportedStrategyType.extract([
@@ -537,14 +608,27 @@ export const InstrumentDetailsCfdOnFutures = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: optional(array(number())),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopLimit',
+    'StopIfTraded',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+    ]),
   })),
   Symbol: string(),
   TickSize: number(),
@@ -590,14 +674,27 @@ export const InstrumentDetailsCfdOnIndex = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopLimit',
+    'StopIfTraded',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+    ]),
   })),
   Symbol: string(),
   TickSize: number(),
@@ -642,14 +739,27 @@ export const InstrumentDetailsCfdOnRights = props({
   RelatedInstruments: array(InstrumentKey),
   ShortTradeDisabled: optional(boolean()),
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopLimit',
+    'StopIfTraded',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+    ]),
   })),
   SupportedStrategies: array(
     SupportedStrategyType.extract([
@@ -718,14 +828,27 @@ export const InstrumentDetailsCfdOnStock = props({
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   ShortTradeDisabled: optional(boolean()),
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(
-    PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
-  ),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Limit',
+    'Market',
+    'StopLimit',
+    'StopIfTraded',
+    'TrailingStopIfTraded',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
-    OrderType: PlaceableOrderType.extract(['Limit', 'Market', 'StopLimit', 'StopIfTraded', 'TrailingStopIfTraded']),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+    OrderType: PlaceableOrderType.extract([
+      'Limit',
+      'Market',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+    ]),
   })),
   SupportedStrategies: optional(
     array(
@@ -794,7 +917,10 @@ export const InstrumentDetailsCompanyWarrant = props({
   PrimaryListing: optional(integer()),
   RelatedInstruments: optional(array(InstrumentKey)),
   StandardAmounts: array(number()),
-  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract(['LastTraded', 'Open']))),
+  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
+    'LastTraded',
+    'Open',
+  ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
       'Limit',
@@ -808,9 +934,12 @@ export const InstrumentDetailsCompanyWarrant = props({
     ]),
   ),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
     OrderType: PlaceableOrderType.extract([
       'Limit',
       'Market',
@@ -892,7 +1021,10 @@ export const InstrumentDetailsContractFutures = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
-  SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType.extract(['LastTraded', 'Open'])),
+  SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType.extract([
+    'LastTraded',
+    'Open',
+  ])),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
       'Limit',
@@ -906,9 +1038,11 @@ export const InstrumentDetailsContractFutures = props({
     ]),
   ),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate']),
-    ),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+    ])),
     OrderType: PlaceableOrderType.extract([
       'Limit',
       'Market',
@@ -933,7 +1067,7 @@ export const InstrumentDetailsContractFutures = props({
     ),
   ),
   Symbol: string(),
-  TickSize: number(),
+  TickSize: optional(number()),
   TradableAs: optional(array(AssetType.extract(['ContractFutures']))),
   TradableOn: optional(array(format('positive-integer'))),
   TradingSessions: InstrumentTradeSessions,
@@ -982,7 +1116,10 @@ export const InstrumentDetailsEtc = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
-  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract(['LastTraded', 'Open']))),
+  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
+    'LastTraded',
+    'Open',
+  ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
       'Limit',
@@ -996,9 +1133,12 @@ export const InstrumentDetailsEtc = props({
     ]),
   ),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
     OrderType: PlaceableOrderType.extract([
       'Limit',
       'Market',
@@ -1044,7 +1184,7 @@ export const InstrumentDetailsEtf = props({
   AssetType: AssetType.extract(['Etf']),
   AffiliateInfoRequired: boolean(),
   AmountDecimals: integer(),
-  CanParticipateIn: optional(array(enums(['SavingsPlan']))),
+  CanParticipateIn: optional(array(literal('SavingsPlan'))),
   CurrencyCode: Currency3,
   DefaultAmount: number(),
   DefaultSlippage: number(),
@@ -1085,7 +1225,10 @@ export const InstrumentDetailsEtf = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
-  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract(['LastTraded', 'Open']))),
+  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
+    'LastTraded',
+    'Open',
+  ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
       'Limit',
@@ -1099,9 +1242,13 @@ export const InstrumentDetailsEtf = props({
     ]),
   ),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'FillOrKill', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'FillOrKill',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
     OrderType: PlaceableOrderType.extract([
       'Limit',
       'Market',
@@ -1188,7 +1335,10 @@ export const InstrumentDetailsEtn = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
-  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract(['LastTraded', 'Open']))),
+  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
+    'LastTraded',
+    'Open',
+  ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
       'Limit',
@@ -1202,9 +1352,13 @@ export const InstrumentDetailsEtn = props({
     ]),
   ),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'FillOrKill', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'FillOrKill',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
     OrderType: PlaceableOrderType.extract([
       'Limit',
       'Market',
@@ -1237,7 +1391,7 @@ export const InstrumentDetailsEtn = props({
   Symbol: string(),
   TickSize: optional(number()),
   TickSizeScheme: optional(TickSizeScheme),
-  TradableAs: optional(array(literal('Etn'))),
+  TradableAs: optional(array(AssetType.extract(['Etn']))),
   TradableOn: array(format('positive-integer')),
   TradingSessions: InstrumentTradeSessions,
   TradingSignals: TradingSignal,
@@ -1289,8 +1443,34 @@ export const InstrumentDetailsFund = props({
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
   SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType)),
-  SupportedOrderTypes: array(PlaceableOrderType),
-  SupportedOrderTypeSettings: array(SupportedOrderTypeSetting),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Market',
+    'TriggerBreakout',
+    'TriggerStop',
+    'TriggerLimit',
+    'StopLimit',
+    'StopIfTraded',
+    'TrailingStopIfTraded',
+    'Limit',
+  ])),
+  SupportedOrderTypeSettings: array(props({
+    OrderType: PlaceableOrderType.extract([
+      'Market',
+      'TriggerBreakout',
+      'TriggerStop',
+      'TriggerLimit',
+      'StopLimit',
+      'StopIfTraded',
+      'TrailingStopIfTraded',
+      'Limit',
+    ]),
+    DurationTypes: array(OrderDurationType.extract([
+      'GoodTillCancel',
+      'DayOrder',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
+  })),
   SupportedStrategies: optional(array(SupportedStrategyType.extract([
     'Iceberg',
     'VWAP',
@@ -1350,7 +1530,6 @@ export const InstrumentDetailsFuturesStrategy = props({
   NonTradableReason: NonTradableReason,
   NoticeDate: optional(format('gregorian-date')),
   OrderDistances: OrderDistances,
-  // OrderSetting: OrderSetting,
   PriceToContractFactor: number(),
   PriceCurrency: Currency3,
   PrimaryListing: integer(),
@@ -1359,9 +1538,21 @@ export const InstrumentDetailsFuturesStrategy = props({
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: array(number()),
   StrategyType,
-  // SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType),
-  SupportedOrderTypes: array(PlaceableOrderType),
-  SupportedOrderTypeSettings: array(SupportedOrderTypeSetting),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Market',
+    'Limit',
+  ])),
+  SupportedOrderTypeSettings: array(props({
+    OrderType: PlaceableOrderType.extract([
+      'Market',
+      'Limit',
+    ]),
+    DurationTypes: array(OrderDurationType.extract([
+      'GoodTillCancel',
+      'DayOrder',
+      'GoodTillDate',
+    ])),
+  })),
   Symbol: string(),
   TickSize: number(),
   TradableAs: optional(array(AssetType.extract(['FuturesStrategy']))),
@@ -1404,8 +1595,20 @@ export const InstrumentDetailsFxForwards = props({
   NonTradableReason: NonTradableReason,
   OrderDistances: OrderDistances,
   StandardAmounts: array(number()),
-  SupportedOrderTypes: array(PlaceableOrderType),
-  SupportedOrderTypeSettings: array(SupportedOrderTypeSetting),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Market',
+    'Limit',
+  ])),
+  SupportedOrderTypeSettings: array(props({
+    OrderType: PlaceableOrderType.extract([
+      'Market',
+      'Limit',
+    ]),
+    DurationTypes: array(OrderDurationType.extract([
+      'ImmediateOrCancel',
+      'DayOrder',
+    ])),
+  })),
   Symbol: string(),
   TickSize: number(),
   TickSizeLimitOrder: number(),
@@ -1655,22 +1858,22 @@ export const InstrumentDetailsFxVanillaOption = props({
   StandardAmounts: array(number()),
   Symbol: string(),
   TickSize: number(),
-  TradableAs: array(enums(['FxVanillaOption', 'FxSpot', 'FxForwards', 'FxSwap'])),
+  TradableAs: array(AssetType.extract(['FxVanillaOption', 'FxSpot', 'FxForwards', 'FxSwap'])),
   TradableOn: array(format('positive-integer')),
   TradingSessions: InstrumentTradeSessions,
   TradingSignals: TradingSignal,
   TradingStatus: TradingStatus,
   Uic: integer(),
-  UnderlyingAssetType: literal('FxSpot'),
+  UnderlyingAssetType: AssetType.extract(['FxSpot']),
   UnderlyingTypeCategory: UnderlyingTypeCategory,
   UnderlyingUic: integer(),
 })
 
 export interface InstrumentDetailsMutualFund extends GuardType<typeof InstrumentDetailsMutualFund> {}
 export const InstrumentDetailsMutualFund = props({
+  AssetType: literal('MutualFund'),
   AdditionalMinimumTradeSize: number(),
   AdditionalMinimumTradeUnits: integer(),
-  AssetType: literal('MutualFund'),
   AffiliateInfoRequired: boolean(),
   AmountDecimals: integer(),
   CurrencyCode: Currency3,
@@ -1875,7 +2078,10 @@ export const InstrumentDetailsStock = props({
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
   StandardAmounts: optional(array(number())),
-  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract(['LastTraded', 'Open']))),
+  SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
+    'LastTraded',
+    'Open',
+  ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
       'Limit',
@@ -1889,9 +2095,12 @@ export const InstrumentDetailsStock = props({
     ]),
   ),
   SupportedOrderTypeSettings: array(props({
-    DurationTypes: array(
-      OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate', 'ImmediateOrCancel']),
-    ),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+      'ImmediateOrCancel',
+    ])),
     OrderType: PlaceableOrderType.extract([
       'Limit',
       'Market',
@@ -1956,21 +2165,36 @@ export const InstrumentDetailsStockIndex = props({
   LotSizeType: LotSizeType,
   MinimumLotSize: optional(number()),
   NonTradableReason: NonTradableReason,
-  // OrderSetting: OrderSetting,
   PriceCurrency: Currency3,
   RelatedInstruments: optional(array(InstrumentKey)),
   RelatedOptionRoots: optional(array(integer())),
   RelatedOptionRootsEnhanced: optional(array(RelatedOptionRoot)),
-  SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType.extract(['LastTraded', 'Open'])),
-  SupportedOrderTypes: array(PlaceableOrderType.extract(['Market', 'TriggerBreakout', 'TriggerStop', 'TriggerLimit'])),
+  SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType.extract([
+    'LastTraded',
+    'Open',
+  ])),
+  SupportedOrderTypes: array(PlaceableOrderType.extract([
+    'Market',
+    'TriggerBreakout',
+    'TriggerStop',
+    'TriggerLimit',
+  ])),
   SupportedOrderTypeSettings: array(props({
-    OrderType: PlaceableOrderType.extract(['Market', 'TriggerBreakout', 'TriggerStop', 'TriggerLimit']),
-    DurationTypes: array(OrderDurationType.extract(['DayOrder', 'GoodTillCancel', 'GoodTillDate'])),
+    OrderType: PlaceableOrderType.extract([
+      'Market',
+      'TriggerBreakout',
+      'TriggerStop',
+      'TriggerLimit',
+    ]),
+    DurationTypes: array(OrderDurationType.extract([
+      'DayOrder',
+      'GoodTillCancel',
+      'GoodTillDate',
+    ])),
   })),
   Symbol: string(),
   TickSize: optional(number()),
   TickSizeScheme: optional(TickSizeScheme),
-  // TradableOn: array(format('positive-integer')),
   TradingSessions: InstrumentTradeSessions,
   TradingSignals: TradingSignal,
   TradingStatus: TradingStatus,
