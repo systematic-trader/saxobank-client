@@ -541,13 +541,20 @@ describe('trade/orders', () => {
         throw new Error(`Could not determine account for simulation user`)
       }
 
+      const price = await findSuiteablePrice({
+        app,
+        assetType: 'FxSpot',
+        uic: 21,
+      })
+
       const placeOrderResponse = await app.trade.orders.post({
         ManualOrder: false,
         AssetType: 'FxSpot',
         Uic: 21,
         BuySell: 'Buy',
         Amount: 50_000,
-        OrderType: 'Market',
+        OrderType: 'Limit',
+        OrderPrice: price.adjust('bid', -200),
         OrderDuration: {
           DurationType: 'DayOrder',
         },
