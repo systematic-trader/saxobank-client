@@ -90,9 +90,6 @@ describe('trade/orders', () => {
     // Some bonds are quite expensive, so we need to set a high balance to be able to place those orders
     balance = 10_000_000,
   }: { balance?: undefined | number } = {}) {
-    // wait a while to not run into rate limit issues // todo remove this when 429-handling is implemented
-    await new Promise((resolve) => setTimeout(resolve, 6_200))
-
     await app.resetAccount({ balance })
   }
 
@@ -748,7 +745,7 @@ describe('trade/orders', () => {
       // todo
     })
 
-    test.only('ContractFutures', async ({ step }) => {
+    test('ContractFutures', async ({ step }) => {
       const instruments = await app.referenceData.instruments.get({
         AssetTypes: ['ContractFutures'],
         limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
