@@ -551,6 +551,7 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
     await this.http.putOkJSON(url, {
       headers: {
         Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ NewBalance: balance }),
     })
