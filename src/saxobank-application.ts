@@ -527,7 +527,7 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
    * @param balance The new account balance.
    * @param accountKey The account key to reset. If not provided, the account key of the authenticated account is used.
    * @param authToken The 24h token to use for the reset. If not provided, the `SAXOBANK_24H_AUTH_TOKEN` environment variable is used.
-   * @returns `true` if the account was reset successfully, otherwise `false` if the account was not found.
+   * @returns A promise that resolves when the account has been reset.
    */
   async resetAccount(
     {
@@ -539,7 +539,7 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
       readonly authToken?: undefined | string
       readonly balance: number
     },
-  ): Promise<boolean> {
+  ): Promise<void> {
     if (authToken === undefined) {
       throw new Error(
         'No SaxoBank 24h token provided. Did you forget to set the `SAXOBANK_24H_AUTH_TOKEN` environment variable?',
@@ -554,7 +554,7 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
       const [account] = await this.portfolio.accounts.me.get()
 
       if (account === undefined) {
-        return false
+        throw new Error('No account found for the authenticated user')
       }
 
       accountKey = account.AccountKey
@@ -569,8 +569,6 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
       },
       body: JSON.stringify({ NewBalance: balance }),
     })
-
-    return true
   }
 }
 
