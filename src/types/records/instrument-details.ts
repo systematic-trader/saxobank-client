@@ -920,6 +920,7 @@ export const InstrumentDetailsCompanyWarrant = props({
   SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
     'LastTraded',
     'Open',
+    'Close',
   ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
@@ -1024,6 +1025,7 @@ export const InstrumentDetailsContractFutures = props({
   SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType.extract([
     'LastTraded',
     'Open',
+    'Close',
   ])),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
@@ -1119,6 +1121,7 @@ export const InstrumentDetailsEtc = props({
   SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
     'LastTraded',
     'Open',
+    'Close',
   ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
@@ -1228,6 +1231,7 @@ export const InstrumentDetailsEtf = props({
   SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
     'LastTraded',
     'Open',
+    'Close',
   ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
@@ -1338,6 +1342,7 @@ export const InstrumentDetailsEtn = props({
   SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
     'LastTraded',
     'Open',
+    'Close',
   ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
@@ -1859,7 +1864,7 @@ export const InstrumentDetailsFxVanillaOption = props({
   Symbol: string(),
   TickSize: number(),
   TradableAs: array(AssetType.extract(['FxVanillaOption', 'FxSpot', 'FxForwards', 'FxSwap'])),
-  TradableOn: array(format('positive-integer')),
+  TradableOn: optional(array(format('positive-integer'))),
   TradingSessions: InstrumentTradeSessions,
   TradingSignals: TradingSignal,
   TradingStatus: TradingStatus,
@@ -2081,6 +2086,7 @@ export const InstrumentDetailsStock = props({
   SupportedOrderTriggerPriceTypes: optional(array(OrderTriggerPriceType.extract([
     'LastTraded',
     'Open',
+    'Close',
   ]))),
   SupportedOrderTypes: array(
     PlaceableOrderType.extract([
@@ -2172,6 +2178,7 @@ export const InstrumentDetailsStockIndex = props({
   SupportedOrderTriggerPriceTypes: array(OrderTriggerPriceType.extract([
     'LastTraded',
     'Open',
+    'Close',
   ])),
   SupportedOrderTypes: array(PlaceableOrderType.extract([
     'Market',
