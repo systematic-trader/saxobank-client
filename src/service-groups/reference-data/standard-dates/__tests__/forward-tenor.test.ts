@@ -1,18 +1,36 @@
+import { expect } from 'std/expect/expect.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
-import { expect, test } from '../../../../testing.ts'
+import { test } from '../../../../testing.ts'
 
-test('reference-data/standard-dates/forward-tenor', async () => {
-  const saxobankApp = new SaxoBankApplication()
+test('reference-data/standard-dates/forward-tenor', async ({ step }) => {
+  using app = new SaxoBankApplication()
 
-  const [account] = await saxobankApp.portfolio.accounts.me.get()
+  const [account] = await app.portfolio.accounts.me.get()
   if (account === undefined) {
     throw new Error('No account found')
   }
 
-  const forwardTenor = await saxobankApp.referenceData.standarddates.forwardTenor.get({
-    AccountKey: account.AccountKey,
-    Uic: 22041762,
+  const instruments = await app.referenceData.instruments.get({
+    AssetTypes: ['FxSpot'],
+    limit: 25,
   })
 
-  expect(forwardTenor).toBeDefined()
+  const sortedByUic = instruments.toSorted((left, right) => left.Identifier - right.Identifier)
+
+  let count = 0
+
+  for (const instrument of sortedByUic) {
+    await step({
+      name:
+        `${++count} / ${instruments.length}: Uic=${instrument.Identifier} Symbol=${instrument.Symbol}, ${instrument.Description}`,
+      async fn() {
+        const dates = await app.referenceData.standarddates.forwardTenor.get({
+          AccountKey: account.AccountKey,
+          Uic: instrument.Identifier,
+        })
+
+        expect(dates.length > 0).toBe(true)
+      },
+    })
+  }
 })

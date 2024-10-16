@@ -8,7 +8,7 @@ import {
   unknown,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { type HTTPClient, HTTPClientError, type HTTPClientOnErrorHandler } from './http-client.ts'
-import { ensureError, type JSONReadonlyObject, Timeout, urlJoin } from './utils.ts'
+import { ensureError, type JSONReadonlyRecord, Timeout, urlJoin } from './utils.ts'
 
 type SearchParamsRecord = Record<string, undefined | boolean | number | string | ReadonlyArray<number | string>>
 
@@ -125,7 +125,7 @@ export class ServiceGroupClient {
     readonly path?: undefined | string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?: undefined | SearchParamsRecord
-    readonly body?: JSONReadonlyObject
+    readonly body?: JSONReadonlyRecord
     readonly guard?: undefined | Guard<T>
     readonly timeout?: undefined | number
   } = {}): Promise<T> {
@@ -160,7 +160,7 @@ export class ServiceGroupClient {
     readonly path?: undefined | string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?: undefined | SearchParamsRecord
-    readonly body?: JSONReadonlyObject
+    readonly body?: JSONReadonlyRecord
     readonly guard?: undefined | Guard<T>
     readonly timeout?: undefined | number
   } = {}): Promise<T> {
@@ -485,7 +485,9 @@ function sanitize(value: unknown): unknown {
 
       let hasDefinedProperty = false
 
-      for (const propertyKey in record) {
+      const propertyKeys = Object.keys(record).sort()
+
+      for (const propertyKey of propertyKeys) {
         const propertyValue = record[propertyKey]
 
         const sanitizedValue = sanitize(propertyValue)

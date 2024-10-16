@@ -322,14 +322,14 @@ export function mergeAbortSignals(
 }
 
 export type JSONType =
-  | JSONPrimitiveType
+  | JSONPrimitive
   | JSONArray
   | JSONReadonlyArray
-  | JSONObject
-  | JSONReadonlyObject
+  | JSONRecord
+  | JSONReadonlyRecord
 
-export type JSONPrimitiveType = null | undefined | boolean | number | string
+export type JSONPrimitive = null | undefined | boolean | number | string
 export interface JSONArray extends Array<JSONType> {}
 export interface JSONReadonlyArray extends ReadonlyArray<JSONType> {}
-export type JSONObject = { [key: string]: JSONType }
-export type JSONReadonlyObject = { readonly [key: string]: JSONType }
+export type JSONRecord = { [key: string]: JSONType }
+export type JSONReadonlyRecord = { readonly [key: string]: JSONType }

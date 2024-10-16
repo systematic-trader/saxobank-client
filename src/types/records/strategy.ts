@@ -2,6 +2,7 @@ import {
   array,
   type GuardType,
   number,
+  optional,
   props,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
@@ -16,7 +17,7 @@ export const Strategy = props({
   Description: string(),
   MinAmountUSD: number(),
   Name: string(),
-  Parameters: array(StrategyParameter),
+  Parameters: optional(array(StrategyParameter)),
   SupportedDurationTypes: array(DurationType),
   SupportedOrderTypes: array(OrderType),
   TradableInstrumentTypes: array(AssetType),

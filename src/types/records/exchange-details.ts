@@ -23,7 +23,7 @@ export const ExchangeDetails = props({
   /** The unique ID of the exchange. */
   ExchangeId: string(),
   /** The exchange start and end times in UTC. */
-  ExchangeSessions: array(ExchangeSession),
+  ExchangeSessions: optional(array(ExchangeSession)),
   /** ISO 10383 Market Identifier Code. A single operating exchange (see `OperatingMIC`) can have one or more individual (sub)markets. */
   IsoMic: optional(string()),
   /** Market Identifier Code used by Saxo to identify a specific market, which can be different from `IsoMic` and is used in instrument symbols and as price source fields. */
@@ -37,7 +37,7 @@ export const ExchangeDetails = props({
   /** The exchange's time zone. */
   TimeZone: integer(),
   /** The exchange's time zone abbreviation. */
-  TimeZoneAbbreviation: string(),
+  TimeZoneAbbreviation: optional(string()),
   /** Exchange's TimeZone */
   TimeZoneId: optional(string()),
   /** The time zone offset from UTC. */

@@ -8,15 +8,15 @@ import {
   props,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
+import { AccountBenchmarkInstrument } from '../derives/account-benchmark-instrument.ts'
 import { AccountSubType } from '../derives/account-sub-type.ts'
 import { AccountType } from '../derives/account-type.ts'
-import { AccountBenchmarkInstrument } from '../derives/account-benchmark-instrument.ts'
+import { AssetType } from '../derives/asset-type.ts'
 import { Currency3 } from '../derives/currency.ts'
 import { DividendReinvestmentConfiguration } from '../derives/dividend-reinvestment-configuration.ts'
-import { AssetType } from '../derives/asset-type.ts'
 import { ManagementType } from '../derives/management-type.ts'
-import { PortfolioMarginMethod } from '../derives/portfolio-margin-method.ts'
 import { MarginLendingEnabled } from '../derives/margin-lending-enabled.ts'
+import { PortfolioMarginMethod } from '../derives/portfolio-margin-method.ts'
 
 export const AccountResponse = props({
   /** Unique ID of the account group used for selection */
@@ -86,7 +86,7 @@ export const AccountResponse = props({
   FractionalOrderEnabled: boolean(),
 
   /* Not documented */
-  FractionalOrderEnabledAssetTypes: array(AssetType),
+  FractionalOrderEnabledAssetTypes: optional(array(AssetType)),
 
   /** Indicates that the margin exposure is calculated for this account only, without cross margining to other accounts within the same account group. */
   IndividualMargining: boolean(),

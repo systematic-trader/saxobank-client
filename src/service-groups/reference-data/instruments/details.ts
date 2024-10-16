@@ -45,7 +45,7 @@ export class InstrumentsDetails {
 
   async get<T extends AssetType>(options: {
     readonly AssetTypes: readonly [T, ...ReadonlyArray<T>]
-    readonly Uics?: undefined | readonly number[]
+    readonly Uics?: undefined | ReadonlyArray<number | string>
     readonly AccountKey?: undefined | string
     readonly Tags?: undefined | ReadonlyArray<string>
     readonly limit?: undefined | number
@@ -70,7 +70,7 @@ export class InstrumentsDetails {
   async get(
     options?: undefined | {
       readonly AssetTypes?: undefined | ReadonlyArray<AssetType>
-      readonly Uics?: undefined | readonly number[]
+      readonly Uics?: undefined | ReadonlyArray<number | string>
       readonly AccountKey?: undefined | string
       readonly Tags?: undefined | ReadonlyArray<string>
       readonly limit?: undefined | number
