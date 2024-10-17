@@ -139,7 +139,15 @@ describe('trade/orders', () => {
     // Some bonds are quite expensive, so we need to set a high balance to be able to place those orders
     balance = 10_000_000,
   }: { balance?: undefined | number } = {}) {
-    await app.resetAccount({ balance })
+    const [account] = await app.portfolio.accounts.me.get()
+    if (account === undefined) {
+      throw new Error(`Could not determine client for simulation user`)
+    }
+
+    await app.portfolio.accounts.account.reset.put({
+      AccountKey: account.AccountKey,
+      NewBalance: balance,
+    })
   }
 
   beforeEach(resetAccount)
