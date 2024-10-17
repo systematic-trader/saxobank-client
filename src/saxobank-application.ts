@@ -533,26 +533,17 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
    * Reset the account balance to a specific value and deletes all orders and positions.
    * @param balance The new account balance.
    * @param accountKey The account key to reset. If not provided, the account key of the authenticated account is used.
-   * @param authToken The 24h token to use for the reset. If not provided, the `SAXOBANK_24H_AUTH_TOKEN` environment variable is used.
    * @returns A promise that resolves when the account has been reset.
    */
   async resetAccount(
     {
       accountKey,
-      authToken = Environment['SAXOBANK_24H_AUTH_TOKEN'],
       balance,
     }: {
       readonly accountKey?: undefined | string
-      readonly authToken?: undefined | string
       readonly balance: number
     },
   ): Promise<void> {
-    if (authToken === undefined) {
-      throw new Error(
-        'No SaxoBank 24h token provided. Did you forget to set the `SAXOBANK_24H_AUTH_TOKEN` environment variable?',
-      )
-    }
-
     if (Number.isSafeInteger(balance) === false || balance <= 0 || balance > 10_000_000) {
       throw new Error('The account balance must be a positive integer between 1 and 100000000')
     }
@@ -570,7 +561,6 @@ export class SaxoBankApplicationSimulation extends SaxoBankApplication {
     await this.#serviceGroupClient.put({
       path: `port/v1/accounts/${accountKey}/reset`,
       headers: {
-        Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
       },
       body: { NewBalance: balance },
