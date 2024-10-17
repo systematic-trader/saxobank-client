@@ -8,18 +8,25 @@ export class Reset {
   }
 
   /**
-   * Resets a trial account.
-   * Cannot be used in live environment.
+   * Reset the account balance to a specific value and deletes all orders and positions.
+   * @param NewBalance The new account balance.
+   * @param AccountKey The account key to reset.
+   * @returns A promise that resolves when the account has been reset.
    */
-  async put({ AccountKey, NewBalance }: {
+  async put({
+    AccountKey,
+    NewBalance,
+  }: {
     readonly AccountKey: string
     readonly NewBalance: number
   }): Promise<void> {
+    if (Number.isSafeInteger(NewBalance) === false || NewBalance <= 0 || NewBalance > 10_000_000) {
+      throw new Error('The account newBalance must be a positive integer between 1 and 100000000')
+    }
+
     return await this.#client.put({
-      body: {
-        NewBalance,
-      },
-      path: [AccountKey, 'reset'].join('/'),
+      path: `${AccountKey}/reset`,
+      body: { NewBalance: NewBalance },
     })
   }
 }
