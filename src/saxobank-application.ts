@@ -129,7 +129,7 @@ export class SaxoBankApplication implements Disposable {
 
   static simulation(
     settings: undefined | Omit<SaxoBankApplicationSettings, 'type'> = {},
-  ): SaxoBankApplicationSimulation {
+  ): SaxoBankApplication {
     const key = settings.key ?? Environment['SAXOBANK_SIMULATION_APP_KEY']
 
     if (key === undefined) {
@@ -146,10 +146,11 @@ export class SaxoBankApplication implements Disposable {
       )
     }
 
-    return new SaxoBankApplicationSimulation({
+    return new SaxoBankApplication({
       key,
       secret,
       ...settings,
+      type: 'Simulation',
     })
   }
 
@@ -514,57 +515,6 @@ export class SaxoBankApplication implements Disposable {
 
   dispose(): void {
     this[Symbol.dispose]()
-  }
-}
-
-export class SaxoBankApplicationSimulation extends SaxoBankApplication {
-  readonly #serviceGroupClient
-
-  constructor(settings: undefined | Omit<SaxoBankApplicationSettings, 'type'> = {}) {
-    super({ ...settings, type: 'Simulation' })
-
-    this.#serviceGroupClient = new ServiceGroupClient({
-      client: this.http,
-      serviceURL: this.settings.serviceURL,
-    })
-  }
-
-  /**
-   * Reset the account balance to a specific value and deletes all orders and positions.
-   * @param balance The new account balance.
-   * @param accountKey The account key to reset. If not provided, the account key of the authenticated account is used.
-   * @returns A promise that resolves when the account has been reset.
-   */
-  async resetAccount(
-    {
-      accountKey,
-      balance,
-    }: {
-      readonly accountKey?: undefined | string
-      readonly balance: number
-    },
-  ): Promise<void> {
-    if (Number.isSafeInteger(balance) === false || balance <= 0 || balance > 10_000_000) {
-      throw new Error('The account balance must be a positive integer between 1 and 100000000')
-    }
-
-    if (accountKey === undefined) {
-      const [account] = await this.portfolio.accounts.me.get()
-
-      if (account === undefined) {
-        throw new Error('No account found for the authenticated user')
-      }
-
-      accountKey = account.AccountKey
-    }
-
-    await this.#serviceGroupClient.put({
-      path: `port/v1/accounts/${accountKey}/reset`,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: { NewBalance: balance },
-    })
   }
 }
 
