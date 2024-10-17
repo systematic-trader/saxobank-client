@@ -75,14 +75,52 @@ type OrderParametersByOrderType = {
   readonly TrailingStopDistanceToMarket: number
 }
 
+type OrderParametersByAssetType =
+  | {
+    readonly AssetType: Extract<
+      AssetType,
+      | 'Bond'
+      | 'CfdOnIndex'
+      | 'CompanyWarrant'
+      | 'CfdOnCompanyWarrant'
+      | 'Stock'
+      | 'CfdOnStock'
+      | 'StockIndexOption'
+      | 'StockOption'
+      | 'ContractFutures'
+      | 'CfdOnFutures'
+      | 'Etc'
+      | 'CfdOnEtc'
+      | 'Etf'
+      | 'CfdOnEtf'
+      | 'Etn'
+      | 'CfdOnEtn'
+      | 'Fund'
+      | 'CfdOnFund'
+      | 'FuturesOption'
+      | 'FxNoTouchOption'
+      | 'FxOneTouchOption'
+      | 'FxSpot'
+      | 'FxSwap'
+      | 'FxVanillaOption'
+      | 'Rights'
+      | 'CfdOnRights'
+    >
+    readonly OrderDuration: OrderDuration
+  }
+  | {
+    readonly AssetType: Extract<AssetType, 'FxForwards'>
+    readonly ForwardDate: string // iso 8601 date
+    readonly OrderDuration: OrderDuration & { readonly DurationType: 'ImmediateOrCancel' }
+  }
+
 type PlaceOrderParametersBase =
+  & OrderParametersByAssetType
   & {
-    readonly AssetType: AssetType // todo asset type should be a discriminated union type
     readonly Uic: number
     readonly BuySell: BuySell
     readonly Amount: number
     readonly ManualOrder: boolean
-    readonly OrderDuration: OrderDuration
     readonly ExternalReference: string
 
     readonly AccountKey?: string
