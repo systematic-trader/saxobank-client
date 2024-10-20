@@ -10,9 +10,9 @@ import {
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { type HTTPClient, HTTPClientError, HTTPClientRequestAbortError } from './http-client.ts'
-import { Timeout, urlJoin } from './utils.ts'
+import { urlJoin } from './utils.ts'
 
-interface SaxoBankApplicationOAuthSession {
+interface OAuthSession {
   readonly accessToken: string
   readonly accessTokenExpiresAt: number
   readonly refreshToken: string
@@ -28,7 +28,6 @@ export interface OpenAuthenticationSettings {
     readonly hostname: string
     readonly port: number
   }
-  readonly refreshTokenTimeout?: undefined | number
   readonly storedSessionPath?: undefined | string
   readonly authorize: {
     handle(authorizationURL: URL): void | Promise<void>
@@ -36,94 +35,89 @@ export interface OpenAuthenticationSettings {
   }
 }
 
-export class OpenAuthentication implements Disposable {
+export class OpenAuthentication {
   readonly #httpClient: HTTPClient
-  #refreshRepeater: undefined | Timeout<void>
-
-  #session: Promise<undefined | SaxoBankApplicationOAuthSession>
   readonly settings: OpenAuthenticationSettings
+
+  #session: undefined | Promise<undefined | OAuthSession> = undefined
 
   constructor(client: HTTPClient, settings: OpenAuthenticationSettings) {
     this.#httpClient = client
     this.settings = settings
+  }
 
-    if (this.settings.storedSessionPath === undefined) {
-      this.#session = Promise.resolve(undefined)
-    } else {
-      this.#session = readSessionsFile(this.settings.storedSessionPath, this.settings.key).then(
-        (session) => {
-          if (session === undefined) {
-            return undefined
-          }
+  #preloadSession(): void {
+    if (this.#session === undefined) {
+      if (this.settings.storedSessionPath === undefined) {
+        this.#session = Promise.resolve(undefined)
+      } else {
+        this.#session = readSessionsFile(this.settings.storedSessionPath, this.settings.key).then(
+          (session) => {
+            if (session === undefined) {
+              return undefined
+            }
 
-          const now = Date.now()
+            const now = Date.now()
 
-          if (now >= session.refreshTokenExpiresAt) {
-            return undefined
-          }
+            if (now >= session.refreshTokenExpiresAt) {
+              return undefined
+            }
 
-          return session
-        },
-      )
-    }
-
-    if (this.settings.refreshTokenTimeout !== undefined /*&& Math.random() < -1*/) {
-      this.#refreshRepeater = Timeout.repeat(this.settings.refreshTokenTimeout, this.#refreshToken.bind(this))
+            return session
+          },
+        )
+      }
     }
   }
 
-  async #refreshToken(signal: AbortSignal): Promise<void> {
-    try {
-      if (signal.aborted === true) {
-        return
-      }
-
-      const currentSession = await this.#session
-
-      if (currentSession === undefined) {
-        return
-      }
-
-      if ((signal.aborted as boolean) === true) {
-        return
-      }
-
-      if (Date.now() > currentSession.refreshTokenExpiresAt) {
-        return
-      }
-
-      const tokenURL = urlJoin(this.settings.authenticationURL, 'token')
-
-      tokenURL.searchParams.set('grant_type', 'refresh_token')
-      tokenURL.searchParams.set('refresh_token', currentSession.refreshToken)
-
-      const refreshedSession = await requestAuthenticationToken({
-        client: this.#httpClient,
-        tokenURL,
-        settings: this.settings,
-        signal,
-      })
-
-      if (refreshedSession === undefined) {
-        return
-      }
-
-      if (this.settings.storedSessionPath !== undefined) {
-        await writeToSessionsFile(this.settings.storedSessionPath, this.settings.key, refreshedSession)
-      }
-
-      if ((signal.aborted as boolean) === true) {
-        return
-      }
-
-      this.#session = this.#session.then(() => refreshedSession)
-    } catch (error) {
-      this.#refreshRepeater?.abort(error)
+  async refresh(signal?: undefined | AbortSignal): Promise<boolean> {
+    if (signal?.aborted === true) {
+      return false
     }
-  }
 
-  [Symbol.dispose](): void {
-    this.dispose()
+    this.#preloadSession()
+
+    const currentSession = await this.#session
+
+    if (currentSession === undefined) {
+      return false
+    }
+
+    if ((signal?.aborted as undefined | boolean) === true) {
+      return false
+    }
+
+    if (Date.now() > currentSession.refreshTokenExpiresAt) {
+      return false
+    }
+
+    const tokenURL = urlJoin(this.settings.authenticationURL, 'token')
+
+    tokenURL.searchParams.set('grant_type', 'refresh_token')
+    tokenURL.searchParams.set('refresh_token', currentSession.refreshToken)
+
+    const refreshedSession = await requestAuthenticationToken({
+      client: this.#httpClient,
+      tokenURL,
+      settings: this.settings,
+      signal,
+    })
+
+    if (refreshedSession === undefined) {
+      return false
+    }
+
+    if (this.settings.storedSessionPath !== undefined) {
+      await writeToSessionsFile(this.settings.storedSessionPath, this.settings.key, refreshedSession)
+    }
+
+    if ((signal?.aborted as undefined | boolean) === true) {
+      return false
+    }
+
+    this.#session = this.#session!.then(() => refreshedSession)
+
+    return true
   }
 
   async authorize(signal?: undefined | AbortSignal): Promise<boolean> {
@@ -209,7 +203,7 @@ export class OpenAuthentication implements Disposable {
     await this.settings.authorize.handle(authorizationURL)
 
     if ((signal?.aborted as undefined | boolean) === true) {
-      this.#session = this.#session.then(() => undefined)
+      this.#session = this.#session === undefined ? Promise.resolve(undefined) : this.#session.then(() => undefined)
 
       return false
     }
@@ -217,7 +211,7 @@ export class OpenAuthentication implements Disposable {
     const session = await handshakePromise
 
     if (session === undefined || (signal?.aborted as undefined | boolean) === true) {
-      this.#session = this.#session.then(() => undefined)
+      this.#session = this.#session === undefined ? Promise.resolve(undefined) : this.#session.then(() => undefined)
 
       return false
     }
@@ -226,17 +220,14 @@ export class OpenAuthentication implements Disposable {
       await writeToSessionsFile(this.settings.storedSessionPath, this.settings.key, session)
     }
 
-    this.#session = this.#session.then(() => session)
+    this.#session = this.#session === undefined ? Promise.resolve(session) : this.#session.then(() => session)
 
     return true
   }
 
-  dispose(): void {
-    this.#refreshRepeater?.abort()
-    this.#refreshRepeater = undefined
-  }
-
   async getAccessToken(): Promise<undefined | string> {
+    this.#preloadSession()
+
     const session = await this.#session
 
     if (session === undefined) {
@@ -244,7 +235,7 @@ export class OpenAuthentication implements Disposable {
     }
 
     if (Date.now() > session.accessTokenExpiresAt) {
-      this.#session = this.#session.then(() => undefined)
+      this.#session = this.#session!.then(() => undefined)
 
       return undefined
     }
@@ -281,7 +272,7 @@ async function requestAuthenticationToken(
     readonly settings: OpenAuthentication['settings']
     readonly signal?: undefined | AbortSignal
   },
-): Promise<undefined | SaxoBankApplicationOAuthSession> {
+): Promise<undefined | OAuthSession> {
   if (options.signal?.aborted) {
     return undefined
   }
@@ -332,12 +323,12 @@ export const SessionFileContent = record(
   }),
 )
 
-async function readSessionsFile(filePath: string, key: string): Promise<undefined | SaxoBankApplicationOAuthSession>
+async function readSessionsFile(filePath: string, key: string): Promise<undefined | OAuthSession>
 async function readSessionsFile(filePath: string, key?: undefined): Promise<undefined | SessionFileContent>
 async function readSessionsFile(
   filePath: string,
   key?: undefined | string,
-): Promise<undefined | SessionFileContent | SaxoBankApplicationOAuthSession> {
+): Promise<undefined | SessionFileContent | OAuthSession> {
   const fileContent = await Deno.readFile(filePath).catch((error) => {
     if (error instanceof Deno.errors.NotFound) {
       return undefined
@@ -372,7 +363,7 @@ async function readSessionsFile(
 async function writeToSessionsFile(
   filePath: string,
   key: string,
-  session: SaxoBankApplicationOAuthSession,
+  session: OAuthSession,
 ): Promise<void> {
   const existingFileContent = await readSessionsFile(filePath)
 

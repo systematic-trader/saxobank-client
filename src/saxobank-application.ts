@@ -10,6 +10,7 @@ import { ClientServices } from './service-groups/client-services.ts'
 import { Portfolio } from './service-groups/portfolio.ts'
 import { ReferenceData } from './service-groups/reference-data.ts'
 import { Trade } from './service-groups/trade.ts'
+import { Timeout } from './utils.ts'
 
 const Config = {
   Live: {
@@ -107,7 +108,9 @@ export interface SaxoBankApplicationSettings {
 
 export class SaxoBankApplication implements Disposable {
   readonly #httpClient: HTTPClient
-  readonly #oauth: OpenAuthentication
+  readonly #auth: OpenAuthentication
+
+  #refreshAuth: undefined | Timeout<void>
 
   get http(): HTTPClient {
     return this.#httpClient
@@ -201,7 +204,7 @@ export class SaxoBankApplication implements Disposable {
 
     this.#httpClient = new HTTPClient({
       headers: async () => {
-        const accessToken = await this.#oauth.getAccessToken()
+        const accessToken = await this.#auth.getAccessToken()
 
         return accessToken === undefined ? undefined : {
           'Authorization': `Bearer ${accessToken}`,
@@ -209,7 +212,7 @@ export class SaxoBankApplication implements Disposable {
       },
     })
 
-    this.#oauth = new OpenAuthentication(this.#httpClient, {
+    this.#auth = new OpenAuthentication(this.#httpClient, {
       authenticationURL,
       key,
       secret,
@@ -218,7 +221,6 @@ export class SaxoBankApplication implements Disposable {
         hostname: listenerHostname,
         port: listenerPort,
       },
-      refreshTokenTimeout: (settings.authentication?.refresh ?? true) ? Config[type].refreshTokenTimeout : undefined,
       storedSessionPath: sessionCredentialsPath === undefined
         ? undefined
         : sessionCredentialsPath[0] === '/'
@@ -230,12 +232,22 @@ export class SaxoBankApplication implements Disposable {
       },
     })
 
+    if (settings.authentication?.refresh ?? true) {
+      this.#refreshAuth = Timeout.repeat(Config[type].refreshTokenTimeout, async (signal) => {
+        try {
+          await this.#auth.refresh(signal)
+        } catch (error) {
+          this.#refreshAuth?.abort(error)
+        }
+      })
+    }
+
     const serviceGroupClient = new ServiceGroupClient({
       client: this.#httpClient,
       serviceURL,
       onError: async (error, retries) => {
         if (retries === 0 && error instanceof HTTPClientError && error.statusCode === 401) {
-          const isAuthorized = await this.#oauth.authorize()
+          const isAuthorized = await this.#auth.authorize()
 
           if (isAuthorized === true) {
             return
@@ -254,10 +266,11 @@ export class SaxoBankApplication implements Disposable {
   }
 
   [Symbol.dispose](): void {
-    this.#oauth.dispose()
+    this.dispose()
   }
 
   dispose(): void {
-    this[Symbol.dispose]()
+    this.#refreshAuth?.abort()
+    this.#refreshAuth = undefined
   }
 }
