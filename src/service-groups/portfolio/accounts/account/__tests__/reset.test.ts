@@ -3,7 +3,7 @@ import { describe, test } from '../../../../../testing.ts'
 
 describe('portfolio/accounts/account/reset', () => {
   test('response passes guard', async () => {
-    using app = SaxoBankApplication.simulation()
+    using app = new SaxoBankApplication({ type: 'Simulation' })
 
     const [account] = await app.portfolio.accounts.me.get()
     if (account === undefined) {
