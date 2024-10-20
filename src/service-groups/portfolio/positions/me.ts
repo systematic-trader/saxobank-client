@@ -9,7 +9,7 @@ export class Me {
     this.#client = client.appendPath('me')
   }
 
-  async get(): Promise<Array<PositionResponse>> {
+  async get(): Promise<ReadonlyArray<PositionResponse>> {
     const FieldGroups: PositionFieldGroup[] = [
       'Costs',
       'DisplayAndFormat',

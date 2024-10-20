@@ -105,7 +105,7 @@ const ErrorMessage = {
  * This class ensures that it is either turned into a Promise, or firstly iterated over and then becoming a promise.
  * Restrictions prevent inconsistency and undesired side effects.
  */
-export class AsyncIterablePromise<R> implements AsyncIterable<R>, Promise<readonly R[]> {
+export class AsyncIterablePromise<R> implements AsyncIterable<R>, PromiseLike<readonly R[]> {
   readonly #iterable
 
   // eslint-disable-next-line functional/prefer-readonly-type -- mutable
@@ -130,7 +130,7 @@ export class AsyncIterablePromise<R> implements AsyncIterable<R>, Promise<readon
     } else if (isIterable(iterable)) {
       this.#iterable = ensureAsyncIterable(iterable)
     } else {
-      throw new TypeError('The provided iterable must be an AsyncIterable.')
+      throw new TypeError('The provided iterable must be an Iterable or AsyncIterable.')
     }
   }
 

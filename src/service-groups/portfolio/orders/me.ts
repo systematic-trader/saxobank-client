@@ -20,7 +20,7 @@ export class Me {
      * Default is "Working" (i.e. orders related to working orders are excluded).
      */
     readonly Status?: undefined | OrderStatusFilter
-  } = {}): Promise<Array<OrderResponse>> {
+  } = {}): Promise<ReadonlyArray<OrderResponse>> {
     const FieldGroups: OrderFieldGroup[] = [
       'DisplayAndFormat',
       'ExchangeInfo',

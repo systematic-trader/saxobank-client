@@ -8,6 +8,7 @@ import {
   unknown,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { type HTTPClient, HTTPClientError, type HTTPClientOnErrorHandler } from './http-client.ts'
+import { AsyncIterablePromise } from './utils/async-iterable.ts'
 import { ensureError } from './utils/error.ts'
 import { type JSONReadonlyRecord, stringifyJSON } from './utils/json.ts'
 import { Timeout } from './utils/timeout.ts'
@@ -73,17 +74,17 @@ export class ServiceGroupClient {
     })
   }
 
-  async getPaginated<T = unknown>(options: {
+  async *#getPaginated<T = unknown>(options: {
     readonly limit?: undefined | number
     readonly path?: undefined | string
     readonly headers?: undefined | Record<string, string>
     readonly searchParams?: undefined | SearchParamsRecord
     readonly guard?: undefined | Guard<T>
     readonly timeout?: undefined | number
-  } = {}): Promise<Array<T>> {
+  }): AsyncGenerator<T, void, undefined> {
     if (typeof options.limit === 'number') {
       if (options.limit === 0) {
-        return []
+        return
       }
 
       if (Number.isSafeInteger(options.limit) === false || options.limit < 0) {
@@ -113,7 +114,7 @@ export class ServiceGroupClient {
 
     setSearchParams(url, searchParams)
 
-    return await fetchPaginatedData({
+    yield* fetchPaginatedData({
       client: this.#client,
       headers,
       url,
@@ -122,6 +123,17 @@ export class ServiceGroupClient {
       onError: this.#onError,
       timeout: options.timeout,
     })
+  }
+
+  getPaginated<T = unknown>(options: {
+    readonly limit?: undefined | number
+    readonly path?: undefined | string
+    readonly headers?: undefined | Record<string, string>
+    readonly searchParams?: undefined | SearchParamsRecord
+    readonly guard?: undefined | Guard<T>
+    readonly timeout?: undefined | number
+  } = {}): AsyncIterablePromise<T> {
+    return new AsyncIterablePromise<T>(this.#getPaginated(options))
   }
 
   async post<T = unknown>(options: {
@@ -365,7 +377,7 @@ const FetchPaginatedDataGuards = new WeakMap<
   >
 >()
 
-async function fetchPaginatedData<T = unknown>({
+async function* fetchPaginatedData<T = unknown>({
   client,
   headers,
   url,
@@ -381,9 +393,9 @@ async function fetchPaginatedData<T = unknown>({
   readonly limit?: undefined | number
   readonly onError?: HTTPClientOnErrorHandler
   readonly timeout?: undefined | number
-}): Promise<Array<T>> {
+}): AsyncGenerator<T, void, undefined> {
   if (limit !== undefined && limit <= 0) {
-    return []
+    return
   }
 
   let bodyGuard = FetchPaginatedDataGuards.get(guard) as
@@ -421,30 +433,32 @@ async function fetchPaginatedData<T = unknown>({
   timeout = timeout === undefined ? undefined : Math.max(0, timeout - (Date.now() - startTime))
 
   if (resourceBody === undefined) {
-    return []
+    return
   }
 
   const { __next, Data } = resourceBody
 
   if (__next === undefined) {
     if (limit !== undefined && Data.length > limit) {
-      return Data.slice(0, limit)
+      return yield* Data.slice(0, limit)
     }
 
-    return Data as Array<T>
+    return yield* Data
   }
 
   if (limit !== undefined) {
     if (Data.length === limit) {
-      return Data as Array<T>
+      return yield* Data
     } else if (Data.length > limit) {
-      return Data.slice(0, limit)
+      return yield* Data
     }
 
     limit -= Data.length
   }
 
-  const nextData = await fetchPaginatedData<T>({
+  yield* Data
+
+  yield* fetchPaginatedData<T>({
     client,
     headers,
     url: __next,
@@ -453,8 +467,6 @@ async function fetchPaginatedData<T = unknown>({
     timeout,
     onError,
   })
-
-  return Data.concat(nextData)
 }
 
 /**

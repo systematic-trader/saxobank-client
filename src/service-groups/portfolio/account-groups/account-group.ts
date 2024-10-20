@@ -13,7 +13,7 @@ export class AccountGroup {
   async get({ AccountGroupKey, ClientKey }: {
     readonly AccountGroupKey: string
     readonly ClientKey: string
-  }): Promise<Array<AccountGroupResponse>> {
+  }): Promise<ReadonlyArray<AccountGroupResponse>> {
     return await this.#client.getPaginated({
       path: AccountGroupKey,
       searchParams: {

@@ -13,7 +13,7 @@ export class Me {
    * Returns a list of net positions fulfilling the criteria specified by the query string parameters.
    * Each net position may include all related sub positions if fieldGroups includes SubPositions.
    */
-  async get(): Promise<Array<NetPositionResponse>> {
+  async get(): Promise<ReadonlyArray<NetPositionResponse>> {
     const FieldGroups: NetPositionFieldGroup[] = [
       'DisplayAndFormat',
       'ExchangeInfo',

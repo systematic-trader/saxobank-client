@@ -10,7 +10,7 @@ export class Me {
   }
 
   /** Returns a list of closed positions fulfilling the criteria specified by the query string parameters. */
-  async get(): Promise<Array<ClosedPositionResponse>> {
+  async get(): Promise<ReadonlyArray<ClosedPositionResponse>> {
     const FieldGroups: ClosedPositionFieldGroup[] = [
       'ClosedPosition',
       'ClosedPositionDetails',
