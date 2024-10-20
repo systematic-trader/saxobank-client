@@ -1,6 +1,6 @@
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
-import { expect, test } from '../../../testing.ts'
 import { AssetTypeValues } from '../../../types/derives/asset-type.ts'
+import { expect, test } from '../../../utils/testing.ts'
 
 test('reference-data/instruments', async ({ step }) => {
   using app = new SaxoBankApplication()

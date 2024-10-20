@@ -12,7 +12,7 @@ import {
 import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import type { TradingConditionFieldGroup } from '../../../types/derives/trading-condition-field-group.ts'
 import { CostResponse } from '../../../types/records/cost-response.ts'
-import { extractKeys } from '../../../utils.ts'
+import { extractKeys } from '../../../utils/object.ts'
 
 const CostParametersGuard = props({
   AccountKey: string(),

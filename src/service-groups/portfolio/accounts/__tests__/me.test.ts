@@ -1,5 +1,5 @@
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
-import { describe, expect, test } from '../../../../testing.ts'
+import { describe, expect, test } from '../../../../utils/testing.ts'
 
 describe('portfolio/accounts/me', () => {
   test('response passes guard', async () => {

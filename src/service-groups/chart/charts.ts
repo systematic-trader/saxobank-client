@@ -14,7 +14,7 @@ import type { ChartFieldGroupSpec } from '../../types/derives/chart-field-group-
 import { ChartRequestMode } from '../../types/derives/chart-request-mode.ts'
 import { Horizon } from '../../types/derives/horizon.ts'
 import { ChartResponse } from '../../types/records/chart-response.ts'
-import { extractKeys } from '../../utils.ts'
+import { extractKeys } from '../../utils/object.ts'
 
 const ChartsParametersModeAndTimeGuard = union([
   props({

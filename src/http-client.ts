@@ -1,5 +1,8 @@
 import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { ensureError, mergeAbortSignals, Timeout } from './utils.ts'
+import { ensureError } from './utils/error.ts'
+import { stringifyJSON } from './utils/json.ts'
+import { mergeAbortSignals } from './utils/signal.ts'
+import { Timeout } from './utils/timeout.ts'
 
 export interface HTTPClientOnErrorHandler {
   (error: Error, retries: number): void | Promise<void>
@@ -39,7 +42,7 @@ export class HTTPClientError extends HTTPError {
     }
 
     if (typeof body === 'object' && body !== null) {
-      message = `${message}\n${JSON.stringify(body, undefined, 2)}`
+      message = `${message}\n${stringifyJSON(body, undefined, 2)}`
     }
 
     super(message, statusCode, statusText)
@@ -83,7 +86,7 @@ export class HTTPServiceError extends HTTPError {
     }
 
     if (typeof body === 'object' && body !== null) {
-      message = `${message}\n${JSON.stringify(body, undefined, 2)}`
+      message = `${message}\n${stringifyJSON(body, undefined, 2)}`
     }
 
     super(message, statusCode, statusText)

@@ -1,7 +1,7 @@
 import { HTTPClientError } from '../../../http-client.ts'
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
-import { describe, expect, test } from '../../../testing.ts'
 import type { ContractOptionEntry } from '../../../types/records/contract-option-entry.ts'
+import { describe, expect, test } from '../../../utils/testing.ts'
 import type { InfoPricesParameters } from '../info-prices.ts'
 
 const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 500

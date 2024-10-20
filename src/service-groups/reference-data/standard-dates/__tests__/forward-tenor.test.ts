@@ -1,5 +1,5 @@
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
-import { expect, test } from '../../../../testing.ts'
+import { expect, test } from '../../../../utils/testing.ts'
 
 test('reference-data/standard-dates/forward-tenor', async ({ step }) => {
   using app = new SaxoBankApplication()

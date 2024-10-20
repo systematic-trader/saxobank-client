@@ -10,7 +10,7 @@ import { ClientServices } from './service-groups/client-services.ts'
 import { Portfolio } from './service-groups/portfolio.ts'
 import { ReferenceData } from './service-groups/reference-data.ts'
 import { Trade } from './service-groups/trade.ts'
-import { Timeout } from './utils.ts'
+import { Timeout } from './utils/timeout.ts'
 
 const Config = {
   Live: {

@@ -8,7 +8,10 @@ import {
   unknown,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { type HTTPClient, HTTPClientError, type HTTPClientOnErrorHandler } from './http-client.ts'
-import { ensureError, type JSONReadonlyRecord, Timeout, urlJoin } from './utils.ts'
+import { ensureError } from './utils/error.ts'
+import { type JSONReadonlyRecord, stringifyJSON } from './utils/json.ts'
+import { Timeout } from './utils/timeout.ts'
+import { urlJoin } from './utils/url.ts'
 
 type SearchParamsRecord = Record<string, undefined | boolean | number | string | ReadonlyArray<number | string>>
 
@@ -148,7 +151,7 @@ export class ServiceGroupClient {
 
     return await this.#client.postOkJSON(url, {
       headers,
-      body: JSON.stringify(options.body),
+      body: stringifyJSON(options.body),
       guard: options.guard,
       coerce: sanitize,
       onError: this.#onError,
@@ -183,7 +186,7 @@ export class ServiceGroupClient {
 
     return await this.#client.putOkJSON(url, {
       headers,
-      body: JSON.stringify(options.body),
+      body: stringifyJSON(options.body),
       guard: options.guard,
       coerce: sanitize,
       onError: this.#onError,

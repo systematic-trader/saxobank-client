@@ -10,7 +10,8 @@ import {
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import { type HTTPClient, HTTPClientError, HTTPClientRequestAbortError } from './http-client.ts'
-import { urlJoin } from './utils.ts'
+import { stringifyJSON } from './utils/json.ts'
+import { urlJoin } from './utils/url.ts'
 
 interface OAuthSession {
   readonly accessToken: string
@@ -191,7 +192,7 @@ export class OpenAuthentication {
       })
     })
 
-    const csrfTokenEncoded = btoa(JSON.stringify(assertReturn(CallbackState, { csrfToken })))
+    const csrfTokenEncoded = btoa(stringifyJSON(assertReturn(CallbackState, { csrfToken })))
 
     const authorizationURL = urlJoin(this.settings.authenticationURL, 'authorize')
 
@@ -377,7 +378,7 @@ async function writeToSessionsFile(
     },
   }
 
-  const fileContentJSON = JSON.stringify(fileContent, undefined, 2)
+  const fileContentJSON = stringifyJSON(fileContent, undefined, 2)
   await Deno.writeFile(filePath, new TextEncoder().encode(fileContentJSON))
 }
 

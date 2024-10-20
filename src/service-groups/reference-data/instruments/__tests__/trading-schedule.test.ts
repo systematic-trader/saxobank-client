@@ -1,5 +1,5 @@
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
-import { test } from '../../../../testing.ts'
+import { test } from '../../../../utils/testing.ts'
 
 const SelectedAssetTypes = [
   'Bond',

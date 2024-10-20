@@ -17,7 +17,7 @@ import type { ServiceGroupClient } from '../../service-group-client.ts'
 import { PutCall } from '../../types/derives/put-call.ts'
 import { ToOpenClose } from '../../types/derives/to-open-close.ts'
 import { InfoPriceResponse } from '../../types/records/info-price-response.ts'
-import { extractKeys } from '../../utils.ts'
+import { extractKeys } from '../../utils/object.ts'
 
 const InfoPricesBaseParameters = props({
   AssetType: enums(extractKeys(InfoPriceResponse)),

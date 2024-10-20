@@ -1,6 +1,6 @@
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
-import { test } from '../../../../testing.ts'
 import { OptionAssetTypeValues } from '../../../../types/records/option-details.ts'
+import { test } from '../../../../utils/testing.ts'
 
 test('reference-data/instruments/contractoptionspaces', async ({ step }) => {
   using app = new SaxoBankApplication()
