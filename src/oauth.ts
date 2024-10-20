@@ -126,6 +126,10 @@ export class OpenAuthentication implements Disposable {
   }
 
   async authorize(signal?: undefined | AbortSignal): Promise<boolean> {
+    if (signal?.aborted === true) {
+      return false
+    }
+
     const csrfToken = crypto.randomUUID()
 
     const callback = Promise.withResolvers<undefined | CodeResponse>()
@@ -184,14 +188,12 @@ export class OpenAuthentication implements Disposable {
       tokenURL.searchParams.set('grant_type', 'authorization_code')
       tokenURL.searchParams.set('code', response.code)
 
-      const result = await requestAuthenticationToken({
+      return await requestAuthenticationToken({
         client: this.#httpClient,
         tokenURL,
         settings: this.settings,
         signal,
       })
-
-      return result
     })
 
     const csrfTokenEncoded = btoa(JSON.stringify(assertReturn(CallbackState, { csrfToken })))
@@ -205,9 +207,15 @@ export class OpenAuthentication implements Disposable {
 
     await this.settings.authorize.handle(authorizationURL)
 
+    if ((signal?.aborted as undefined | boolean) === true) {
+      this.#session = this.#session.then(() => undefined)
+
+      return false
+    }
+
     const session = await handshakePromise
 
-    if (session === undefined) {
+    if (session === undefined || (signal?.aborted as undefined | boolean) === true) {
       this.#session = this.#session.then(() => undefined)
 
       return false
