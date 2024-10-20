@@ -1,6 +1,5 @@
-import { expect } from 'std/expect/expect.ts'
 import { SaxoBankApplication } from '../../../../saxobank-application.ts'
-import { test } from '../../../../testing.ts'
+import { expect, test } from '../../../../testing.ts'
 
 test('reference-data/standard-dates/forward-tenor', async ({ step }) => {
   using app = new SaxoBankApplication()

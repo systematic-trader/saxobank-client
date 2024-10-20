@@ -1,4 +1,5 @@
-import { decode } from 'https://deno.land/x/djwt@v3.0.2/mod.ts'
+import { decode } from 'jsr:@zaubrik/djwt@^3.0.2'
+
 import {
   assertReturn,
   type GuardType,

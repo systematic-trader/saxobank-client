@@ -1,5 +1,5 @@
-export { expect } from 'std/expect/mod.ts'
-export { describe, test } from 'std/testing/bdd.ts'
+export { expect } from 'jsr:@std/expect'
+export { describe, test } from 'jsr:@std/testing/bdd'
 
 import { Timeout } from './utils.ts'
 

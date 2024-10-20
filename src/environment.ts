@@ -1,4 +1,4 @@
-import { load } from 'https://deno.land/std@0.224.0/dotenv/mod.ts'
+import { load } from 'jsr:@std/dotenv@0.225.2'
 
 export const Environment: Record<string, string | undefined> = Deno.env.toObject()
 
