@@ -235,7 +235,9 @@ export class SaxoBankApplication implements Disposable {
       serviceURL,
       onError: async (error, retries) => {
         if (retries === 0 && error instanceof HTTPClientError && error.statusCode === 401) {
-          if (await this.#oauth.authorize()) {
+          const isAuthorized = await this.#oauth.authorize()
+
+          if (isAuthorized === true) {
             return
           }
         }
