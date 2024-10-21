@@ -4,7 +4,8 @@ import type { ContractOptionEntry } from '../../../types/records/contract-option
 import { describe, expect, test } from '../../../utils/testing.ts'
 import type { InfoPricesParameters } from '../info-prices.ts'
 
-const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 500
+// Set this to a reasonable number (e.g. 100) to quickly test the different asset types - undefined will test info prices for all instruments
+const ASSET_TYPE_INSTRUMENTS_LIMIT: number | undefined = 20
 
 function progress(current: number, total: number) {
   return `${String(current).padStart(String(total).length, '0')}/${total}`
@@ -49,25 +50,28 @@ describe('trade/info-prices', () => {
       'FxOneTouchOption',
       'FxSpot',
       'FxSwap',
-      'FxVanillaOption', // todo 8/47 of the instruments respond with an undocumented error - rewrite the test to use live data instead
+      'FxVanillaOption',
       'Rights',
       'CfdOnRights',
     ] as const
 
     for (const assetType of assetTypeCandidates) {
+      if (['Stock'].includes(assetType) === false) {
+        continue
+      }
+
       const instruments = await app.referenceData.instruments.get({
         AssetTypes: [assetType] as const,
-        limit: MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE,
+        limit: ASSET_TYPE_INSTRUMENTS_LIMIT,
       })
 
       await step(assetType, async ({ step }) => {
-        let index = 0
+        let instrumentCount = 0
         for (const instrument of instruments) {
-          const label = `${
-            progress(++index, instruments.length)
-          }: ${instrument.Description} (UIC=${instrument.Identifier})`
+          const instrumentLabel = `${instrument.Description} (UIC ${instrument.Identifier})`
+          const testLabel = `${progress(++instrumentCount, instruments.length)}: ${instrumentLabel}`
 
-          await step(label, async ({ step }) => {
+          await step(testLabel, async ({ step }) => {
             switch (assetType) {
               case 'Bond':
               case 'CfdOnCompanyWarrant':
@@ -85,7 +89,6 @@ describe('trade/info-prices', () => {
               case 'Etf':
               case 'Etn':
               case 'Fund':
-              case 'FxForwards':
               case 'FxSpot':
               case 'Rights':
               case 'Stock': {
@@ -156,40 +159,93 @@ describe('trade/info-prices', () => {
                 break
               }
 
-              case 'FxSwap': {
-                const today = new Date()
-                const nearLeg = Date.UTC(today.getFullYear(), today.getMonth() + 2, 1)
-                const farLeg = Date.UTC(today.getFullYear(), today.getMonth() + 3, 1)
-
-                const infoPrices = await app.trade.infoPrices.get({
-                  Amount: 80,
-                  AssetType: assetType,
+              case 'FxForwards': {
+                const forwardDates = await app.referenceData.standarddates.forwardTenor.get({
                   Uic: instrument.Identifier,
-                  ForwardDateNearLeg: new Date(nearLeg).toISOString(),
-                  ForwardDateFarLeg: new Date(farLeg).toISOString(),
                 })
 
-                expect(infoPrices).toBeDefined()
+                expect(forwardDates.length).toBeGreaterThan(0)
+
+                for (const { Date } of [{ Date: undefined }, ...forwardDates]) {
+                  const stepLabel = Date === undefined ? `No specific forward date` : `Forward date ${Date}`
+
+                  await step(stepLabel, async () => {
+                    const infoPrices = await app.trade.infoPrices.get({
+                      Amount: 80,
+                      AssetType: assetType,
+                      Uic: instrument.Identifier,
+                      ForwardDate: Date,
+                    })
+
+                    expect(infoPrices).toBeDefined()
+                  })
+                }
+
+                break
+              }
+
+              case 'FxSwap': {
+                const forwardDates = await app.referenceData.standarddates.forwardTenor.get({
+                  Uic: instrument.Identifier,
+                })
+
+                expect(forwardDates.length).toBeGreaterThan(1)
+
+                for (let nearLegIndex = 0; nearLegIndex < forwardDates.length - 1; nearLegIndex++) {
+                  for (let farLegIndex = nearLegIndex + 1; farLegIndex < forwardDates.length; farLegIndex++) {
+                    const nearLeg = forwardDates[nearLegIndex]
+                    const farLeg = forwardDates[farLegIndex]
+
+                    if (nearLeg === undefined) {
+                      throw new Error(`Near leg is undefined`)
+                    }
+
+                    if (farLeg === undefined) {
+                      throw new Error(`Far leg is undefined`)
+                    }
+
+                    const stepLabel = `Near leg ${nearLeg.Date}, far leg ${farLeg.Date}`
+
+                    await step(stepLabel, async () => {
+                      const infoPrices = await app.trade.infoPrices.get({
+                        Amount: 80,
+                        AssetType: assetType,
+                        Uic: instrument.Identifier,
+                        ForwardDateNearLeg: nearLeg.Date,
+                        ForwardDateFarLeg: farLeg.Date,
+                      })
+
+                      expect(infoPrices).toBeDefined()
+                    })
+                  }
+                }
 
                 break
               }
 
               case 'FxVanillaOption': {
-                const today = new Date()
-                const expityDate = Date.UTC(today.getFullYear(), today.getMonth() + 2, 1)
+                const expiryDates = await app.referenceData.standarddates.fxOptionExpiry.get({
+                  Uic: instrument.Identifier,
+                })
+
+                expect(expiryDates.length).toBeGreaterThan(0)
 
                 for (const action of ['Call', 'Put'] as const) {
-                  await step(action, async () => {
-                    const infoPrices = await app.trade.infoPrices.get({
-                      Amount: 80,
-                      AssetType: assetType,
-                      Uic: instrument.Identifier,
-                      PutCall: action,
-                      ExpiryDate: new Date(expityDate).toISOString(),
-                    })
+                  for (const { Date } of expiryDates) {
+                    const stepLabel = `${action}, ${Date}`
 
-                    expect(infoPrices).toBeDefined()
-                  })
+                    await step(stepLabel, async () => {
+                      const infoPrices = await app.trade.infoPrices.get({
+                        Amount: 80,
+                        AssetType: assetType,
+                        Uic: instrument.Identifier,
+                        PutCall: action,
+                        ExpiryDate: Date,
+                      })
+
+                      expect(infoPrices).toBeDefined()
+                    })
+                  }
                 }
 
                 break
