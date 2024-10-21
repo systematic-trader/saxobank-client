@@ -1,4 +1,4 @@
-import { HTTPClientError } from '../../../http-client.ts'
+import { HTTPClientError } from '../../../clients/http-client.ts'
 import { SaxoBankApplication } from '../../../saxobank-application.ts'
 import type { ContractOptionEntry } from '../../../types/records/contract-option-entry.ts'
 import { describe, expect, test } from '../../../utils/testing.ts'

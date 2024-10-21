@@ -1,7 +1,7 @@
 import { assertReturn } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
 import type { AssetType } from '../../../types/derives/asset-type.ts'
 
-import { HTTPClientError } from '../../../http-client.ts'
+import { HTTPClientError } from '../../../clients/http-client.ts'
 import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import {
   InstrumentDetailsBond,

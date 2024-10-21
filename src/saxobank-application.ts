@@ -1,7 +1,7 @@
 import { open } from 'https://deno.land/x/open@v0.0.6/index.ts'
 import * as path from 'jsr:@std/path'
 
-import { HTTPClient, HTTPClientError } from './http-client.ts'
+import { HTTPClient, HTTPClientError } from './clients/http-client.ts'
 import { OpenAuthentication } from './oauth.ts'
 import { ServiceGroupClient } from './service-group-client.ts'
 import { Chart } from './service-groups/chart.ts'

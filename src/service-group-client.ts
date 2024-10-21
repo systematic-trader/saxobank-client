@@ -7,7 +7,7 @@ import {
   string,
   unknown,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { type HTTPClient, HTTPClientError, type HTTPClientOnErrorHandler } from './http-client.ts'
+import { type HTTPClient, HTTPClientError, type HTTPClientOnErrorHandler } from './clients/http-client.ts'
 import { AsyncIterablePromise } from './utils/async-iterable.ts'
 import { ensureError } from './utils/error.ts'
 import { type JSONReadonlyRecord, stringifyJSON } from './utils/json.ts'

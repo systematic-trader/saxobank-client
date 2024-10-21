@@ -1,4 +1,4 @@
-import { HTTPClientError } from '../../../http-client.ts'
+import { HTTPClientError } from '../../../clients/http-client.ts'
 import type { ServiceGroupClient } from '../../../service-group-client.ts'
 import type { OptionSpaceSegment } from '../../../types/derives/option-space-segment.ts'
 import type { TradingStatus } from '../../../types/derives/trading-status.ts'

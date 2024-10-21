@@ -9,7 +9,7 @@ import {
   record,
   string,
 } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { type HTTPClient, HTTPClientError, HTTPClientRequestAbortError } from './http-client.ts'
+import { type HTTPClient, HTTPClientError, HTTPClientRequestAbortError } from './clients/http-client.ts'
 import { stringifyJSON } from './utils/json.ts'
 import { urlJoin } from './utils/url.ts'
 

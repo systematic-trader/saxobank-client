@@ -1,8 +1,8 @@
 import { assertReturn, type Guard } from 'https://raw.githubusercontent.com/systematic-trader/type-guard/main/mod.ts'
-import { ensureError } from './utils/error.ts'
-import { stringifyJSON } from './utils/json.ts'
-import { mergeAbortSignals } from './utils/signal.ts'
-import { Timeout } from './utils/timeout.ts'
+import { ensureError } from '../utils/error.ts'
+import { stringifyJSON } from '../utils/json.ts'
+import { mergeAbortSignals } from '../utils/signal.ts'
+import { Timeout } from '../utils/timeout.ts'
 
 export interface HTTPClientOnErrorHandler {
   (error: Error, retries: number): void | Promise<void>
