@@ -7,7 +7,7 @@ import type { InfoPricesParameters } from '../info-prices.ts'
 // todo write some tests that result in errors (e.g. wrong side of market + wrong duration etc)
 // todo test long/short
 
-const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 20
+const MAXIMUM_INSTRUMENTS_PER_ASSET_TYPE = 1
 
 function roundPrice(price: number, tickSize: number): number {
   const rounded = Math.round(price / tickSize) * tickSize
@@ -16,15 +16,17 @@ function roundPrice(price: number, tickSize: number): number {
 
 // todo use TickSizeScheme
 // todo refactor this to a function that returns both order type and adjusted price, based on a tolerance
-async function findSuiteablePrice({ app, assetType, uic }: {
+async function findSuiteablePrice({ app, assetType, uic, forwardDate }: {
   readonly app: SaxoBankApplication
   readonly assetType: keyof InfoPricesParameters
   readonly uic: number
   readonly delta?: undefined | number
+  readonly forwardDate?: undefined | string
 }) {
   const infoPrice = await app.trade.infoPrices.get({
     AssetType: assetType,
     Uic: uic,
+    ForwardDate: forwardDate,
   })
 
   const bid = infoPrice.Quote.Bid
@@ -633,6 +635,7 @@ describe('trade/orders', () => {
       // todo 'StockOption',
     ] as const
 
+    // todo remove this
     const whitelist = new Set<typeof assetTypesToTest[number]>(['FxForwards'])
 
     for (const assetType of assetTypesToTest) {
@@ -739,13 +742,16 @@ describe('trade/orders', () => {
 
             for (const instrument of instrumentsToTest) {
               await step(`${instrument.Description} (UIC ${instrument.Uic})`, async () => {
-                // sleep 12 seconds // todo remove this
-                await new Promise((resolve) => setTimeout(resolve, 12_000))
+                // todo find a way to remove this (repeated trade on auto quote)
+                await new Promise((resolve) => setTimeout(resolve, 2000))
+
+                const forwardDate = '2024-11-14'
 
                 const price = await findSuiteablePrice({
                   app,
                   assetType: 'FxForwards',
                   uic: instrument.Uic,
+                  forwardDate,
                 })
 
                 const [instrumentDetails] = await app.referenceData.instruments.details.get({
@@ -768,8 +774,8 @@ describe('trade/orders', () => {
                   ManualOrder: false,
                   ExternalReference: crypto.randomUUID(),
                   OrderType: 'Limit',
-                  OrderPrice: price.adjust('ask', 10, 'limit'),
-                  ForwardDate: '2024-11-01', // todo
+                  OrderPrice: price.adjust('ask', 20, 'limit'),
+                  ForwardDate: forwardDate,
                   OrderDuration: {
                     DurationType: 'ImmediateOrCancel',
                   },
@@ -778,6 +784,7 @@ describe('trade/orders', () => {
                 expect(placeOrderResponse).toBeDefined()
               })
 
+              // todo only do this every few orders to speed things up
               await resetAccount()
             }
 
