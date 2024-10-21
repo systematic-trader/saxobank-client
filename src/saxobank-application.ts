@@ -1,7 +1,6 @@
 import { open } from 'https://deno.land/x/open@v0.0.6/index.ts'
 import * as path from 'jsr:@std/path'
 
-import { Environment } from './environment.ts'
 import { HTTPClient, HTTPClientError } from './http-client.ts'
 import { OpenAuthentication } from './oauth.ts'
 import { ServiceGroupClient } from './service-group-client.ts'
@@ -10,6 +9,7 @@ import { ClientServices } from './service-groups/client-services.ts'
 import { Portfolio } from './service-groups/portfolio.ts'
 import { ReferenceData } from './service-groups/reference-data.ts'
 import { Trade } from './service-groups/trade.ts'
+import { Environment } from './utils/environment.ts'
 import { Timeout } from './utils/timeout.ts'
 
 const Config = {
