@@ -10,12 +10,17 @@ export class ForwardTenor {
   }
 
   async get(
-    { Uic, AccountKey }: { readonly Uic: number | string; readonly AccountKey: string },
+    { Uic, AccountKey }: {
+      readonly Uic: number | string
+      readonly AccountKey?: undefined | string
+    },
   ): Promise<ReadonlyArray<StandardDate>> {
     try {
       return await this.#client.getPaginated({
         path: String(Uic),
-        searchParams: { AccountKey: String(AccountKey) },
+        searchParams: {
+          AccountKey: AccountKey === undefined ? undefined : String(AccountKey),
+        },
         guard: StandardDate,
       })
     } catch (error) {
